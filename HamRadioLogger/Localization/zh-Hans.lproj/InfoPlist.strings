@@ -1,0 +1,12 @@
+/* 
+  InfoPlist.strings (Chinese Simplified)
+  HamRadioLogger
+  
+  用于本地化 Info.plist 中的字符串
+*/
+
+// 应用显示名称
+"CFBundleDisplayName" = "通联日志";
+
+// 权限描述
+"NSDocumentsFolderUsageDescription" = "需要访问文档文件夹以导入和导出日志文件"; 

@@ -1,0 +1,427 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 70;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1A1A1A1A1A1A1A1A1A1A1A1A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2A2A2A2A2A2A2A2A2A2A2A /* ContentView.swift */; };
+		1B1B1B1B1B1B1B1B1B1B1B1B /* HamRadioLoggerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B2B2B2B2B2B2B2B2B2B2B2B /* HamRadioLoggerApp.swift */; };
+		1C1C1C1C1C1C1C1C1C1C1C1C /* QSORecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C2C2C2C2C2C2C2C2C2C2C2C /* QSORecord.swift */; };
+		1D1D1D1D1D1D1D1D1D1D1D1D /* QSORecordEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D2D2D2D2D2D2D2D2D2D2D2D /* QSORecordEntity.swift */; };
+		1E1E1E1E1E1E1E1E1E1E1E1E /* HamRadioLoggerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E2E2E2E2E2E2E2E2E2E2E2E /* HamRadioLoggerModel.swift */; };
+		1F1F1F1F1F1F1F1F1F1F1F1F /* QSORecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F2F2F2F2F2F2F2F2F2F2F2F /* QSORecordView.swift */; };
+		1G1G1G1G1G1G1G1G1G1G1G1G /* LogQueryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2G2G2G2G2G2G2G2G2G2G2G2G /* LogQueryView.swift */; };
+		1H1H1H1H1H1H1H1H1H1H1H1H /* EditQSOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2H2H2H2H2H2H2H2H2H2H2H2H /* EditQSOView.swift */; };
+		1I1I1I1I1I1I1I1I1I1I1I1I /* LogImportExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2I2I2I2I2I2I2I2I2I2I2I2I /* LogImportExportView.swift */; };
+		1J1J1J1J1J1J1J1J1J1J1J1J /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2J2J2J2J2J2J2J2J2J2J2J2J /* Assets.xcassets */; };
+		1K1K1K1K1K1K1K1K1K1K1K1K /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2K2K2K2K2K2K2K2K2K2K2K2K /* Preview Assets.xcassets */; };
+		D935FFB72E5FF72A00359E84 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D935FFB62E5FF72A00359E84 /* AboutView.swift */; };
+		D9E529AB2E32838C00B01B99 /* QTHManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E529AA2E32838C00B01B99 /* QTHManager.swift */; };
+		D9E529AD2E32897400B01B99 /* EnhancedMapLocationPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E529AC2E32897400B01B99 /* EnhancedMapLocationPicker.swift */; };
+		D9E529BB2E33B9A000B01B99 /* KeyboardToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E529BA2E33B9A000B01B99 /* KeyboardToolbar.swift */; };
+		D9E529BD2E33D64C00B01B99 /* TimezoneSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E529BC2E33D64C00B01B99 /* TimezoneSettingsView.swift */; };
+		D9E529BF2E33D67000B01B99 /* TimezoneManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E529BE2E33D67000B01B99 /* TimezoneManager.swift */; };
+		D9E529C12E34B5ED00B01B99 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = D9E529C02E34B5ED00B01B99 /* logo.png */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		2A2A2A2A2A2A2A2A2A2A2A2A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		2B2B2B2B2B2B2B2B2B2B2B2B /* HamRadioLoggerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HamRadioLoggerApp.swift; sourceTree = "<group>"; };
+		2C2C2C2C2C2C2C2C2C2C2C2C /* QSORecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QSORecord.swift; sourceTree = "<group>"; };
+		2D2D2D2D2D2D2D2D2D2D2D2D /* QSORecordEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QSORecordEntity.swift; sourceTree = "<group>"; };
+		2E2E2E2E2E2E2E2E2E2E2E2E /* HamRadioLoggerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HamRadioLoggerModel.swift; sourceTree = "<group>"; };
+		2F2F2F2F2F2F2F2F2F2F2F2F /* QSORecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QSORecordView.swift; sourceTree = "<group>"; };
+		2G2G2G2G2G2G2G2G2G2G2G2G /* LogQueryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogQueryView.swift; sourceTree = "<group>"; };
+		2H2H2H2H2H2H2H2H2H2H2H2H /* EditQSOView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditQSOView.swift; sourceTree = "<group>"; };
+		2I2I2I2I2I2I2I2I2I2I2I2I /* LogImportExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogImportExportView.swift; sourceTree = "<group>"; };
+		2J2J2J2J2J2J2J2J2J2J2J2J /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		2K2K2K2K2K2K2K2K2K2K2K2K /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		2L2L2L2L2L2L2L2L2L2L2L2L /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2M2M2M2M2M2M2M2M2M2M2M2M /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		3A3A3A3A3A3A3A3A3A3A3A3A /* HamRadioLogger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HamRadioLogger.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D935FFB62E5FF72A00359E84 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		D9E529AA2E32838C00B01B99 /* QTHManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QTHManager.swift; sourceTree = "<group>"; };
+		D9E529AC2E32897400B01B99 /* EnhancedMapLocationPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnhancedMapLocationPicker.swift; sourceTree = "<group>"; };
+		D9E529BA2E33B9A000B01B99 /* KeyboardToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardToolbar.swift; sourceTree = "<group>"; };
+		D9E529BC2E33D64C00B01B99 /* TimezoneSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimezoneSettingsView.swift; sourceTree = "<group>"; };
+		D9E529BE2E33D67000B01B99 /* TimezoneManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimezoneManager.swift; sourceTree = "<group>"; };
+		D9E529C02E34B5ED00B01B99 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		D90FA78D2E31007C00E6F966 /* Localization */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Localization; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4A4A4A4A4A4A4A4A4A4A4A4A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		5A5A5A5A5A5A5A5A5A5A5A5A = {
+			isa = PBXGroup;
+			children = (
+				2M2M2M2M2M2M2M2M2M2M2M2M /* README.md */,
+				5B5B5B5B5B5B5B5B5B5B5B5B /* HamRadioLogger */,
+				5C5C5C5C5C5C5C5C5C5C5C5C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		5B5B5B5B5B5B5B5B5B5B5B5B /* HamRadioLogger */ = {
+			isa = PBXGroup;
+			children = (
+				2B2B2B2B2B2B2B2B2B2B2B2B /* HamRadioLoggerApp.swift */,
+				5D5D5D5D5D5D5D5D5D5D5D5D /* Views */,
+				5E5E5E5E5E5E5E5E5E5E5E5E /* Models */,
+				D90FA78D2E31007C00E6F966 /* Localization */,
+				2J2J2J2J2J2J2J2J2J2J2J2J /* Assets.xcassets */,
+				D9E529C02E34B5ED00B01B99 /* logo.png */,
+				2L2L2L2L2L2L2L2L2L2L2L2L /* Info.plist */,
+				5F5F5F5F5F5F5F5F5F5F5F5F /* Preview Content */,
+			);
+			path = HamRadioLogger;
+			sourceTree = "<group>";
+		};
+		5C5C5C5C5C5C5C5C5C5C5C5C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3A3A3A3A3A3A3A3A3A3A3A3A /* HamRadioLogger.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5D5D5D5D5D5D5D5D5D5D5D5D /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D935FFB62E5FF72A00359E84 /* AboutView.swift */,
+				D9E529BC2E33D64C00B01B99 /* TimezoneSettingsView.swift */,
+				D9E529BA2E33B9A000B01B99 /* KeyboardToolbar.swift */,
+				D9E529AC2E32897400B01B99 /* EnhancedMapLocationPicker.swift */,
+				2F2F2F2F2F2F2F2F2F2F2F2F /* QSORecordView.swift */,
+				2G2G2G2G2G2G2G2G2G2G2G2G /* LogQueryView.swift */,
+				2H2H2H2H2H2H2H2H2H2H2H2H /* EditQSOView.swift */,
+				2I2I2I2I2I2I2I2I2I2I2I2I /* LogImportExportView.swift */,
+				2A2A2A2A2A2A2A2A2A2A2A2A /* ContentView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		5E5E5E5E5E5E5E5E5E5E5E5E /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				D9E529BE2E33D67000B01B99 /* TimezoneManager.swift */,
+				D9E529AA2E32838C00B01B99 /* QTHManager.swift */,
+				2C2C2C2C2C2C2C2C2C2C2C2C /* QSORecord.swift */,
+				2D2D2D2D2D2D2D2D2D2D2D2D /* QSORecordEntity.swift */,
+				2E2E2E2E2E2E2E2E2E2E2E2E /* HamRadioLoggerModel.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		5F5F5F5F5F5F5F5F5F5F5F5F /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				2K2K2K2K2K2K2K2K2K2K2K2K /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6A6A6A6A6A6A6A6A6A6A6A6A /* HamRadioLogger */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6B6B6B6B6B6B6B6B6B6B6B6B /* Build configuration list for PBXNativeTarget "HamRadioLogger" */;
+			buildPhases = (
+				6C6C6C6C6C6C6C6C6C6C6C6C /* Sources */,
+				4A4A4A4A4A4A4A4A4A4A4A4A /* Frameworks */,
+				6D6D6D6D6D6D6D6D6D6D6D6D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				D90FA78D2E31007C00E6F966 /* Localization */,
+			);
+			name = HamRadioLogger;
+			productName = HamRadioLogger;
+			productReference = 3A3A3A3A3A3A3A3A3A3A3A3A /* HamRadioLogger.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7A7A7A7A7A7A7A7A7A7A7A7A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastSwiftUpdateCheck = 1300;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					6A6A6A6A6A6A6A6A6A6A6A6A = {
+						CreatedOnToolsVersion = 13.0;
+					};
+				};
+			};
+			buildConfigurationList = 7B7B7B7B7B7B7B7B7B7B7B7B /* Build configuration list for PBXProject "HamRadioLogger" */;
+			compatibilityVersion = "Xcode 12.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				"zh-Hans",
+			);
+			mainGroup = 5A5A5A5A5A5A5A5A5A5A5A5A;
+			productRefGroup = 5C5C5C5C5C5C5C5C5C5C5C5C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6A6A6A6A6A6A6A6A6A6A6A6A /* HamRadioLogger */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6D6D6D6D6D6D6D6D6D6D6D6D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1K1K1K1K1K1K1K1K1K1K1K1K /* Preview Assets.xcassets in Resources */,
+				D9E529C12E34B5ED00B01B99 /* logo.png in Resources */,
+				1J1J1J1J1J1J1J1J1J1J1J1J /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6C6C6C6C6C6C6C6C6C6C6C6C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D935FFB72E5FF72A00359E84 /* AboutView.swift in Sources */,
+				D9E529AD2E32897400B01B99 /* EnhancedMapLocationPicker.swift in Sources */,
+				1A1A1A1A1A1A1A1A1A1A1A1A /* ContentView.swift in Sources */,
+				D9E529BD2E33D64C00B01B99 /* TimezoneSettingsView.swift in Sources */,
+				1B1B1B1B1B1B1B1B1B1B1B1B /* HamRadioLoggerApp.swift in Sources */,
+				1C1C1C1C1C1C1C1C1C1C1C1C /* QSORecord.swift in Sources */,
+				D9E529BF2E33D67000B01B99 /* TimezoneManager.swift in Sources */,
+				D9E529AB2E32838C00B01B99 /* QTHManager.swift in Sources */,
+				1D1D1D1D1D1D1D1D1D1D1D1D /* QSORecordEntity.swift in Sources */,
+				1E1E1E1E1E1E1E1E1E1E1E1E /* HamRadioLoggerModel.swift in Sources */,
+				1F1F1F1F1F1F1F1F1F1F1F1F /* QSORecordView.swift in Sources */,
+				1G1G1G1G1G1G1G1G1G1G1G1G /* LogQueryView.swift in Sources */,
+				1H1H1H1H1H1H1H1H1H1H1H1H /* EditQSOView.swift in Sources */,
+				D9E529BB2E33B9A000B01B99 /* KeyboardToolbar.swift in Sources */,
+				1I1I1I1I1I1I1I1I1I1I1I1I /* LogImportExportView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		8A8A8A8A8A8A8A8A8A8A8A8A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		8B8B8B8B8B8B8B8B8B8B8B8B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		8C8C8C8C8C8C8C8C8C8C8C8C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"HamRadioLogger/Preview Content\"";
+				DEVELOPMENT_TEAM = 938YYDD5ZL;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = HamRadioLogger/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.shadowmov.HamRadioLogger;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		8D8D8D8D8D8D8D8D8D8D8D8D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"HamRadioLogger/Preview Content\"";
+				DEVELOPMENT_TEAM = 938YYDD5ZL;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = HamRadioLogger/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.shadowmov.HamRadioLogger;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6B6B6B6B6B6B6B6B6B6B6B6B /* Build configuration list for PBXNativeTarget "HamRadioLogger" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8C8C8C8C8C8C8C8C8C8C8C8C /* Debug */,
+				8D8D8D8D8D8D8D8D8D8D8D8D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7B7B7B7B7B7B7B7B7B7B7B7B /* Build configuration list for PBXProject "HamRadioLogger" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8A8A8A8A8A8A8A8A8A8A8A8A /* Debug */,
+				8B8B8B8B8B8B8B8B8B8B8B8B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 7A7A7A7A7A7A7A7A7A7A7A7A /* Project object */;
+}

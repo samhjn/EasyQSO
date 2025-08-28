@@ -1,0 +1,12 @@
+/* 
+  InfoPlist.strings (English)
+  HamRadioLogger
+  
+  For localizing Info.plist strings
+*/
+
+// App display name
+"CFBundleDisplayName" = "EasyQSO";
+
+// Permission descriptions
+"NSDocumentsFolderUsageDescription" = "Access to the Documents folder is needed to import and export log files"; 

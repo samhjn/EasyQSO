@@ -1,0 +1,163 @@
+/* 
+  Localizable.strings (Chinese Simplified)
+  HamRadioLogger
+  
+  中文本地化字符串文件
+*/
+
+// MARK: - 主要标签页
+"record_qso" = "记录QSO";
+"query_log" = "查询日志";
+"import_export" = "导入导出";
+
+// MARK: - 表单段落标题
+"basic_info" = "基本信息";
+"signal_report" = "信号报告";
+"technical_info" = "技术信息";
+"own_qth_info" = "己方QTH信息";
+"qth_info" = "对方QTH信息";
+"additional_info" = "附加信息";
+"data_management" = "数据管理";
+"export_log" = "导出日志";
+"import_log" = "导入日志";
+
+// MARK: - 字段标签
+"callsign" = "通联呼号";
+"date_time" = "时间";
+"band" = "波段";
+"mode" = "模式";
+"frequency" = "频率 (MHz)";
+"rx_frequency" = "接收频率 (MHz)";
+"tx_power" = "发射功率";
+"rst_sent" = "发出的RST";
+"rst_received" = "接收的RST";
+"name" = "姓名";
+"qth" = "位置描述";
+"own_qth" = "己方位置";
+"grid_square" = "网格信息";
+"cq_zone" = "CQ Zone";
+"itu_zone" = "ITU Zone";
+"satellite" = "卫星信息";
+"remarks" = "备注";
+
+// MARK: - 地图和位置选择
+"select_location" = "选择位置";
+"select_on_map" = "在地图上选择";
+"location_name" = "位置名称";
+"coordinates" = "坐标";
+"latitude" = "纬度";
+"longitude" = "经度";
+"grid_coordinate" = "网格坐标";
+"click_map_to_select" = "点击地图选择位置";
+"selected_location_info" = "选中的位置信息";
+
+// MARK: - 按钮
+"save_qso" = "保存QSO记录";
+"save_changes" = "保存更改";
+"export_all" = "导出所有记录";
+"import_from_adif" = "从ADIF文件导入";
+"import_from_csv" = "从CSV文件导入";
+"delete" = "删除";
+"cancel" = "取消";
+"confirm" = "确定";
+
+// MARK: - 键盘工具栏
+"previous" = "上一项";
+"next" = "下一项";
+"done" = "完成";
+
+// MARK: - 搜索和显示
+"search_placeholder" = "搜索呼号、波段、模式等";
+"record_count" = "共有 %d 条记录";
+"operator" = "操作员";
+"export_format" = "导出格式";
+"current_record_count" = "当前记录数: %d";
+
+// MARK: - 导航标题
+"edit_qso" = "编辑QSO";
+
+// MARK: - 验证和错误消息
+"validation_error" = "验证错误";
+"callsign_empty" = "呼号不能为空";
+"callsign_invalid" = "呼号格式不正确，应包含字母和/或数字";
+"frequency_invalid" = "频率格式不正确，应为有效数字且在合理范围内";
+"grid_square_invalid" = "网格坐标格式不正确，应为 AB12cd 格式";
+"cq_zone_invalid" = "CQ Zone 应为 1-40 之间的数字";
+"itu_zone_invalid" = "ITU Zone 应为 1-90 之间的数字";
+
+// MARK: - 成功消息
+"qso_saved" = "QSO已保存";
+"qso_saved_message" = "通联记录已成功保存";
+"save_success" = "保存成功";
+"qso_updated" = "QSO记录已更新";
+"delete_success" = "删除成功";
+"delete_success_message" = "通联记录已成功删除";
+"export_success" = "导出成功";
+"export_success_message" = "日志已导出到 %@";
+"import_success" = "导入成功";
+"import_success_message" = "成功导入 %d 条记录";
+
+// MARK: - 失败消息
+"save_failed" = "保存失败";
+"save_failed_message" = "保存QSO记录失败: %@";
+"delete_failed" = "删除失败";
+"delete_failed_message" = "删除记录时出错: %@";
+"export_failed" = "导出失败";
+"import_failed" = "导入失败";
+"cannot_access_documents" = "无法访问文档目录";
+"cannot_read_file" = "无法读取文件";
+"csv_format_incorrect" = "CSV文件格式不正确或为空";
+"cannot_get_existing_records" = "无法获取现有记录";
+
+// MARK: - 删除确认
+"delete_record" = "删除记录";
+"delete_confirm_message" = "确定要删除与 %@ 的通联记录吗？";
+
+// MARK: - 应用信息
+"app_display_name" = "业余无线电通联日志";
+"documents_folder_usage" = "需要访问文档文件夹以导入和导出日志文件";
+
+// MARK: - 进阶功能字符串
+"import_success_with_duplicates" = "成功导入 %d 条记录（重复记录已自动跳过）";
+
+// MARK: - 时区设置
+"export_timezone" = "导出时区";
+"import_timezone" = "导入时区";
+"timezone_settings" = "CSV时区设置";
+"export_tab" = "CSV导出";
+"import_tab" = "CSV导入";
+"notes" = "说明";
+"timezone_note_local" = "• 应用内始终使用本地时间显示";
+"timezone_note_adif" = "• ADIF文件始终使用UTC时间";
+"timezone_note_csv" = "• CSV文件支持自定义时区";
+"timezone_note_conversion" = "• 时间会在导入导出时自动转换";
+"timezone_note_adif_ignore" = "• ADIF文件忽略这些设置，始终使用UTC";
+"export_timezone_desc" = "选择导出CSV文件时使用的时区";
+"import_timezone_desc" = "选择导入CSV文件时假设的时区";
+"local_time" = "本地时间";
+"adif_uses_utc" = "ADIF格式按标准使用UTC时间";
+"csv_timezone_only" = "仅适用于CSV文件。ADIF文件始终使用UTC。";
+
+// MARK: - 关于和许可证
+"about" = "关于";
+"license" = "许可证";
+"license_type" = "许可证类型";
+"gpl_v3" = "GNU通用公共许可证v3.0";
+"license_description" = "本软件基于GPL v3.0发布，这意味着：";
+"license_freedom_use" = "• 您可以自由使用本软件";
+"license_freedom_modify" = "• 您可以自由修改本软件";
+"license_freedom_distribute" = "• 您可以自由分发本软件";
+"license_terms_apply" = "• 但必须遵循GPL v3.0的条款";
+"copyright" = "版权声明";
+"copyright_notice" = "本软件是自由软件，遵循GPL v3.0许可证。";
+"view_full_license" = "查看完整GPL v3.0许可证";
+"view_source_code" = "查看源代码";
+"report_issue" = "报告问题";
+"software_introduction" = "软件简介";
+"software_description" = "EasyQSO是一个专为业余无线电爱好者设计的通联日志记录软件。它提供了完整的QSO记录管理功能，包括记录、查询、导入导出等特性。";
+"open_source_license" = "开源许可证";
+"version" = "版本";
+"welcome_gpl_notice" = "欢迎使用EasyQSO！本软件基于GNU通用公共许可证v3.0发布。点击\"了解GPL许可证\"查看详细信息。";
+"welcome_title" = "欢迎使用 EasyQSO";
+"learn_gpl_license" = "了解GPL许可证";
+"view_later" = "稍后查看";

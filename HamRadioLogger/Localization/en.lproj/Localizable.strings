@@ -1,0 +1,163 @@
+/* 
+  Localizable.strings (English)
+  HamRadioLogger
+  
+  English localization strings file
+*/
+
+// MARK: - Main Tabs
+"record_qso" = "Record QSO";
+"query_log" = "Query Log";
+"import_export" = "Import/Export";
+
+// MARK: - Form Section Headers
+"basic_info" = "Basic Information";
+"signal_report" = "Signal Report";
+"technical_info" = "Technical Information";
+"own_qth_info" = "Own QTH Information";
+"qth_info" = "QTH Information";
+"additional_info" = "Additional Information";
+"data_management" = "Data Management";
+"export_log" = "Export Log";
+"import_log" = "Import Log";
+
+// MARK: - Field Labels
+"callsign" = "Callsign";
+"date_time" = "Date and Time";
+"band" = "Band";
+"mode" = "Mode";
+"frequency" = "Frequency (MHz)";
+"rx_frequency" = "RX Frequency (MHz)";
+"tx_power" = "TX Power";
+"rst_sent" = "RST Sent";
+"rst_received" = "RST Received";
+"name" = "Name";
+"qth" = "QTH Description";
+"own_qth" = "Own QTH";
+"grid_square" = "Grid Square";
+"cq_zone" = "CQ Zone";
+"itu_zone" = "ITU Zone";
+"satellite" = "Satellite";
+"remarks" = "Remarks";
+
+// MARK: - Map and Location Selection
+"select_location" = "Select Location";
+"select_on_map" = "Select on Map";
+"location_name" = "Location Name";
+"coordinates" = "Coordinates";
+"latitude" = "Latitude";
+"longitude" = "Longitude";
+"grid_coordinate" = "Grid Coordinate";
+"click_map_to_select" = "Click map to select location";
+"selected_location_info" = "Selected Location Info";
+
+// MARK: - Buttons
+"save_qso" = "Save QSO Record";
+"save_changes" = "Save Changes";
+"export_all" = "Export All Records";
+"import_from_adif" = "Import from ADIF File";
+"import_from_csv" = "Import from CSV File";
+"delete" = "Delete";
+"cancel" = "Cancel";
+"confirm" = "OK";
+
+// MARK: - Keyboard Toolbar
+"previous" = "Previous";
+"next" = "Next";
+"done" = "Done";
+
+// MARK: - Search and Display
+"search_placeholder" = "Search callsign, band, mode, etc.";
+"record_count" = "Total %d records";
+"operator" = "Operator";
+"export_format" = "Export Format";
+"current_record_count" = "Current record count: %d";
+
+// MARK: - Navigation Titles
+"edit_qso" = "Edit QSO";
+
+// MARK: - Validation and Error Messages
+"validation_error" = "Validation Error";
+"callsign_empty" = "Callsign cannot be empty";
+"callsign_invalid" = "Invalid callsign format, should contain letters and/or numbers";
+"frequency_invalid" = "Invalid frequency format, should be a valid number within reasonable range";
+"grid_square_invalid" = "Invalid grid square format, should be AB12cd format";
+"cq_zone_invalid" = "CQ Zone should be a number between 1-40";
+"itu_zone_invalid" = "ITU Zone should be a number between 1-90";
+
+// MARK: - Success Messages
+"qso_saved" = "QSO Saved";
+"qso_saved_message" = "QSO record saved successfully";
+"save_success" = "Save Successful";
+"qso_updated" = "QSO record updated";
+"delete_success" = "Delete Successful";
+"delete_success_message" = "QSO record deleted successfully";
+"export_success" = "Export Successful";
+"export_success_message" = "Log exported to %@";
+"import_success" = "Import Successful";
+"import_success_message" = "Successfully imported %d records";
+
+// MARK: - Failure Messages
+"save_failed" = "Save Failed";
+"save_failed_message" = "Failed to save QSO record: %@";
+"delete_failed" = "Delete Failed";
+"delete_failed_message" = "Error deleting record: %@";
+"export_failed" = "Export Failed";
+"import_failed" = "Import Failed";
+"cannot_access_documents" = "Cannot access documents directory";
+"cannot_read_file" = "Cannot read file";
+"csv_format_incorrect" = "CSV file format incorrect or empty";
+"cannot_get_existing_records" = "Cannot get existing records";
+
+// MARK: - Delete Confirmation
+"delete_record" = "Delete Record";
+"delete_confirm_message" = "Are you sure you want to delete the QSO record with %@?";
+
+// MARK: - App Information
+"app_display_name" = "Ham Radio Logger";
+"documents_folder_usage" = "Access to the Documents folder is needed to import and export log files";
+
+// MARK: - Advanced Feature Strings
+"import_success_with_duplicates" = "Successfully imported %d records (duplicate records were automatically skipped)";
+
+// MARK: - Timezone Settings
+"export_timezone" = "Export Timezone";
+"import_timezone" = "Import Timezone";
+"timezone_settings" = "CSV Timezone Settings";
+"export_tab" = "CSV Export";
+"import_tab" = "CSV Import";
+"notes" = "Notes";
+"timezone_note_local" = "• App always displays local time";
+"timezone_note_adif" = "• ADIF files always use UTC time";
+"timezone_note_csv" = "• CSV files support custom timezone";
+"timezone_note_conversion" = "• Time converted automatically during import/export";
+"timezone_note_adif_ignore" = "• ADIF files ignore these settings and always use UTC";
+"export_timezone_desc" = "Select timezone for exporting CSV files";
+"import_timezone_desc" = "Select assumed timezone for importing CSV files";
+"local_time" = "Local Time";
+"adif_uses_utc" = "ADIF format uses UTC time as per standard";
+"csv_timezone_only" = "Only applies to CSV files. ADIF files always use UTC.";
+
+// MARK: - About and License
+"about" = "About";
+"license" = "License";
+"license_type" = "License Type";
+"gpl_v3" = "GNU General Public License v3.0";
+"license_description" = "This software is released under GPL v3.0, which means:";
+"license_freedom_use" = "• You can freely use this software";
+"license_freedom_modify" = "• You can freely modify this software";
+"license_freedom_distribute" = "• You can freely distribute this software";
+"license_terms_apply" = "• But you must follow the terms of GPL v3.0";
+"copyright" = "Copyright";
+"copyright_notice" = "This software is free software under GPL v3.0 license.";
+"view_full_license" = "View Full GPL v3.0 License";
+"view_source_code" = "View Source Code";
+"report_issue" = "Report Issue";
+"software_introduction" = "Software Introduction";
+"software_description" = "EasyQSO is a QSO logging application designed for amateur radio enthusiasts. It provides comprehensive QSO record management features including recording, querying, import/export and more.";
+"open_source_license" = "Open Source License";
+"version" = "Version";
+"welcome_gpl_notice" = "Welcome to EasyQSO! This software is released under GNU General Public License v3.0. Click \"Learn about GPL License\" to view detailed information.";
+"welcome_title" = "Welcome to EasyQSO";
+"learn_gpl_license" = "Learn about GPL License";
+"view_later" = "View Later";
