@@ -259,18 +259,15 @@ struct QSORecordView: View {
         .toolbar {
             KeyboardToolbar(focusedField: $focusedField)
         }
-        .alert(isPresented: $showingAlert) {
-            Alert(
-                title: Text(alertTitle),
-                message: Text(alertMessage),
-                dismissButton: .default(Text("OK")) {
-                    // 只有成功保存QSO后才清除字段
-                    if !isValidationError {
-                        clearFields()
-                    }
+        .background(
+            EmptyView()
+                .alert(isPresented: $showingAlert) {
+                    Alert(
+                        title: Text(alertTitle),
+                        message: Text(alertMessage)
+                    )
                 }
-            )
-        }
+        )
         .fullScreenCover(isPresented: $showingMapPicker) {
             EnhancedMapLocationPicker(
                 selectedLocation: $selectedLocation,
@@ -288,6 +285,19 @@ struct QSORecordView: View {
                 editMode: .ownQTH
             )
             .id(UUID())
+        }
+        .onChange(of: showingAlert) { isShowing in
+            if isShowing {
+                // 所有弹窗自动关闭
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                    showingAlert = false
+                    
+                    // 只有成功保存QSO后才清除字段
+                    if !isValidationError {
+                        clearFields()
+                    }
+                }
+            }
         }
         .onAppear {
             // 延迟加载己方QTH信息，避免在视图初始化时触发状态更新

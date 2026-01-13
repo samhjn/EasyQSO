@@ -287,8 +287,7 @@ struct EditQSOView: View {
         .alert(isPresented: $showingAlert) {
             Alert(
                 title: Text(alertTitle),
-                message: Text(alertMessage),
-                dismissButton: .default(Text("OK"))
+                message: Text(alertMessage)
             )
         }
         .fullScreenCover(isPresented: $showingMapPicker) {
