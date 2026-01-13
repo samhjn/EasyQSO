@@ -21,7 +21,6 @@ import CoreData
 
 struct ContentView: View {
     @State private var selectedTab = 0
-    @State private var tabViewID = UUID()
     @State private var showingGPLAlert = false
     @Environment(\.managedObjectContext) private var viewContext
     
@@ -53,14 +52,6 @@ struct ContentView: View {
                     .tag(3)
             }
             .accentColor(.blue)
-            // 使用组合ID确保每个Tab视图是独立的
-            .id(tabViewID)
-            .onChange(of: selectedTab) { newValue in
-                // 当切换到查询日志标签时，强制刷新TabView
-                if newValue == 1 {
-                    tabViewID = UUID()
-                }
-            }
         }
         .navigationViewStyle(StackNavigationViewStyle())
         .onAppear {

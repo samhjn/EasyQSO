@@ -188,9 +188,13 @@ struct EditQSOView: View {
                         .focused($focusedField, equals: .ownQTH)
                     
                     Button(LocalizedStrings.selectOnMap.localized) {
-                        ownMapPickerID = UUID()
-                        isMapPickerActive = true
-                        showingOwnMapPicker = true
+                        // 关闭键盘后再打开地图选择器
+                        focusedField = nil
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            ownMapPickerID = UUID()
+                            isMapPickerActive = true
+                            showingOwnMapPicker = true
+                        }
                     }
                     .font(.caption)
                     .foregroundColor(.blue)
@@ -219,9 +223,13 @@ struct EditQSOView: View {
                         .focused($focusedField, equals: .qth)
                     
                     Button(LocalizedStrings.selectOnMap.localized) {
-                        mapPickerID = UUID()
-                        isMapPickerActive = true
-                        showingMapPicker = true
+                        // 关闭键盘后再打开地图选择器
+                        focusedField = nil
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            mapPickerID = UUID()
+                            isMapPickerActive = true
+                            showingMapPicker = true
+                        }
                     }
                     .font(.caption)
                     .foregroundColor(.blue)
@@ -251,16 +259,25 @@ struct EditQSOView: View {
             }
             
             Section {
-                Button(LocalizedStrings.saveChanges.localized) {
-                    if validateInputs() {
-                        updateQSO()
+                Button(action: {
+                    // 先关闭键盘
+                    focusedField = nil
+                    // 延迟一小会儿再执行保存，确保键盘已关闭
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        if validateInputs() {
+                            updateQSO()
+                        }
                     }
+                }) {
+                    Text(LocalizedStrings.saveChanges.localized)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
                 }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(10)
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
             }
         }
         .navigationTitle(LocalizedStrings.editQSO.localized)
@@ -270,7 +287,8 @@ struct EditQSOView: View {
         .alert(isPresented: $showingAlert) {
             Alert(
                 title: Text(alertTitle),
-                message: Text(alertMessage)
+                message: Text(alertMessage),
+                dismissButton: .default(Text("OK"))
             )
         }
         .fullScreenCover(isPresented: $showingMapPicker) {

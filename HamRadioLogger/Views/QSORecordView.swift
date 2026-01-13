@@ -142,16 +142,20 @@ struct QSORecordView: View {
                 
                 // 己方QTH信息段落
                 Section(header: Text(LocalizedStrings.ownQthInfo.localized)) {
-                                    HStack {
-                    TextField(LocalizedStrings.ownQth.localized, text: $ownQTH)
-                        .focused($focusedField, equals: .ownQTH)
-                    
-                    Button(LocalizedStrings.selectOnMap.localized) {
-                        showingOwnMapPicker = true
+                    HStack {
+                        TextField(LocalizedStrings.ownQth.localized, text: $ownQTH)
+                            .focused($focusedField, equals: .ownQTH)
+                        
+                        Button(LocalizedStrings.selectOnMap.localized) {
+                            // 关闭键盘后再打开地图选择器
+                            focusedField = nil
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                showingOwnMapPicker = true
+                            }
+                        }
+                        .font(.caption)
+                        .foregroundColor(.blue)
                     }
-                    .font(.caption)
-                    .foregroundColor(.blue)
-                }
                     
                     TextField(LocalizedStrings.gridSquare.localized, text: $ownGridSquare)
                         .focused($focusedField, equals: .ownGridSquare)
@@ -171,16 +175,20 @@ struct QSORecordView: View {
                 
                 // 对方QTH信息段落
                 Section(header: Text(LocalizedStrings.qthInfo.localized)) {
-                                    HStack {
-                    TextField(LocalizedStrings.qth.localized, text: $qth)
-                        .focused($focusedField, equals: .qth)
-                    
-                    Button(LocalizedStrings.selectOnMap.localized) {
-                        showingMapPicker = true
+                    HStack {
+                        TextField(LocalizedStrings.qth.localized, text: $qth)
+                            .focused($focusedField, equals: .qth)
+                        
+                        Button(LocalizedStrings.selectOnMap.localized) {
+                            // 关闭键盘后再打开地图选择器
+                            focusedField = nil
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                showingMapPicker = true
+                            }
+                        }
+                        .font(.caption)
+                        .foregroundColor(.blue)
                     }
-                    .font(.caption)
-                    .foregroundColor(.blue)
-                }
                     
                     TextField(LocalizedStrings.gridSquare.localized, text: $gridSquare)
                         .focused($focusedField, equals: .gridSquare)
@@ -214,16 +222,23 @@ struct QSORecordView: View {
             VStack {
                 Spacer()
                 
-                Button(LocalizedStrings.saveQSO.localized) {
-                    if validateInputs() {
-                        saveQSO()
+                Button(action: {
+                    // 先关闭键盘
+                    focusedField = nil
+                    // 延迟一小会儿再执行保存，确保键盘已关闭
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        if validateInputs() {
+                            saveQSO()
+                        }
                     }
+                }) {
+                    Text(LocalizedStrings.saveQSO.localized)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
                 }
-                .frame(maxWidth: .infinity)
-                .frame(height: 50)
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(12)
                 .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
                 .padding(.horizontal, 16)
                 .padding(.bottom, 8)
@@ -237,20 +252,25 @@ struct QSORecordView: View {
                     .frame(height: 100)
                 )
             }
+            // 让悬浮按钮可以响应点击，不被下层视图拦截
+            .allowsHitTesting(true)
         }
         .navigationTitle(LocalizedStrings.recordQSO.localized)
         .toolbar {
             KeyboardToolbar(focusedField: $focusedField)
         }
-        .background(
-            EmptyView()
-                .alert(isPresented: $showingAlert) {
-                    Alert(
-                        title: Text(alertTitle),
-                        message: Text(alertMessage)
-                    )
+        .alert(isPresented: $showingAlert) {
+            Alert(
+                title: Text(alertTitle),
+                message: Text(alertMessage),
+                dismissButton: .default(Text("OK")) {
+                    // 只有成功保存QSO后才清除字段
+                    if !isValidationError {
+                        clearFields()
+                    }
                 }
-        )
+            )
+        }
         .fullScreenCover(isPresented: $showingMapPicker) {
             EnhancedMapLocationPicker(
                 selectedLocation: $selectedLocation,
@@ -268,19 +288,6 @@ struct QSORecordView: View {
                 editMode: .ownQTH
             )
             .id(UUID())
-        }
-        .onChange(of: showingAlert) { isShowing in
-            if isShowing {
-                // 所有弹窗自动关闭
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-                    showingAlert = false
-                    
-                    // 只有成功保存QSO后才清除字段
-                    if !isValidationError {
-                        clearFields()
-                    }
-                }
-            }
         }
         .onAppear {
             // 延迟加载己方QTH信息，避免在视图初始化时触发状态更新
