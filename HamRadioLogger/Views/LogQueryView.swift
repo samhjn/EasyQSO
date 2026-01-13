@@ -19,6 +19,12 @@
 import SwiftUI
 import CoreData
 
+// 删除确认的标识结构
+struct DeleteConfirmation: Identifiable {
+    let id: NSManagedObjectID
+    let callsign: String
+}
+
 // 自定义搜索栏视图
 struct CustomSearchBar: View {
     @Binding var text: String
@@ -52,21 +58,17 @@ struct LogQueryView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \QSORecord.date, ascending: false)],
-        animation: .default)
+        animation: nil)
     private var qsoRecords: FetchedResults<QSORecord>
     
     @State private var searchText = ""
-    @State private var showingDeleteAlert = false
-    @State private var recordToDelete: QSORecord?
+    @State private var deleteConfirmation: DeleteConfirmation?
     @State private var selectedRecord: QSORecord?
     
     // 添加一个用于显示一般警告的状态和属性
     @State private var showingAlert = false
     @State private var alertTitle = ""
     @State private var alertMessage = ""
-    
-    // 添加一个状态变量用于强制刷新视图
-    @State private var refreshID = UUID()
     
     var filteredRecords: [QSORecord] {
         if searchText.isEmpty {
@@ -90,24 +92,23 @@ struct LogQueryView: View {
             
             // 列表
             List {
-                ForEach(filteredRecords, id: \.self) { record in
+                ForEach(filteredRecords) { record in
                     NavigationLink {
                         EditQSOView(record: record)
                     } label: {
                         QSOLogRow(record: record)
                     }
-                    .swipeActions(edge: .trailing) {
-                        Button(role: .destructive) {
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        Button {
                             print("滑动删除按钮: \(record.callsign)")
-                            recordToDelete = record
-                            showingDeleteAlert = true
+                            deleteConfirmation = DeleteConfirmation(id: record.objectID, callsign: record.callsign)
                         } label: {
                             Label(LocalizedStrings.delete.localized, systemImage: "trash")
                         }
+                        .tint(.red)
                     }
                 }
             }
-            .id(refreshID) // 使用refreshID强制刷新列表
             
             Text(String(format: LocalizedStrings.recordCount.localized, filteredRecords.count))
                 .font(.caption)
@@ -116,19 +117,15 @@ struct LogQueryView: View {
         }
         .navigationTitle(LocalizedStrings.queryLog.localized)
         // 删除确认对话框
-        .alert(isPresented: $showingDeleteAlert) {
+        .alert(item: $deleteConfirmation) { confirmation in
             Alert(
                 title: Text(LocalizedStrings.deleteRecord.localized),
-                message: Text(String(format: LocalizedStrings.deleteConfirmMessage.localized, recordToDelete?.callsign ?? "")),
+                message: Text(String(format: LocalizedStrings.deleteConfirmMessage.localized, confirmation.callsign)),
                 primaryButton: .destructive(Text(LocalizedStrings.delete.localized)) {
-                    if let recordToDelete = recordToDelete {
-                        print("确认删除: \(recordToDelete.callsign)")
-                        deleteRecord(recordToDelete)
-                    }
+                    print("确认删除: \(confirmation.callsign)")
+                    deleteRecordByID(confirmation.id)
                 },
-                secondaryButton: .cancel(Text(LocalizedStrings.cancel.localized)) {
-                    self.recordToDelete = nil
-                }
+                secondaryButton: .cancel(Text(LocalizedStrings.cancel.localized))
             )
         }
         // 操作结果对话框
@@ -144,10 +141,19 @@ struct LogQueryView: View {
         )
     }
     
-    private func deleteRecord(_ record: QSORecord) {
-        print("开始删除记录: \(record.callsign)")
+    private func deleteRecordByID(_ objectID: NSManagedObjectID) {
+        print("开始删除记录: \(objectID)")
         
-        // 直接从视图上下文中删除记录
+        // 从objectID获取记录对象
+        guard let record = try? viewContext.existingObject(with: objectID) as? QSORecord else {
+            print("无法找到要删除的记录")
+            return
+        }
+        
+        let callsign = record.callsign
+        print("准备删除: \(callsign)")
+        
+        // 从视图上下文中删除记录
         viewContext.delete(record)
         
         // 保存上下文
@@ -159,16 +165,6 @@ struct LogQueryView: View {
             alertTitle = LocalizedStrings.deleteSuccess.localized
             alertMessage = LocalizedStrings.deleteSuccessMessage.localized
             showingAlert = true
-            
-            // 清除记录引用
-            self.recordToDelete = nil
-            
-            // 强制刷新视图
-            self.refreshID = UUID()
-            print("视图已刷新，ID: \(refreshID)")
-            
-            // 强制刷新FetchRequest
-            qsoRecords.nsPredicate = nil
         } catch {
             print("删除记录失败: \(error)")
             // 显示删除失败的警告

@@ -126,6 +126,12 @@ public class QSORecord: NSManagedObject {
     }
 }
 
+extension QSORecord: Identifiable {
+    public var id: NSManagedObjectID {
+        return self.objectID
+    }
+}
+
 extension QSORecord {
     // 创建一个用于获取所有QSO记录的请求
     @nonobjc public class func fetchRequest() -> NSFetchRequest<QSORecord> {
