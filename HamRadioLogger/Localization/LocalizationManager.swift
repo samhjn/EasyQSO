@@ -56,6 +56,7 @@ struct LocalizedStrings {
     static let recordQSO = "record_qso"
     static let queryLog = "query_log"
     static let importExport = "import_export"
+    static let settings = "settings"
     
     // MARK: - 表单段落标题
     static let basicInfo = "basic_info"

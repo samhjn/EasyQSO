@@ -9,6 +9,7 @@
 "record_qso" = "记录QSO";
 "query_log" = "查询日志";
 "import_export" = "导入导出";
+"settings" = "设置";
 
 // MARK: - 表单段落标题
 "basic_info" = "基本信息";

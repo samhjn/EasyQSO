@@ -9,6 +9,7 @@
 "record_qso" = "Record QSO";
 "query_log" = "Query Log";
 "import_export" = "Import/Export";
+"settings" = "Settings";
 
 // MARK: - Form Section Headers
 "basic_info" = "Basic Information";

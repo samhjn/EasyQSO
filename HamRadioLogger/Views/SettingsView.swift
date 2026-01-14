@@ -16,53 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// DEPRECATED: 此文件已被弃用，功能已合并到 SettingsView.swift
-// DEPRECATED: This file is deprecated, functionality has been merged into SettingsView.swift
-
 import SwiftUI
 import UniformTypeIdentifiers
 import CoreData
 import MobileCoreServices
 import UIKit
 
-// 文档选择器代理
-class DocumentPickerDelegate: NSObject, UIDocumentPickerDelegate, ObservableObject {
-    @Published var importedFileURL: URL?
-    var importHandler: ((Data) -> Void)?
-    var viewContext: NSManagedObjectContext?
-    
-    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-        guard let url = urls.first else { return }
-        
-        importedFileURL = url
-        
-        // 获取安全作用域资源的访问权限
-        let accessing = url.startAccessingSecurityScopedResource()
-        defer {
-            if accessing {
-                url.stopAccessingSecurityScopedResource()
-            }
-        }
-        
-        do {
-            let data = try Data(contentsOf: url)
-            importHandler?(data)
-        } catch {
-            print("Error reading file: \(error)")
-        }
-    }
-}
-
-// 文档交互控制器代理
-class DocumentInteractionDelegate: NSObject, UIDocumentInteractionControllerDelegate {
-    var presentationController: UIViewController?
-    
-    func documentInteractionControllerViewControllerForPreview(_ controller: UIDocumentInteractionController) -> UIViewController {
-        return presentationController!
-    }
-}
-
-struct LogImportExportView: View {
+struct SettingsView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \QSORecord.date, ascending: false)],
@@ -86,100 +46,184 @@ struct LogImportExportView: View {
     let exportFormats = ["ADIF", "CSV"]
     
     var body: some View {
-        Form {
-                Section(header: Text(LocalizedStrings.exportLog.localized)) {
-                    Picker(LocalizedStrings.exportFormat.localized, selection: $exportFormat) {
-                        ForEach(exportFormats, id: \.self) {
-                            Text($0)
+        NavigationView {
+            Form {
+                // ===== 导入导出部分 =====
+                Section(header: Text(LocalizedStrings.importExport.localized)) {
+                    // 导出日志
+                    Group {
+                        Text(LocalizedStrings.exportLog.localized)
+                            .font(.headline)
+                            .padding(.top, 8)
+                        
+                        Picker(LocalizedStrings.exportFormat.localized, selection: $exportFormat) {
+                            ForEach(exportFormats, id: \.self) {
+                                Text($0)
+                            }
                         }
+                        
+                        // 只有CSV格式才显示时区选择
+                        if exportFormat == "CSV" {
+                            HStack {
+                                Text(LocalizedStrings.exportTimezone.localized)
+                                Spacer()
+                                Text(exportTimezone.displayName)
+                                    .foregroundColor(.secondary)
+                            }
+                            .onTapGesture {
+                                timezoneSettingsInitialTab = 0  // 导出选项卡
+                                showingTimezoneSettings = true
+                            }
+                        }
+                        
+                        // 对ADIF格式显示UTC说明
+                        if exportFormat == "ADIF" {
+                            Text(LocalizedStrings.adifUsesUtc.localized)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Button(LocalizedStrings.exportAll.localized) {
+                            exportLogs()
+                        }
+                        .disabled(qsoRecords.isEmpty)
                     }
                     
-                    // 只有CSV格式才显示时区选择
-                    if exportFormat == "CSV" {
+                    // 导入日志
+                    Group {
+                        Text(LocalizedStrings.importLog.localized)
+                            .font(.headline)
+                            .padding(.top, 16)
+                        
                         HStack {
-                            Text(LocalizedStrings.exportTimezone.localized)
+                            Text(LocalizedStrings.importTimezone.localized)
                             Spacer()
-                            Text(exportTimezone.displayName)
+                            Text(importTimezone.displayName)
                                 .foregroundColor(.secondary)
                         }
                         .onTapGesture {
-                            timezoneSettingsInitialTab = 0  // 导出选项卡
+                            timezoneSettingsInitialTab = 1  // 导入选项卡
                             showingTimezoneSettings = true
+                        }
+                        
+                        Text(LocalizedStrings.csvTimezoneOnly.localized)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        
+                        Button(LocalizedStrings.importFromADIF.localized) {
+                            if #available(iOS 15.0, *) {
+                                showingImportPicker = true
+                            } else {
+                                presentLegacyDocumentPicker(fileType: "adi")
+                            }
+                        }
+                        
+                        Button(LocalizedStrings.importFromCSV.localized) {
+                            if #available(iOS 15.0, *) {
+                                showingImportPicker = true
+                            } else {
+                                presentLegacyDocumentPicker(fileType: "csv")
+                            }
                         }
                     }
                     
-                    // 对ADIF格式显示UTC说明
-                    if exportFormat == "ADIF" {
-                        Text(LocalizedStrings.adifUsesUtc.localized)
+                    // 数据管理
+                    Group {
+                        Text(LocalizedStrings.dataManagement.localized)
+                            .font(.headline)
+                            .padding(.top, 16)
+                        
+                        Text(String(format: LocalizedStrings.currentRecordCount.localized, qsoRecords.count))
+                            .foregroundColor(.secondary)
+                    }
+                }
+                
+                // ===== 关于部分 =====
+                Section(header: Text(LocalizedStrings.about.localized)) {
+                    // 应用信息
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Image("logo")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 50, height: 50)
+                                .cornerRadius(10)
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("EasyQSO")
+                                    .font(.headline)
+                                Text("\(LocalizedStrings.version.localized) 1.0.0")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        
+                        Text(LocalizedStrings.softwareDescription.localized)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.vertical, 8)
+                    
+                    // 许可证信息
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text(LocalizedStrings.license.localized)
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                            Spacer()
+                            Text("GPL v3")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Text(LocalizedStrings.licenseDescription.localized)
+                            .font(.caption)
+                            .fontWeight(.medium)
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(LocalizedStrings.licenseFreedomUse.localized)
+                            Text(LocalizedStrings.licenseFreedomModify.localized)
+                            Text(LocalizedStrings.licenseFreedomDistribute.localized)
+                            Text(LocalizedStrings.licenseTermsApply.localized)
+                        }
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    }
+                    .padding(.vertical, 8)
+                    
+                    // 版权信息
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(LocalizedStrings.copyright.localized)
+                            .font(.caption)
+                            .fontWeight(.medium)
+                        Text("Copyright © 2025 ShadowMov")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
+                    .padding(.vertical, 4)
                     
-                    Button(LocalizedStrings.exportAll.localized) {
-                        exportLogs()
-                    }
-                    .disabled(qsoRecords.isEmpty)
-                }
-                
-                Section(header: Text(LocalizedStrings.importLog.localized)) {
-                    HStack {
-                        Text(LocalizedStrings.importTimezone.localized)
-                        Spacer()
-                        Text(importTimezone.displayName)
-                            .foregroundColor(.secondary)
-                    }
-                    .onTapGesture {
-                        timezoneSettingsInitialTab = 1  // 导入选项卡
-                        showingTimezoneSettings = true
-                    }
-                    
-                    Text(LocalizedStrings.csvTimezoneOnly.localized)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    Button(LocalizedStrings.importFromADIF.localized) {
-                        if #available(iOS 15.0, *) {
-                            showingImportPicker = true
-                        } else {
-                            presentLegacyDocumentPicker(fileType: "adi")
-                        }
-                    }
-                    
-                    Button(LocalizedStrings.importFromCSV.localized) {
-                        if #available(iOS 15.0, *) {
-                            showingImportPicker = true
-                        } else {
-                            presentLegacyDocumentPicker(fileType: "csv")
-                        }
-                    }
-                }
-                
-                Section(header: Text(LocalizedStrings.dataManagement.localized)) {
-                    Text(String(format: LocalizedStrings.currentRecordCount.localized, qsoRecords.count))
-                        .foregroundColor(.secondary)
-                }
-                
-                Section(header: Text(LocalizedStrings.about.localized)) {
-                    HStack {
-                        Text(LocalizedStrings.license.localized)
-                        Spacer()
-                        Text("GPL v3")
-                            .foregroundColor(.secondary)
-                    }
-                    
-                    Text(LocalizedStrings.licenseDescription.localized)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
+                    // 操作按钮
                     Button(LocalizedStrings.viewFullLicense.localized) {
                         if let url = URL(string: "https://www.gnu.org/licenses/gpl-3.0.html") {
                             UIApplication.shared.open(url)
                         }
                     }
-                    .font(.caption)
+                    
+                    Button(LocalizedStrings.viewSourceCode.localized) {
+                        if let url = URL(string: "https://github.com/samhjn/EasyQSO") {
+                            UIApplication.shared.open(url)
+                        }
+                    }
+                    
+                    Button(LocalizedStrings.reportIssue.localized) {
+                        if let url = URL(string: "https://github.com/samhjn/EasyQSO/issues") {
+                            UIApplication.shared.open(url)
+                        }
+                    }
                 }
             }
-            .navigationTitle(LocalizedStrings.importExport.localized)
+            .navigationTitle(LocalizedStrings.settings.localized)
             .fileExporter(
                 isPresented: $isExporting,
                 document: LogExportDocument(
@@ -263,6 +307,7 @@ struct LogImportExportView: View {
                     }
                 }
             }
+        }
     }
     
     private func exportLogs() {
@@ -611,37 +656,9 @@ struct LogImportExportView: View {
     }
 }
 
-// 自定义文件类型
-extension UTType {
-    static var adifType: UTType {
-        UTType(exportedAs: "com.hamradio.adif")
-    }
-    static var csvType: UTType {
-        UTType(importedAs: "public.comma-separated-values-text")
-    }
-}
-
-// 导出文档
-struct LogExportDocument: FileDocument {
-    var data: Data
-    var format: String
-    
-    static var readableContentTypes: [UTType] { [.adifType, .csvType] }
-    
-    init(data: Data, format: String) {
-        self.data = data
-        self.format = format
-    }
-    
-    init(configuration: ReadConfiguration) throws {
-        guard let data = configuration.file.regularFileContents else {
-            throw CocoaError(.fileReadCorruptFile)
-        }
-        self.data = data
-        self.format = "ADIF"
-    }
-    
-    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
-        return FileWrapper(regularFileWithContents: data)
+struct SettingsView_Previews: PreviewProvider {
+    static var previews: some View {
+        SettingsView()
+            .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }

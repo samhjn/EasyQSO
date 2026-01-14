@@ -39,17 +39,11 @@ struct ContentView: View {
                     }
                     .tag(1)
                 
-                LogImportExportView()
+                SettingsView()
                     .tabItem {
-                        Label(LocalizedStrings.importExport.localized, systemImage: "arrow.up.arrow.down")
+                        Label(LocalizedStrings.settings.localized, systemImage: "gearshape")
                     }
                     .tag(2)
-                
-                AboutView()
-                    .tabItem {
-                        Label(LocalizedStrings.about.localized, systemImage: "info.circle")
-                    }
-                    .tag(3)
             }
             .accentColor(.blue)
         }
@@ -64,7 +58,7 @@ struct ContentView: View {
         }
         .alert(LocalizedStrings.welcomeTitle.localized, isPresented: $showingGPLAlert) {
             Button(LocalizedStrings.learnGplLicense.localized) {
-                selectedTab = 3 // 切换到关于标签页
+                selectedTab = 2 // 切换到设置标签页
                 UserDefaults.standard.set(true, forKey: "hasShownGPLAlert")
             }
             Button(LocalizedStrings.viewLater.localized) {

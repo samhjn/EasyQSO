@@ -16,6 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// DEPRECATED: 此文件已被弃用，功能已合并到 SettingsView.swift
+// DEPRECATED: This file is deprecated, functionality has been merged into SettingsView.swift
+
 import SwiftUI
 
 struct AboutView: View {
