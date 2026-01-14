@@ -70,11 +70,23 @@ struct LogQueryView: View {
     @State private var alertTitle = ""
     @State private var alertMessage = ""
     
+    // 高级筛选相关状态
+    @State private var showingAdvancedFilter = false
+    @State private var filterCriteria = FilterCriteria()
+    
     var filteredRecords: [QSORecord] {
+        let records = Array(qsoRecords)
+        
+        // 如果有高级筛选条件，优先使用高级筛选
+        if filterCriteria.hasActiveFilters {
+            return filterCriteria.apply(to: records)
+        }
+        
+        // 否则使用简单搜索
         if searchText.isEmpty {
-            return Array(qsoRecords)
+            return records
         } else {
-            return qsoRecords.filter { record in
+            return records.filter { record in
                 record.callsign.localizedCaseInsensitiveContains(searchText) ||
                 record.band.localizedCaseInsensitiveContains(searchText) ||
                 record.mode.localizedCaseInsensitiveContains(searchText) ||
@@ -84,11 +96,71 @@ struct LogQueryView: View {
         }
     }
     
+    var availableBands: [String] {
+        Array(qsoRecords).uniqueBands()
+    }
+    
+    var availableModes: [String] {
+        Array(qsoRecords).uniqueModes()
+    }
+    
     var body: some View {
         VStack(spacing: 0) {
-            // 自定义搜索栏
-            CustomSearchBar(text: $searchText, placeholder: LocalizedStrings.searchPlaceholder.localized)
-                .padding(.vertical, 8)
+            // 搜索栏和筛选按钮
+            HStack(spacing: 12) {
+                CustomSearchBar(text: $searchText, placeholder: LocalizedStrings.searchPlaceholder.localized)
+                
+                // 高级筛选按钮
+                Button(action: {
+                    showingAdvancedFilter = true
+                }) {
+                    ZStack {
+                        Image(systemName: "line.3.horizontal.decrease.circle")
+                            .font(.title2)
+                            .foregroundColor(filterCriteria.hasActiveFilters ? .blue : .gray)
+                        
+                        // 显示活动筛选指示器
+                        if filterCriteria.hasActiveFilters {
+                            Circle()
+                                .fill(Color.red)
+                                .frame(width: 8, height: 8)
+                                .offset(x: 10, y: -10)
+                        }
+                    }
+                }
+                .padding(.trailing, 12)
+            }
+            .padding(.vertical, 8)
+            
+            // 筛选条件提示
+            if filterCriteria.hasActiveFilters {
+                HStack {
+                    Text(LocalizedStrings.activeFilters.localized)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        filterCriteria.reset()
+                        searchText = ""
+                    }) {
+                        Text(LocalizedStrings.clearAll.localized)
+                            .font(.caption)
+                            .foregroundColor(.blue)
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 4)
+                
+                ScrollView(.horizontal, showsIndicators: false) {
+                    Text(filterCriteria.getDescription())
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal)
+                        .padding(.bottom, 4)
+                }
+            }
             
             // 列表
             List {
@@ -116,6 +188,13 @@ struct LogQueryView: View {
                 .padding(.bottom, 8)
         }
         .navigationTitle(LocalizedStrings.queryLog.localized)
+        .sheet(isPresented: $showingAdvancedFilter) {
+            AdvancedFilterView(
+                filterCriteria: $filterCriteria,
+                availableBands: availableBands,
+                availableModes: availableModes
+            )
+        }
         // 删除确认对话框
         .alert(item: $deleteConfirmation) { confirmation in
             Alert(

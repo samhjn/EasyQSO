@@ -43,7 +43,28 @@ struct SettingsView: View {
     @StateObject private var documentPickerDelegate = DocumentPickerDelegate()
     @State private var documentInteractionDelegate = DocumentInteractionDelegate()
     
+    // 导出筛选相关状态
+    @State private var showingExportFilter = false
+    @State private var exportFilterCriteria = FilterCriteria()
+    @State private var useFilterForExport = false
+    
     let exportFormats = ["ADIF", "CSV"]
+    
+    var filteredExportRecords: [QSORecord] {
+        let records = Array(qsoRecords)
+        if useFilterForExport && exportFilterCriteria.hasActiveFilters {
+            return exportFilterCriteria.apply(to: records)
+        }
+        return records
+    }
+    
+    var availableBands: [String] {
+        Array(qsoRecords).uniqueBands()
+    }
+    
+    var availableModes: [String] {
+        Array(qsoRecords).uniqueModes()
+    }
     
     var body: some View {
         NavigationView {
@@ -83,10 +104,49 @@ struct SettingsView: View {
                                 .foregroundColor(.secondary)
                         }
                         
-                        Button(LocalizedStrings.exportAll.localized) {
+                        // 导出筛选选项
+                        Toggle(isOn: $useFilterForExport) {
+                            Text(LocalizedStrings.useFilterForExport.localized)
+                        }
+                        
+                        if useFilterForExport {
+                            Button(action: {
+                                showingExportFilter = true
+                            }) {
+                                HStack {
+                                    Image(systemName: "line.3.horizontal.decrease.circle")
+                                    Text(LocalizedStrings.configureExportFilter.localized)
+                                    Spacer()
+                                    if exportFilterCriteria.hasActiveFilters {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundColor(.blue)
+                                    }
+                                }
+                            }
+                            
+                            if exportFilterCriteria.hasActiveFilters {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(LocalizedStrings.exportFilterActive.localized)
+                                        .font(.caption)
+                                        .foregroundColor(.blue)
+                                    Text(exportFilterCriteria.getDescription())
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                        .lineLimit(2)
+                                }
+                            }
+                            
+                            Text(String(format: LocalizedStrings.recordsToExport.localized, filteredExportRecords.count))
+                                .font(.caption)
+                                .foregroundColor(exportFilterCriteria.hasActiveFilters ? .blue : .secondary)
+                        }
+                        
+                        Button(useFilterForExport && exportFilterCriteria.hasActiveFilters ? 
+                               LocalizedStrings.exportFiltered.localized : 
+                               LocalizedStrings.exportAll.localized) {
                             exportLogs()
                         }
-                        .disabled(qsoRecords.isEmpty)
+                        .disabled(qsoRecords.isEmpty || (useFilterForExport && filteredExportRecords.isEmpty))
                     }
                     
                     // 导入日志
@@ -224,10 +284,17 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle(LocalizedStrings.settings.localized)
+            .sheet(isPresented: $showingExportFilter) {
+                AdvancedFilterView(
+                    filterCriteria: $exportFilterCriteria,
+                    availableBands: availableBands,
+                    availableModes: availableModes
+                )
+            }
             .fileExporter(
                 isPresented: $isExporting,
                 document: LogExportDocument(
-                    data: exportFormat == "ADIF" ? generateADIF() : generateCSV(),
+                    data: exportFormat == "ADIF" ? generateADIF(from: filteredExportRecords) : generateCSV(from: filteredExportRecords),
                     format: exportFormat
                 ),
                 contentType: exportFormat == "ADIF" ? .adifType : .csvType,
@@ -323,7 +390,7 @@ struct SettingsView: View {
         // 创建临时文件
         let fileName = "HamLog_\(formattedDate())"
         let fileExtension = exportFormat == "ADIF" ? "adi" : "csv"
-        let fileData = exportFormat == "ADIF" ? generateADIF() : generateCSV()
+        let fileData = exportFormat == "ADIF" ? generateADIF(from: filteredExportRecords) : generateCSV(from: filteredExportRecords)
         
         guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
             alertTitle = LocalizedStrings.exportFailed.localized
@@ -377,9 +444,9 @@ struct SettingsView: View {
         }
     }
     
-    private func generateADIF() -> Data {
+    private func generateADIF(from records: [QSORecord]) -> Data {
         var adif = "<ADIF_VERS:5>3.1.0<EOH>\n"
-        for record in qsoRecords {
+        for record in records {
             // ADIF标准要求使用UTC时间
             let (dateString, timeString) = TimezoneManager.formatDateForADIF(record.date)
             adif += "<CALL:\(record.callsign.count)>\(record.callsign)"
@@ -426,10 +493,10 @@ struct SettingsView: View {
         return Data(adif.utf8)
     }
     
-    private func generateCSV() -> Data {
+    private func generateCSV(from records: [QSORecord]) -> Data {
         var csv = "Callsign,Date,Time,Band,Mode,Frequency,RX_Frequency,TX_Power,RST_Sent,RST_Received,Name,QTH,Grid_Square,CQ_Zone,ITU_Zone,Satellite,Remarks\n"
         
-        for record in qsoRecords {
+        for record in records {
             // 使用选定的导出时区格式化时间
             let (dateString, timeString) = TimezoneManager.formatDateForCSV(record.date, timezone: exportTimezone)
             

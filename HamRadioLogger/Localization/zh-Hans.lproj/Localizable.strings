@@ -139,6 +139,58 @@
 "adif_uses_utc" = "ADIF格式按标准使用UTC时间";
 "csv_timezone_only" = "仅适用于CSV文件。ADIF文件始终使用UTC。";
 
+// MARK: - 高级筛选
+"advanced_filter" = "高级筛选";
+"search_mode" = "搜索模式";
+"fuzzy_search" = "模糊搜索";
+"exact_search" = "精确搜索";
+"fuzzy_search_desc" = "搜索包含关键字的记录";
+"exact_search_desc" = "搜索完全匹配的记录";
+"general_search" = "通用搜索";
+"enter_callsign" = "输入呼号";
+"enter_band" = "输入波段";
+"enter_mode" = "输入模式";
+"or_select_bands" = "或从列表中选择波段：";
+"or_select_modes" = "或从列表中选择模式：";
+"date_range" = "时间范围";
+"start_date" = "开始日期";
+"end_date" = "结束日期";
+"clear_start_date" = "清除开始日期";
+"clear_end_date" = "清除结束日期";
+"frequency_range" = "频率范围";
+"min_frequency" = "最小频率";
+"max_frequency" = "最大频率";
+"other_filters" = "其他筛选";
+"reset_filters" = "重置筛选";
+"apply_filters" = "应用筛选";
+"active_filters" = "筛选条件：";
+"clear_all" = "清除全部";
+"operator_label" = "操作员";
+
+// MARK: - 导出筛选
+"use_filter_for_export" = "使用筛选条件导出";
+"configure_export_filter" = "配置导出筛选";
+"export_filter_active" = "筛选条件已激活";
+"records_to_export" = "将导出 %d 条记录";
+"export_filtered" = "导出筛选记录";
+
+// MARK: - 筛选描述
+"filter_search" = "搜索";
+"filter_fuzzy" = "模糊";
+"filter_exact" = "精确";
+"filter_callsign" = "呼号";
+"filter_band" = "波段";
+"filter_mode" = "模式";
+"filter_start_date" = "开始日期";
+"filter_end_date" = "结束日期";
+"filter_name" = "姓名";
+"filter_qth" = "QTH";
+"filter_grid" = "网格";
+"filter_min_freq" = "最小频率";
+"filter_max_freq" = "最大频率";
+"filter_satellite" = "卫星";
+"filter_no_filters" = "无筛选条件";
+
 // MARK: - 关于和许可证
 "about" = "关于";
 "license" = "许可证";

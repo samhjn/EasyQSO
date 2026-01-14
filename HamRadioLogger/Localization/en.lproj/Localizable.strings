@@ -139,6 +139,58 @@
 "adif_uses_utc" = "ADIF format uses UTC time as per standard";
 "csv_timezone_only" = "Only applies to CSV files. ADIF files always use UTC.";
 
+// MARK: - Advanced Filter
+"advanced_filter" = "Advanced Filter";
+"search_mode" = "Search Mode";
+"fuzzy_search" = "Fuzzy Search";
+"exact_search" = "Exact Match";
+"fuzzy_search_desc" = "Search for records containing keywords";
+"exact_search_desc" = "Search for exact matches";
+"general_search" = "General Search";
+"enter_callsign" = "Enter Callsign";
+"enter_band" = "Enter Band";
+"enter_mode" = "Enter Mode";
+"or_select_bands" = "Or select from list:";
+"or_select_modes" = "Or select from list:";
+"date_range" = "Date Range";
+"start_date" = "Start Date";
+"end_date" = "End Date";
+"clear_start_date" = "Clear Start Date";
+"clear_end_date" = "Clear End Date";
+"frequency_range" = "Frequency Range";
+"min_frequency" = "Min Frequency";
+"max_frequency" = "Max Frequency";
+"other_filters" = "Other Filters";
+"reset_filters" = "Reset Filters";
+"apply_filters" = "Apply Filters";
+"active_filters" = "Active Filters:";
+"clear_all" = "Clear All";
+"operator_label" = "Operator";
+
+// MARK: - Export Filter
+"use_filter_for_export" = "Use Filter for Export";
+"configure_export_filter" = "Configure Export Filter";
+"export_filter_active" = "Filter Active";
+"records_to_export" = "Records to export: %d";
+"export_filtered" = "Export Filtered Records";
+
+// MARK: - Filter Descriptions
+"filter_search" = "Search";
+"filter_fuzzy" = "Fuzzy";
+"filter_exact" = "Exact";
+"filter_callsign" = "Callsign";
+"filter_band" = "Band";
+"filter_mode" = "Mode";
+"filter_start_date" = "Start Date";
+"filter_end_date" = "End Date";
+"filter_name" = "Name";
+"filter_qth" = "QTH";
+"filter_grid" = "Grid";
+"filter_min_freq" = "Min Frequency";
+"filter_max_freq" = "Max Frequency";
+"filter_satellite" = "Satellite";
+"filter_no_filters" = "No Filters";
+
 // MARK: - About and License
 "about" = "About";
 "license" = "License";

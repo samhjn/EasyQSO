@@ -19,6 +19,8 @@
 		1J1J1J1J1J1J1J1J1J1J1J1J /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2J2J2J2J2J2J2J2J2J2J2J2J /* Assets.xcassets */; };
 		1K1K1K1K1K1K1K1K1K1K1K1K /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2K2K2K2K2K2K2K2K2K2K2K2K /* Preview Assets.xcassets */; };
 		D935FFB72E5FF72A00359E84 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D935FFB62E5FF72A00359E84 /* AboutView.swift */; };
+		D93CF0C02F17E24D0090CE47 /* AdvancedFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93CF0BF2F17E24D0090CE47 /* AdvancedFilterView.swift */; };
+		D93CF0C22F17E2570090CE47 /* FilterCriteria.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93CF0C12F17E2570090CE47 /* FilterCriteria.swift */; };
 		D995C37C2F174A3F004BA2F6 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D995C37B2F174A3F004BA2F6 /* SettingsView.swift */; };
 		D9E529AB2E32838C00B01B99 /* QTHManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E529AA2E32838C00B01B99 /* QTHManager.swift */; };
 		D9E529AD2E32897400B01B99 /* EnhancedMapLocationPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E529AC2E32897400B01B99 /* EnhancedMapLocationPicker.swift */; };
@@ -44,6 +46,8 @@
 		2M2M2M2M2M2M2M2M2M2M2M2M /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		3A3A3A3A3A3A3A3A3A3A3A3A /* HamRadioLogger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HamRadioLogger.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D935FFB62E5FF72A00359E84 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		D93CF0BF2F17E24D0090CE47 /* AdvancedFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedFilterView.swift; sourceTree = "<group>"; };
+		D93CF0C12F17E2570090CE47 /* FilterCriteria.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCriteria.swift; sourceTree = "<group>"; };
 		D995C37B2F174A3F004BA2F6 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		D9E529AA2E32838C00B01B99 /* QTHManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QTHManager.swift; sourceTree = "<group>"; };
 		D9E529AC2E32897400B01B99 /* EnhancedMapLocationPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnhancedMapLocationPicker.swift; sourceTree = "<group>"; };
@@ -103,6 +107,7 @@
 		5D5D5D5D5D5D5D5D5D5D5D5D /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				D93CF0BF2F17E24D0090CE47 /* AdvancedFilterView.swift */,
 				D995C37B2F174A3F004BA2F6 /* SettingsView.swift */,
 				D935FFB62E5FF72A00359E84 /* AboutView.swift */,
 				D9E529BC2E33D64C00B01B99 /* TimezoneSettingsView.swift */,
@@ -120,6 +125,7 @@
 		5E5E5E5E5E5E5E5E5E5E5E5E /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				D93CF0C12F17E2570090CE47 /* FilterCriteria.swift */,
 				D9E529BE2E33D67000B01B99 /* TimezoneManager.swift */,
 				D9E529AA2E32838C00B01B99 /* QTHManager.swift */,
 				2C2C2C2C2C2C2C2C2C2C2C2C /* QSORecord.swift */,
@@ -222,13 +228,14 @@
 				D9E529BF2E33D67000B01B99 /* TimezoneManager.swift in Sources */,
 				D9E529AB2E32838C00B01B99 /* QTHManager.swift in Sources */,
 				1D1D1D1D1D1D1D1D1D1D1D1D /* QSORecordEntity.swift in Sources */,
+				D93CF0C02F17E24D0090CE47 /* AdvancedFilterView.swift in Sources */,
+				D93CF0C22F17E2570090CE47 /* FilterCriteria.swift in Sources */,
 				1E1E1E1E1E1E1E1E1E1E1E1E /* HamRadioLoggerModel.swift in Sources */,
 				1F1F1F1F1F1F1F1F1F1F1F1F /* QSORecordView.swift in Sources */,
 				1G1G1G1G1G1G1G1G1G1G1G1G /* LogQueryView.swift in Sources */,
 				1H1H1H1H1H1H1H1H1H1H1H1H /* EditQSOView.swift in Sources */,
 				D9E529BB2E33B9A000B01B99 /* KeyboardToolbar.swift in Sources */,
 				1I1I1I1I1I1I1I1I1I1I1I1I /* LogImportExportView.swift in Sources */,
-				D9FFFFFF2FFFFFFFFF2FFF02 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
