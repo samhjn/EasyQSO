@@ -26,8 +26,16 @@ public class QSORecord: NSManagedObject {
     @NSManaged public var date: Date
     @NSManaged public var band: String
     @NSManaged public var mode: String
-    @NSManaged public var frequency: Double
-    @NSManaged public var rxFrequency: Double
+    
+    // 新版本：以Hz为单位的整数频率
+    @NSManaged public var frequencyHz: Int64
+    @NSManaged public var rxFrequencyHz: Int64
+    
+    // 旧版本数据迁移字段（以MHz为单位的浮点数，仅用于读取旧数据）
+    // 使用带下划线的内部字段名来避免与计算属性冲突
+    @NSManaged private var frequency: NSNumber?
+    @NSManaged private var rxFrequency: NSNumber?
+    
     @NSManaged public var txPower: String?
     @NSManaged public var rstSent: String
     @NSManaged public var rstReceived: String
@@ -41,6 +49,145 @@ public class QSORecord: NSManagedObject {
     // 新增坐标字段
     @NSManaged public var latitude: Double
     @NSManaged public var longitude: Double
+    
+    // MARK: - 频率访问接口（兼容旧版本）
+    
+    /// 获取发射频率（MHz）- 用于显示和编辑
+    public var frequencyMHz: Double {
+        get {
+            // 如果有新格式数据，使用新格式
+            if frequencyHz > 0 {
+                return Double(frequencyHz) / 1_000_000.0
+            }
+            // 否则尝试从旧格式读取
+            return frequency?.doubleValue ?? 0.0
+        }
+        set {
+            // 将MHz转换为Hz存储
+            if newValue > 0 {
+                frequencyHz = Int64(newValue * 1_000_000.0)
+            } else {
+                frequencyHz = 0
+            }
+            // 清除旧数据
+            frequency = nil
+        }
+    }
+    
+    /// 获取接收频率（MHz）- 用于显示和编辑
+    public var rxFrequencyMHz: Double {
+        get {
+            // 如果有新格式数据，使用新格式
+            if rxFrequencyHz > 0 {
+                return Double(rxFrequencyHz) / 1_000_000.0
+            }
+            // 否则尝试从旧格式读取
+            return rxFrequency?.doubleValue ?? 0.0
+        }
+        set {
+            // 将MHz转换为Hz存储
+            if newValue > 0 {
+                rxFrequencyHz = Int64(newValue * 1_000_000.0)
+            } else {
+                rxFrequencyHz = 0
+            }
+            // 清除旧数据
+            rxFrequency = nil
+        }
+    }
+    
+    /// 获取发射频率的精确Hz值
+    public var frequencyInHz: Int64 {
+        get {
+            if frequencyHz > 0 {
+                return frequencyHz
+            }
+            // 从旧格式迁移
+            if let legacy = frequency?.doubleValue, legacy > 0 {
+                return Int64(legacy * 1_000_000.0)
+            }
+            return 0
+        }
+        set {
+            frequencyHz = newValue
+            frequency = nil
+        }
+    }
+    
+    /// 获取接收频率的精确Hz值
+    public var rxFrequencyInHz: Int64 {
+        get {
+            if rxFrequencyHz > 0 {
+                return rxFrequencyHz
+            }
+            // 从旧格式迁移
+            if let legacy = rxFrequency?.doubleValue, legacy > 0 {
+                return Int64(legacy * 1_000_000.0)
+            }
+            return 0
+        }
+        set {
+            rxFrequencyHz = newValue
+            rxFrequency = nil
+        }
+    }
+    
+    // MARK: - 数据迁移支持
+    
+    /// 检测并执行数据迁移（从旧的MHz格式迁移到新的Hz格式）
+    public func migrateFrequencyDataIfNeeded() {
+        var needsSave = false
+        
+        // 迁移发射频率
+        if frequencyHz == 0, let legacyFreq = frequency?.doubleValue, legacyFreq > 0 {
+            frequencyHz = Int64(legacyFreq * 1_000_000.0)
+            frequency = nil
+            needsSave = true
+        }
+        
+        // 迁移接收频率
+        if rxFrequencyHz == 0, let legacyRxFreq = rxFrequency?.doubleValue, legacyRxFreq > 0 {
+            rxFrequencyHz = Int64(legacyRxFreq * 1_000_000.0)
+            rxFrequency = nil
+            needsSave = true
+        }
+        
+        // 如果有数据迁移，保存上下文
+        if needsSave, let context = managedObjectContext {
+            do {
+                try context.save()
+                print("✓ 频率数据迁移成功: \(callsign)")
+            } catch {
+                print("✗ 频率数据迁移失败: \(error)")
+            }
+        }
+    }
+    
+    /// 格式化频率显示（自动选择合适的单位）
+    public func formattedFrequency(useMHz: Bool = true) -> String {
+        let hz = frequencyInHz
+        if hz == 0 { return "" }
+        
+        if useMHz {
+            let mhz = Double(hz) / 1_000_000.0
+            return String(format: "%.6f", mhz).trimmingCharacters(in: CharacterSet(charactersIn: "0")).trimmingCharacters(in: CharacterSet(charactersIn: "."))
+        } else {
+            return String(hz)
+        }
+    }
+    
+    /// 格式化接收频率显示（自动选择合适的单位）
+    public func formattedRxFrequency(useMHz: Bool = true) -> String {
+        let hz = rxFrequencyInHz
+        if hz == 0 { return "" }
+        
+        if useMHz {
+            let mhz = Double(hz) / 1_000_000.0
+            return String(format: "%.6f", mhz).trimmingCharacters(in: CharacterSet(charactersIn: "0")).trimmingCharacters(in: CharacterSet(charactersIn: "."))
+        } else {
+            return String(hz)
+        }
+    }
     
     // 计算属性：获取坐标（如果有效）
     var coordinate: CLLocationCoordinate2D? {
@@ -78,8 +225,8 @@ public class QSORecord: NSManagedObject {
     }
     
     // 根据频率自动确定波段
-    static func bandForFrequency(_ frequency: Double) -> String? {
-        switch frequency {
+    static func bandForFrequency(_ frequencyMHz: Double) -> String? {
+        switch frequencyMHz {
         case 1.8...2.0:
             return "160m"
         case 3.5...4.0:
@@ -112,13 +259,13 @@ public class QSORecord: NSManagedObject {
     // 获取指定波段的最后使用频率
     static func lastFrequencyForBand(_ band: String, context: NSManagedObjectContext) -> Double? {
         let request = NSFetchRequest<QSORecord>(entityName: "QSORecord")
-        request.predicate = NSPredicate(format: "band == %@ AND frequency > 0", band)
+        request.predicate = NSPredicate(format: "band == %@ AND frequencyHz > 0", band)
         request.sortDescriptors = [NSSortDescriptor(keyPath: \QSORecord.date, ascending: false)]
         request.fetchLimit = 1
         
         do {
             let results = try context.fetch(request)
-            return results.first?.frequency
+            return results.first?.frequencyMHz
         } catch {
             print("获取波段最后使用频率时出错: \(error)")
             return nil

@@ -43,6 +43,11 @@ struct SettingsView: View {
     @StateObject private var documentPickerDelegate = DocumentPickerDelegate()
     @State private var documentInteractionDelegate = DocumentInteractionDelegate()
     
+    // 导入报告相关
+    @State private var showingImportReport = false
+    @State private var importResult: ImportResult?
+    @State private var importHasDetails = false
+    
     // 导出筛选相关状态
     @State private var showingExportFilter = false
     @State private var exportFilterCriteria = FilterCriteria()
@@ -67,8 +72,7 @@ struct SettingsView: View {
     }
     
     var body: some View {
-        NavigationView {
-            Form {
+        Form {
                 // ===== 导入导出部分 =====
                 Section(header: Text(LocalizedStrings.importExport.localized)) {
                     // 导出日志
@@ -284,6 +288,7 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle(LocalizedStrings.settings.localized)
+            .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showingExportFilter) {
                 AdvancedFilterView(
                     filterCriteria: $exportFilterCriteria,
@@ -331,10 +336,12 @@ struct SettingsView: View {
                     do {
                         let data = try Data(contentsOf: url)
                         importedData = data
-                        if url.pathExtension.lowercased() == "adi" || url.pathExtension.lowercased() == "adif" {
-                            importADIF(data)
-                        } else if url.pathExtension.lowercased() == "csv" {
+                        let ext = url.pathExtension.lowercased()
+                        if ext == "csv" {
                             importCSV(data)
+                        } else {
+                            // adi、adif 以及其他扩展名（含无扩展名）都按 ADIF 尝试解析
+                            importADIF(data)
                         }
                     } catch {
                         alertTitle = LocalizedStrings.importFailed.localized
@@ -348,11 +355,25 @@ struct SettingsView: View {
                 }
             }
             .alert(isPresented: $showingAlert) {
-                Alert(
-                    title: Text(alertTitle),
-                    message: Text(alertMessage),
-                    dismissButton: .default(Text(LocalizedStrings.confirm.localized))
-                )
+                if importHasDetails {
+                    Alert(
+                        title: Text(alertTitle),
+                        message: Text(alertMessage),
+                        primaryButton: .default(Text("查看详情")) {
+                            importHasDetails = false
+                            showingImportReport = true
+                        },
+                        secondaryButton: .default(Text(LocalizedStrings.confirm.localized)) {
+                            importHasDetails = false
+                        }
+                    )
+                } else {
+                    Alert(
+                        title: Text(alertTitle),
+                        message: Text(alertMessage),
+                        dismissButton: .default(Text(LocalizedStrings.confirm.localized))
+                    )
+                }
             }
             .sheet(isPresented: $showingTimezoneSettings) {
                 TimezoneSettingsView(
@@ -361,20 +382,25 @@ struct SettingsView: View {
                     initialTab: timezoneSettingsInitialTab
                 )
             }
+            .sheet(isPresented: $showingImportReport) {
+                if let result = importResult {
+                    ImportReportView(result: result)
+                }
+            }
             .onAppear {
                 // 设置代理
                 documentPickerDelegate.viewContext = viewContext
                 documentPickerDelegate.importHandler = { data in
                     if let url = documentPickerDelegate.importedFileURL {
-                        if url.pathExtension.lowercased() == "adi" || url.pathExtension.lowercased() == "adif" {
-                            importADIF(data)
-                        } else if url.pathExtension.lowercased() == "csv" {
+                        let ext = url.pathExtension.lowercased()
+                        if ext == "csv" {
                             importCSV(data)
+                        } else {
+                            importADIF(data)
                         }
                     }
                 }
             }
-        }
     }
     
     private func exportLogs() {
@@ -451,15 +477,30 @@ struct SettingsView: View {
             let (dateString, timeString) = TimezoneManager.formatDateForADIF(record.date)
             adif += "<CALL:\(record.callsign.count)>\(record.callsign)"
             adif += "<QSO_DATE:8>\(dateString)"
-            adif += "<TIME_ON:4>\(timeString)"
+            adif += "<TIME_ON:\(timeString.count)>\(timeString)"
             adif += "<BAND:\(record.band.count)>\(record.band)"
             adif += "<MODE:\(record.mode.count)>\(record.mode)"
-            if record.frequency > 0 {
-                let freqString = String(format: "%.3f", record.frequency)
+            if record.frequencyMHz > 0 {
+                // 使用6位小数保持完整精度（到Hz级别），移除尾随零以符合ADIF标准
+                var freqString = String(format: "%.6f", record.frequencyMHz)
+                // 移除尾随的零和可能的小数点
+                while freqString.hasSuffix("0") && freqString.contains(".") {
+                    freqString.removeLast()
+                }
+                if freqString.hasSuffix(".") {
+                    freqString.removeLast()
+                }
                 adif += "<FREQ:\(freqString.count)>\(freqString)"
             }
-            if record.rxFrequency > 0 {
-                let rxFreqString = String(format: "%.3f", record.rxFrequency)
+            if record.rxFrequencyMHz > 0 {
+                var rxFreqString = String(format: "%.6f", record.rxFrequencyMHz)
+                // 移除尾随的零和可能的小数点
+                while rxFreqString.hasSuffix("0") && rxFreqString.contains(".") {
+                    rxFreqString.removeLast()
+                }
+                if rxFreqString.hasSuffix(".") {
+                    rxFreqString.removeLast()
+                }
                 adif += "<FREQ_RX:\(rxFreqString.count)>\(rxFreqString)"
             }
             if let txPower = record.txPower, !txPower.isEmpty {
@@ -500,8 +541,9 @@ struct SettingsView: View {
             // 使用选定的导出时区格式化时间
             let (dateString, timeString) = TimezoneManager.formatDateForCSV(record.date, timezone: exportTimezone)
             
-            let frequency = record.frequency > 0 ? String(format: "%.3f", record.frequency) : ""
-            let rxFrequency = record.rxFrequency > 0 ? String(format: "%.3f", record.rxFrequency) : ""
+            // 使用6位小数保持完整精度（到Hz级别）
+            let frequency = record.frequencyMHz > 0 ? String(format: "%.6f", record.frequencyMHz) : ""
+            let rxFrequency = record.rxFrequencyMHz > 0 ? String(format: "%.6f", record.rxFrequencyMHz) : ""
             let txPower = record.txPower ?? ""
             let name = record.name ?? ""
             let qth = record.qth ?? ""
@@ -532,6 +574,10 @@ struct SettingsView: View {
             showingAlert = true
             return
         }
+        
+        // 创建导入结果记录
+        var result = ImportResult()
+        
         // 获取所有现有QSO用于去重
         let fetchRequest: NSFetchRequest<QSORecord> = QSORecord.fetchRequest()
         let existingQSOs: [QSORecord]
@@ -566,36 +612,90 @@ struct SettingsView: View {
             records = dataString.components(separatedBy: .newlines)
         }
         
-        var importCount = 0
+        // 处理每条记录
         for record in records {
             let trimmedRecord = record.trimmingCharacters(in: .whitespacesAndNewlines)
-            if trimmedRecord.isEmpty || !trimmedRecord.contains("<CALL:") { continue }
-            guard let callsign = extractField(from: trimmedRecord, fieldName: "CALL") else { continue }
+            
+            // 跳过空记录
+            if trimmedRecord.isEmpty { continue }
+            
+            // 检查是否包含呼号字段
+            if !trimmedRecord.uppercased().contains("<CALL:") {
+                // 非法记录：缺少呼号
+                if trimmedRecord.count > 10 { // 只记录有实质内容的
+                    result.invalidRecords.append(ImportRecord(
+                        callsign: "",
+                        dateTime: "",
+                        band: "",
+                        mode: "",
+                        frequency: "",
+                        reason: "缺少必填字段：呼号",
+                        rawData: String(trimmedRecord.prefix(200))
+                    ))
+                }
+                continue
+            }
+            
+            // 提取呼号
+            guard let callsign = extractField(from: trimmedRecord, fieldName: "CALL"), !callsign.isEmpty else {
+                result.invalidRecords.append(ImportRecord(
+                    callsign: "",
+                    dateTime: "",
+                    band: "",
+                    mode: "",
+                    frequency: "",
+                    reason: "呼号字段为空",
+                    rawData: String(trimmedRecord.prefix(200))
+                ))
+                continue
+            }
+            
+            // 提取其他字段
             let dateString = extractField(from: trimmedRecord, fieldName: "QSO_DATE") ?? ""
             let timeString = extractField(from: trimmedRecord, fieldName: "TIME_ON") ?? ""
-            
-            // ADIF标准规定时间为UTC，直接按UTC解析
-            let qsoDate = TimezoneManager.parseDateFromADIF(dateString: dateString, timeString: timeString)
             let band = extractField(from: trimmedRecord, fieldName: "BAND") ?? "20m"
             let mode = extractField(from: trimmedRecord, fieldName: "MODE") ?? "SSB"
             let freqString = extractField(from: trimmedRecord, fieldName: "FREQ")
             let frequency = freqString != nil ? (Double(freqString!) ?? 0.0) : 0.0
-            // 去重判断：呼号、日期（到分钟）、波段、模式、频率完全一致
+            
+            // 解析日期时间
+            let qsoDate = TimezoneManager.parseDateFromADIF(dateString: dateString, timeString: timeString)
+            
+            // 格式化显示用的日期时间
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+            let displayDateTime = dateFormatter.string(from: qsoDate)
+            
+            // 检查重复
             let isDuplicate = existingQSOs.contains { exist in
                 exist.callsign.uppercased() == callsign.uppercased() &&
                 exist.band == band &&
                 exist.mode == mode &&
-                abs(exist.frequency - frequency) < 0.001 &&
+                abs(exist.frequencyMHz - frequency) < 0.001 &&
                 Calendar.current.isDate(exist.date, equalTo: qsoDate, toGranularity: .minute)
             }
-            if isDuplicate { continue }
+            
+            if isDuplicate {
+                // 重复记录
+                result.duplicateRecords.append(ImportRecord(
+                    callsign: callsign,
+                    dateTime: displayDateTime,
+                    band: band,
+                    mode: mode,
+                    frequency: frequency > 0 ? String(format: "%.3f", frequency) : "",
+                    reason: "该记录已存在于数据库中"
+                ))
+                continue
+            }
+            
+            // 创建新记录
             let newQSO = QSORecord(context: viewContext)
             newQSO.callsign = callsign
             newQSO.date = qsoDate
             newQSO.band = band
             newQSO.mode = mode
-            newQSO.frequency = frequency
-            newQSO.rxFrequency = Double(extractField(from: trimmedRecord, fieldName: "FREQ_RX") ?? "") ?? 0.0
+            newQSO.frequencyMHz = frequency
+            newQSO.rxFrequencyMHz = Double(extractField(from: trimmedRecord, fieldName: "FREQ_RX") ?? "") ?? 0.0
             newQSO.txPower = extractField(from: trimmedRecord, fieldName: "TX_PWR")
             newQSO.rstSent = extractField(from: trimmedRecord, fieldName: "RST_SENT") ?? "59"
             newQSO.rstReceived = extractField(from: trimmedRecord, fieldName: "RST_RCVD") ?? "59"
@@ -606,18 +706,30 @@ struct SettingsView: View {
             newQSO.ituZone = extractField(from: trimmedRecord, fieldName: "ITUZ")
             newQSO.satellite = extractField(from: trimmedRecord, fieldName: "SAT_NAME")
             newQSO.remarks = extractField(from: trimmedRecord, fieldName: "COMMENT")
-            importCount += 1
+            
+            // 记录成功导入
+            result.successRecords.append(ImportRecord(
+                callsign: callsign,
+                dateTime: displayDateTime,
+                band: band,
+                mode: mode,
+                frequency: frequency > 0 ? String(format: "%.3f", frequency) : ""
+            ))
         }
-        do {
-            try viewContext.save()
-            alertTitle = LocalizedStrings.importSuccess.localized
-            alertMessage = String(format: LocalizedStrings.importSuccessWithDuplicates.localized, importCount)
-            showingAlert = true
-        } catch {
-            alertTitle = LocalizedStrings.importFailed.localized
-            alertMessage = String(format: LocalizedStrings.saveFailedMessage.localized, error.localizedDescription)
-            showingAlert = true
+        
+        // 保存到数据库
+        if !result.successRecords.isEmpty {
+            do {
+                try viewContext.save()
+            } catch {
+                alertTitle = LocalizedStrings.importFailed.localized
+                alertMessage = String(format: LocalizedStrings.saveFailedMessage.localized, error.localizedDescription)
+                showingAlert = true
+                return
+            }
         }
+        
+        showImportSummaryAlert(result)
     }
     
     private func importCSV(_ data: Data) {
@@ -636,39 +748,106 @@ struct SettingsView: View {
             return
         }
         
-        // 跳过标题行
-        var importCount = 0
+        // 创建导入结果记录
+        var result = ImportResult()
         
+        // 获取所有现有QSO用于去重
+        let fetchRequest: NSFetchRequest<QSORecord> = QSORecord.fetchRequest()
+        let existingQSOs: [QSORecord]
+        do {
+            existingQSOs = try viewContext.fetch(fetchRequest)
+        } catch {
+            alertTitle = LocalizedStrings.importFailed.localized
+            alertMessage = LocalizedStrings.cannotGetExistingRecords.localized
+            showingAlert = true
+            return
+        }
+        
+        // 跳过标题行，处理数据行
         for i in 1..<rows.count {
-            let row = rows[i]
+            let row = rows[i].trimmingCharacters(in: .whitespacesAndNewlines)
             if row.isEmpty { continue }
             
             // 简单的CSV解析，不处理引号内的逗号
             let fields = row.components(separatedBy: ",")
-            guard fields.count >= 5 else { continue } // 至少需要呼号、日期、时间、波段、模式
             
-            let newQSO = QSORecord(context: viewContext)
+            // 检查字段数量
+            if fields.count < 5 {
+                result.invalidRecords.append(ImportRecord(
+                    callsign: fields.first ?? "",
+                    dateTime: "",
+                    band: "",
+                    mode: "",
+                    frequency: "",
+                    reason: "CSV格式错误：字段数量不足（至少需要呼号、日期、时间、波段、模式）",
+                    rawData: String(row.prefix(200))
+                ))
+                continue
+            }
             
-            newQSO.callsign = fields[0]
+            let callsign = fields[0].trimmingCharacters(in: .whitespaces)
+            if callsign.isEmpty {
+                result.invalidRecords.append(ImportRecord(
+                    callsign: "",
+                    dateTime: fields[1],
+                    band: "",
+                    mode: "",
+                    frequency: "",
+                    reason: "呼号为空",
+                    rawData: String(row.prefix(200))
+                ))
+                continue
+            }
             
-            // 使用选定的导入时区解析日期和时间
+            // 解析日期和时间
             let dateString = fields[1]
             let timeString = fields.count > 2 ? fields[2] : ""
-            newQSO.date = TimezoneManager.parseDateFromCSV(
+            let qsoDate = TimezoneManager.parseDateFromCSV(
                 dateString: dateString,
                 timeString: timeString,
                 timezone: importTimezone
             )
             
-            if fields.count > 3 { newQSO.band = fields[3] }
-            if fields.count > 4 { newQSO.mode = fields[4] }
+            let band = fields.count > 3 ? fields[3] : "20m"
+            let mode = fields.count > 4 ? fields[4] : "SSB"
+            let frequency = (fields.count > 5 && !fields[5].isEmpty) ? (Double(fields[5]) ?? 0.0) : 0.0
             
-            if fields.count > 5 && !fields[5].isEmpty {
-                newQSO.frequency = Double(fields[5]) ?? 0.0
+            // 格式化显示用的日期时间
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+            let displayDateTime = dateFormatter.string(from: qsoDate)
+            
+            // 检查重复
+            let isDuplicate = existingQSOs.contains { exist in
+                exist.callsign.uppercased() == callsign.uppercased() &&
+                exist.band == band &&
+                exist.mode == mode &&
+                abs(exist.frequencyMHz - frequency) < 0.001 &&
+                Calendar.current.isDate(exist.date, equalTo: qsoDate, toGranularity: .minute)
             }
             
+            if isDuplicate {
+                result.duplicateRecords.append(ImportRecord(
+                    callsign: callsign,
+                    dateTime: displayDateTime,
+                    band: band,
+                    mode: mode,
+                    frequency: frequency > 0 ? String(format: "%.3f", frequency) : "",
+                    reason: "该记录已存在于数据库中"
+                ))
+                continue
+            }
+            
+            // 创建新记录
+            let newQSO = QSORecord(context: viewContext)
+            newQSO.callsign = callsign
+            newQSO.date = qsoDate
+            newQSO.band = band
+            newQSO.mode = mode
+            newQSO.frequencyMHz = frequency
+            
             if fields.count > 6 && !fields[6].isEmpty {
-                newQSO.rxFrequency = Double(fields[6]) ?? 0.0
+                newQSO.rxFrequencyMHz = Double(fields[6]) ?? 0.0
             }
             
             if fields.count > 7 { newQSO.txPower = fields[7].isEmpty ? nil : fields[7] }
@@ -682,25 +861,55 @@ struct SettingsView: View {
             if fields.count > 15 { newQSO.satellite = fields[15].isEmpty ? nil : fields[15] }
             if fields.count > 16 { newQSO.remarks = fields[16].isEmpty ? nil : fields[16] }
             
-            importCount += 1
+            // 记录成功导入
+            result.successRecords.append(ImportRecord(
+                callsign: callsign,
+                dateTime: displayDateTime,
+                band: band,
+                mode: mode,
+                frequency: frequency > 0 ? String(format: "%.3f", frequency) : ""
+            ))
         }
         
-        do {
-            try viewContext.save()
-            alertTitle = LocalizedStrings.importSuccess.localized
-            alertMessage = String(format: LocalizedStrings.importSuccessMessage.localized, importCount)
-            showingAlert = true
-        } catch {
-            alertTitle = LocalizedStrings.importFailed.localized
-            alertMessage = String(format: LocalizedStrings.saveFailedMessage.localized, error.localizedDescription)
-            showingAlert = true
+        // 保存到数据库
+        if !result.successRecords.isEmpty {
+            do {
+                try viewContext.save()
+            } catch {
+                alertTitle = LocalizedStrings.importFailed.localized
+                alertMessage = String(format: LocalizedStrings.saveFailedMessage.localized, error.localizedDescription)
+                showingAlert = true
+                return
+            }
         }
+        
+        showImportSummaryAlert(result)
+    }
+    
+    /// 显示导入摘要 alert，有问题时可点击查看详情
+    private func showImportSummaryAlert(_ result: ImportResult) {
+        importResult = result
+        
+        var summary = "成功导入: \(result.successRecords.count)"
+        if !result.duplicateRecords.isEmpty {
+            summary += "\n重复跳过: \(result.duplicateRecords.count)"
+        }
+        if !result.invalidRecords.isEmpty {
+            summary += "\n非法记录: \(result.invalidRecords.count)"
+        }
+        
+        alertTitle = result.successRecords.isEmpty && result.duplicateRecords.isEmpty && result.invalidRecords.isEmpty
+            ? LocalizedStrings.importFailed.localized
+            : LocalizedStrings.importSuccess.localized
+        alertMessage = summary
+        importHasDetails = result.hasIssues
+        showingAlert = true
     }
     
     private func extractField(from record: String, fieldName: String) -> String? {
         let pattern = "<\(fieldName):(\\d+)>([^<]*)"
         
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else {
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else {
             return nil
         }
         
@@ -709,11 +918,27 @@ struct SettingsView: View {
             return nil
         }
         
+        // 提取ADIF标注的长度
+        guard let lengthRange = Range(match.range(at: 1), in: record),
+              let length = Int(record[lengthRange]) else {
+            return nil
+        }
+        
+        // 长度为0表示字段值为空，返回nil让调用方使用默认值
+        if length == 0 {
+            return nil
+        }
+        
         guard let valueRange = Range(match.range(at: 2), in: record) else {
             return nil
         }
         
-        return String(record[valueRange])
+        let rawValue = String(record[valueRange])
+        // 按照ADIF标注的长度截取，避免多取数据
+        if rawValue.count > length {
+            return String(rawValue.prefix(length))
+        }
+        return rawValue.isEmpty ? nil : rawValue
     }
     
     private func formattedDate() -> String {

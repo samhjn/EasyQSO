@@ -277,8 +277,8 @@ struct QSOLogRow: View {
             HStack {
                 Text("\(record.band) · \(record.mode)")
                     .font(.subheadline)
-                if record.frequency > 0 {
-                    Text("· \(String(format: "%.3f", record.frequency)) MHz")
+                if record.frequencyMHz > 0 {
+                    Text("· \(String(format: "%.3f", record.frequencyMHz)) MHz")
                         .font(.subheadline)
                 }
             }

@@ -80,8 +80,8 @@ struct EditQSOView: View {
         _date = State(initialValue: record.date)
         _band = State(initialValue: record.band)
         _mode = State(initialValue: record.mode)
-        _frequency = State(initialValue: record.frequency > 0 ? String(record.frequency) : "")
-        _rxFrequency = State(initialValue: record.rxFrequency > 0 ? String(record.rxFrequency) : "")
+        _frequency = State(initialValue: record.frequencyMHz > 0 ? String(record.frequencyMHz) : "")
+        _rxFrequency = State(initialValue: record.rxFrequencyMHz > 0 ? String(record.rxFrequencyMHz) : "")
         _txPower = State(initialValue: record.txPower ?? "")
         _rstSent = State(initialValue: record.rstSent)
         _rstReceived = State(initialValue: record.rstReceived)
@@ -445,8 +445,8 @@ struct EditQSOView: View {
         record.date = date
         record.band = band
         record.mode = mode
-        record.frequency = Double(frequency) ?? 0.0
-        record.rxFrequency = Double(rxFrequency) ?? 0.0
+        record.frequencyMHz = Double(frequency) ?? 0.0
+        record.rxFrequencyMHz = Double(rxFrequency) ?? 0.0
         record.txPower = txPower.isEmpty ? nil : txPower
         record.rstSent = rstSent
         record.rstReceived = rstReceived

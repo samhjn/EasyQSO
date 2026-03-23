@@ -225,13 +225,13 @@ struct FilterCriteria {
         // 应用频率范围筛选
         if let minFreq = minFrequency {
             filtered = filtered.filter { record in
-                record.frequency >= minFreq
+                record.frequencyMHz >= minFreq
             }
         }
 
         if let maxFreq = maxFrequency {
             filtered = filtered.filter { record in
-                record.frequency <= maxFreq
+                record.frequencyMHz <= maxFreq
             }
         }
 

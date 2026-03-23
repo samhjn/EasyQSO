@@ -337,8 +337,8 @@ struct QSORecordView: View {
             band = latestQSO.band
             mode = latestQSO.mode
             // 如果最近QSO有频率信息，也可以设置频率
-            if latestQSO.frequency > 0 {
-                frequency = String(latestQSO.frequency)
+            if latestQSO.frequencyMHz > 0 {
+                frequency = String(latestQSO.frequencyMHz)
             }
         }
     }
@@ -430,8 +430,8 @@ struct QSORecordView: View {
         newQSO.date = date
         newQSO.band = band
         newQSO.mode = mode
-        newQSO.frequency = Double(frequency) ?? 0.0
-        newQSO.rxFrequency = Double(rxFrequency) ?? 0.0
+        newQSO.frequencyMHz = Double(frequency) ?? 0.0
+        newQSO.rxFrequencyMHz = Double(rxFrequency) ?? 0.0
         newQSO.txPower = txPower.isEmpty ? nil : txPower
         newQSO.rstSent = rstSent
         newQSO.rstReceived = rstReceived

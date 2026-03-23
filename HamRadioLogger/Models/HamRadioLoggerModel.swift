@@ -60,20 +60,39 @@ class HamRadioLoggerModel {
         modeAttribute.isOptional = false
         properties.append(modeAttribute)
         
-        // 频率属性
-        let frequencyAttribute = NSAttributeDescription()
-        frequencyAttribute.name = "frequency"
-        frequencyAttribute.attributeType = .doubleAttributeType
-        frequencyAttribute.isOptional = false
-        properties.append(frequencyAttribute)
+        // 频率属性（新版本：以Hz为单位的整数）
+        let frequencyHzAttribute = NSAttributeDescription()
+        frequencyHzAttribute.name = "frequencyHz"
+        frequencyHzAttribute.attributeType = .integer64AttributeType
+        frequencyHzAttribute.isOptional = false
+        frequencyHzAttribute.defaultValue = 0
+        properties.append(frequencyHzAttribute)
         
-        // 接收频率属性
-        let rxFrequencyAttribute = NSAttributeDescription()
-        rxFrequencyAttribute.name = "rxFrequency"
-        rxFrequencyAttribute.attributeType = .doubleAttributeType
-        rxFrequencyAttribute.isOptional = false
-        rxFrequencyAttribute.defaultValue = 0.0
-        properties.append(rxFrequencyAttribute)
+        // 接收频率属性（新版本：以Hz为单位的整数）
+        let rxFrequencyHzAttribute = NSAttributeDescription()
+        rxFrequencyHzAttribute.name = "rxFrequencyHz"
+        rxFrequencyHzAttribute.attributeType = .integer64AttributeType
+        rxFrequencyHzAttribute.isOptional = false
+        rxFrequencyHzAttribute.defaultValue = 0
+        properties.append(rxFrequencyHzAttribute)
+        
+        // 旧频率属性（保留用于数据迁移，以MHz为单位的浮点数）
+        // 使用原始字段名以兼容旧版本数据
+        let legacyFrequencyAttribute = NSAttributeDescription()
+        legacyFrequencyAttribute.name = "frequency"
+        legacyFrequencyAttribute.attributeType = .doubleAttributeType
+        legacyFrequencyAttribute.isOptional = true
+        legacyFrequencyAttribute.defaultValue = nil
+        properties.append(legacyFrequencyAttribute)
+        
+        // 旧接收频率属性（保留用于数据迁移，以MHz为单位的浮点数）
+        // 使用原始字段名以兼容旧版本数据
+        let legacyRxFrequencyAttribute = NSAttributeDescription()
+        legacyRxFrequencyAttribute.name = "rxFrequency"
+        legacyRxFrequencyAttribute.attributeType = .doubleAttributeType
+        legacyRxFrequencyAttribute.isOptional = true
+        legacyRxFrequencyAttribute.defaultValue = nil
+        properties.append(legacyRxFrequencyAttribute)
         
         // 发射功率属性
         let txPowerAttribute = NSAttributeDescription()

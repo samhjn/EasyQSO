@@ -22,6 +22,8 @@
 		D93CF0C02F17E24D0090CE47 /* AdvancedFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93CF0BF2F17E24D0090CE47 /* AdvancedFilterView.swift */; };
 		D93CF0C22F17E2570090CE47 /* FilterCriteria.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93CF0C12F17E2570090CE47 /* FilterCriteria.swift */; };
 		D995C37C2F174A3F004BA2F6 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D995C37B2F174A3F004BA2F6 /* SettingsView.swift */; };
+		D9DC5FB52F4487EF00867DB2 /* ImportReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9DC5FB42F4487EF00867DB2 /* ImportReportView.swift */; };
+		D9DC5FB72F44880700867DB2 /* ImportResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9DC5FB62F44880700867DB2 /* ImportResult.swift */; };
 		D9E529AB2E32838C00B01B99 /* QTHManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E529AA2E32838C00B01B99 /* QTHManager.swift */; };
 		D9E529AD2E32897400B01B99 /* EnhancedMapLocationPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E529AC2E32897400B01B99 /* EnhancedMapLocationPicker.swift */; };
 		D9E529BB2E33B9A000B01B99 /* KeyboardToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E529BA2E33B9A000B01B99 /* KeyboardToolbar.swift */; };
@@ -49,6 +51,8 @@
 		D93CF0BF2F17E24D0090CE47 /* AdvancedFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedFilterView.swift; sourceTree = "<group>"; };
 		D93CF0C12F17E2570090CE47 /* FilterCriteria.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCriteria.swift; sourceTree = "<group>"; };
 		D995C37B2F174A3F004BA2F6 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		D9DC5FB42F4487EF00867DB2 /* ImportReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportReportView.swift; sourceTree = "<group>"; };
+		D9DC5FB62F44880700867DB2 /* ImportResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportResult.swift; sourceTree = "<group>"; };
 		D9E529AA2E32838C00B01B99 /* QTHManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QTHManager.swift; sourceTree = "<group>"; };
 		D9E529AC2E32897400B01B99 /* EnhancedMapLocationPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnhancedMapLocationPicker.swift; sourceTree = "<group>"; };
 		D9E529BA2E33B9A000B01B99 /* KeyboardToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardToolbar.swift; sourceTree = "<group>"; };
@@ -107,6 +111,7 @@
 		5D5D5D5D5D5D5D5D5D5D5D5D /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				D9DC5FB42F4487EF00867DB2 /* ImportReportView.swift */,
 				D93CF0BF2F17E24D0090CE47 /* AdvancedFilterView.swift */,
 				D995C37B2F174A3F004BA2F6 /* SettingsView.swift */,
 				D935FFB62E5FF72A00359E84 /* AboutView.swift */,
@@ -125,6 +130,7 @@
 		5E5E5E5E5E5E5E5E5E5E5E5E /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				D9DC5FB62F44880700867DB2 /* ImportResult.swift */,
 				D93CF0C12F17E2570090CE47 /* FilterCriteria.swift */,
 				D9E529BE2E33D67000B01B99 /* TimezoneManager.swift */,
 				D9E529AA2E32838C00B01B99 /* QTHManager.swift */,
@@ -221,6 +227,7 @@
 				D935FFB72E5FF72A00359E84 /* AboutView.swift in Sources */,
 				D9E529AD2E32897400B01B99 /* EnhancedMapLocationPicker.swift in Sources */,
 				1A1A1A1A1A1A1A1A1A1A1A1A /* ContentView.swift in Sources */,
+				D9DC5FB52F4487EF00867DB2 /* ImportReportView.swift in Sources */,
 				D9E529BD2E33D64C00B01B99 /* TimezoneSettingsView.swift in Sources */,
 				1B1B1B1B1B1B1B1B1B1B1B1B /* HamRadioLoggerApp.swift in Sources */,
 				D995C37C2F174A3F004BA2F6 /* SettingsView.swift in Sources */,
@@ -230,6 +237,7 @@
 				1D1D1D1D1D1D1D1D1D1D1D1D /* QSORecordEntity.swift in Sources */,
 				D93CF0C02F17E24D0090CE47 /* AdvancedFilterView.swift in Sources */,
 				D93CF0C22F17E2570090CE47 /* FilterCriteria.swift in Sources */,
+				D9DC5FB72F44880700867DB2 /* ImportResult.swift in Sources */,
 				1E1E1E1E1E1E1E1E1E1E1E1E /* HamRadioLoggerModel.swift in Sources */,
 				1F1F1F1F1F1F1F1F1F1F1F1F /* QSORecordView.swift in Sources */,
 				1G1G1G1G1G1G1G1G1G1G1G1G /* LogQueryView.swift in Sources */,

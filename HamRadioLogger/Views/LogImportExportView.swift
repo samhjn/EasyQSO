@@ -220,10 +220,11 @@ struct LogImportExportView: View {
                     do {
                         let data = try Data(contentsOf: url)
                         importedData = data
-                        if url.pathExtension.lowercased() == "adi" || url.pathExtension.lowercased() == "adif" {
-                            importADIF(data)
-                        } else if url.pathExtension.lowercased() == "csv" {
+                        let ext = url.pathExtension.lowercased()
+                        if ext == "csv" {
                             importCSV(data)
+                        } else {
+                            importADIF(data)
                         }
                     } catch {
                         alertTitle = LocalizedStrings.importFailed.localized
@@ -255,10 +256,11 @@ struct LogImportExportView: View {
                 documentPickerDelegate.viewContext = viewContext
                 documentPickerDelegate.importHandler = { data in
                     if let url = documentPickerDelegate.importedFileURL {
-                        if url.pathExtension.lowercased() == "adi" || url.pathExtension.lowercased() == "adif" {
-                            importADIF(data)
-                        } else if url.pathExtension.lowercased() == "csv" {
+                        let ext = url.pathExtension.lowercased()
+                        if ext == "csv" {
                             importCSV(data)
+                        } else {
+                            importADIF(data)
                         }
                     }
                 }
@@ -339,15 +341,30 @@ struct LogImportExportView: View {
             let (dateString, timeString) = TimezoneManager.formatDateForADIF(record.date)
             adif += "<CALL:\(record.callsign.count)>\(record.callsign)"
             adif += "<QSO_DATE:8>\(dateString)"
-            adif += "<TIME_ON:4>\(timeString)"
+            adif += "<TIME_ON:\(timeString.count)>\(timeString)"
             adif += "<BAND:\(record.band.count)>\(record.band)"
             adif += "<MODE:\(record.mode.count)>\(record.mode)"
-            if record.frequency > 0 {
-                let freqString = String(format: "%.3f", record.frequency)
+            if record.frequencyMHz > 0 {
+                // 使用6位小数保持完整精度（到Hz级别），移除尾随零以符合ADIF标准
+                var freqString = String(format: "%.6f", record.frequencyMHz)
+                // 移除尾随的零和可能的小数点
+                while freqString.hasSuffix("0") && freqString.contains(".") {
+                    freqString.removeLast()
+                }
+                if freqString.hasSuffix(".") {
+                    freqString.removeLast()
+                }
                 adif += "<FREQ:\(freqString.count)>\(freqString)"
             }
-            if record.rxFrequency > 0 {
-                let rxFreqString = String(format: "%.3f", record.rxFrequency)
+            if record.rxFrequencyMHz > 0 {
+                var rxFreqString = String(format: "%.6f", record.rxFrequencyMHz)
+                // 移除尾随的零和可能的小数点
+                while rxFreqString.hasSuffix("0") && rxFreqString.contains(".") {
+                    rxFreqString.removeLast()
+                }
+                if rxFreqString.hasSuffix(".") {
+                    rxFreqString.removeLast()
+                }
                 adif += "<FREQ_RX:\(rxFreqString.count)>\(rxFreqString)"
             }
             if let txPower = record.txPower, !txPower.isEmpty {
@@ -388,8 +405,9 @@ struct LogImportExportView: View {
             // 使用选定的导出时区格式化时间
             let (dateString, timeString) = TimezoneManager.formatDateForCSV(record.date, timezone: exportTimezone)
             
-            let frequency = record.frequency > 0 ? String(format: "%.3f", record.frequency) : ""
-            let rxFrequency = record.rxFrequency > 0 ? String(format: "%.3f", record.rxFrequency) : ""
+            // 使用6位小数保持完整精度（到Hz级别）
+            let frequency = record.frequencyMHz > 0 ? String(format: "%.6f", record.frequencyMHz) : ""
+            let rxFrequency = record.rxFrequencyMHz > 0 ? String(format: "%.6f", record.rxFrequencyMHz) : ""
             let txPower = record.txPower ?? ""
             let name = record.name ?? ""
             let qth = record.qth ?? ""
@@ -457,7 +475,7 @@ struct LogImportExportView: View {
         var importCount = 0
         for record in records {
             let trimmedRecord = record.trimmingCharacters(in: .whitespacesAndNewlines)
-            if trimmedRecord.isEmpty || !trimmedRecord.contains("<CALL:") { continue }
+            if trimmedRecord.isEmpty || !trimmedRecord.uppercased().contains("<CALL:") { continue }
             guard let callsign = extractField(from: trimmedRecord, fieldName: "CALL") else { continue }
             let dateString = extractField(from: trimmedRecord, fieldName: "QSO_DATE") ?? ""
             let timeString = extractField(from: trimmedRecord, fieldName: "TIME_ON") ?? ""
@@ -473,7 +491,7 @@ struct LogImportExportView: View {
                 exist.callsign.uppercased() == callsign.uppercased() &&
                 exist.band == band &&
                 exist.mode == mode &&
-                abs(exist.frequency - frequency) < 0.001 &&
+                abs(exist.frequencyMHz - frequency) < 0.001 &&
                 Calendar.current.isDate(exist.date, equalTo: qsoDate, toGranularity: .minute)
             }
             if isDuplicate { continue }
@@ -482,8 +500,8 @@ struct LogImportExportView: View {
             newQSO.date = qsoDate
             newQSO.band = band
             newQSO.mode = mode
-            newQSO.frequency = frequency
-            newQSO.rxFrequency = Double(extractField(from: trimmedRecord, fieldName: "FREQ_RX") ?? "") ?? 0.0
+            newQSO.frequencyMHz = frequency
+            newQSO.rxFrequencyMHz = Double(extractField(from: trimmedRecord, fieldName: "FREQ_RX") ?? "") ?? 0.0
             newQSO.txPower = extractField(from: trimmedRecord, fieldName: "TX_PWR")
             newQSO.rstSent = extractField(from: trimmedRecord, fieldName: "RST_SENT") ?? "59"
             newQSO.rstReceived = extractField(from: trimmedRecord, fieldName: "RST_RCVD") ?? "59"
@@ -552,11 +570,11 @@ struct LogImportExportView: View {
             if fields.count > 4 { newQSO.mode = fields[4] }
             
             if fields.count > 5 && !fields[5].isEmpty {
-                newQSO.frequency = Double(fields[5]) ?? 0.0
+                newQSO.frequencyMHz = Double(fields[5]) ?? 0.0
             }
             
             if fields.count > 6 && !fields[6].isEmpty {
-                newQSO.rxFrequency = Double(fields[6]) ?? 0.0
+                newQSO.rxFrequencyMHz = Double(fields[6]) ?? 0.0
             }
             
             if fields.count > 7 { newQSO.txPower = fields[7].isEmpty ? nil : fields[7] }
@@ -588,7 +606,7 @@ struct LogImportExportView: View {
     private func extractField(from record: String, fieldName: String) -> String? {
         let pattern = "<\(fieldName):(\\d+)>([^<]*)"
         
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else {
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else {
             return nil
         }
         
@@ -597,11 +615,27 @@ struct LogImportExportView: View {
             return nil
         }
         
+        // 提取ADIF标注的长度
+        guard let lengthRange = Range(match.range(at: 1), in: record),
+              let length = Int(record[lengthRange]) else {
+            return nil
+        }
+        
+        // 长度为0表示字段值为空，返回nil让调用方使用默认值
+        if length == 0 {
+            return nil
+        }
+        
         guard let valueRange = Range(match.range(at: 2), in: record) else {
             return nil
         }
         
-        return String(record[valueRange])
+        let rawValue = String(record[valueRange])
+        // 按照ADIF标注的长度截取，避免多取数据
+        if rawValue.count > length {
+            return String(rawValue.prefix(length))
+        }
+        return rawValue.isEmpty ? nil : rawValue
     }
     
     private func formattedDate() -> String {

@@ -116,6 +116,7 @@ class TimezoneManager {
     }
     
     /// 合并日期和时间字符串（支持不同时区）
+    /// 自动识别时间格式：4位（HHMM）、6位（HHMMSS）或其他
     static func combineDateTime(dateString: String, timeString: String, 
                                dateFormat: String, timeFormat: String, 
                                timezone: TimeZone) -> Date? {
@@ -126,14 +127,41 @@ class TimezoneManager {
         let dateFormatter = createDateFormatter(format: dateFormat, timezone: timezone)
         guard let baseDate = dateFormatter.date(from: dateString) else { return nil }
         
-        // 如果没有时间字符串，就返回当天的开始时间
+        // 如果没有时间字符串或时间字符串太短，就返回当天的开始时间
         guard !timeString.isEmpty && timeString.count >= 4 else {
             return baseDate
         }
         
-        // 解析时间
-        let hour = Int(timeString.prefix(2)) ?? 0
-        let minute = Int(timeString.dropFirst(2).prefix(2)) ?? 0
+        // 解析时间（自动识别格式）
+        // ADIF标准支持：
+        // - 4位：HHMM（时分）
+        // - 6位：HHMMSS（时分秒）
+        let hour: Int
+        let minute: Int
+        let second: Int
+        
+        // 提取小时（前2位）
+        if let h = Int(timeString.prefix(2)), h >= 0 && h <= 23 {
+            hour = h
+        } else {
+            hour = 0
+        }
+        
+        // 提取分钟（第3-4位）
+        if timeString.count >= 4,
+           let m = Int(timeString.dropFirst(2).prefix(2)), m >= 0 && m <= 59 {
+            minute = m
+        } else {
+            minute = 0
+        }
+        
+        // 提取秒数（第5-6位，如果有的话）
+        if timeString.count >= 6,
+           let s = Int(timeString.dropFirst(4).prefix(2)), s >= 0 && s <= 59 {
+            second = s
+        } else {
+            second = 0
+        }
         
         // 使用指定时区的日历
         var calendar = Calendar.current
@@ -143,7 +171,7 @@ class TimezoneManager {
         var components = calendar.dateComponents([.year, .month, .day], from: baseDate)
         components.hour = hour
         components.minute = minute
-        components.second = 0
+        components.second = second
         
         return calendar.date(from: components)
     }
@@ -151,19 +179,31 @@ class TimezoneManager {
     // MARK: - ADIF标准时间处理
     
     /// 将本地时间转换为ADIF标准的UTC时间格式
+    /// 导出格式：
+    /// - 日期：YYYYMMDD（8位）
+    /// - 时间：HHMMSS（6位，包含秒数）
+    /// 
+    /// 注：ADIF标准同时支持4位（HHMM）和6位（HHMMSS）时间格式，
+    /// 我们导出6位格式以保留完整精度，导入时同时支持两种格式。
     static func formatDateForADIF(_ date: Date) -> (date: String, time: String) {
         let dateString = formatDateAsUTC(date, format: "yyyyMMdd")
-        let timeString = formatDateAsUTC(date, format: "HHmm")
+        // 使用6位时间格式（HHmmss）包含秒数，以保持最大精度
+        let timeString = formatDateAsUTC(date, format: "HHmmss")
         return (date: dateString, time: timeString)
     }
     
     /// 从ADIF格式解析时间（假设为UTC）
+    /// 支持4位（HHMM）和6位（HHMMSS）时间格式
     static func parseDateFromADIF(dateString: String, timeString: String) -> Date {
-        // 尝试从UTC解析
+        // ADIF标准支持两种时间格式：
+        // - 4位：HHMM（只有时分）
+        // - 6位：HHMMSS（有时分秒）
+        
+        // 尝试从UTC解析（ADIF标准时间）
         if let date = combineDateTime(dateString: dateString, 
                                     timeString: timeString,
                                     dateFormat: "yyyyMMdd", 
-                                    timeFormat: "HHmm",
+                                    timeFormat: "", // 未使用，combineDateTime会自动判断
                                     timezone: utcTimezone) {
             return date
         }
@@ -172,7 +212,7 @@ class TimezoneManager {
         if let date = combineDateTime(dateString: dateString, 
                                     timeString: timeString,
                                     dateFormat: "yyyyMMdd", 
-                                    timeFormat: "HHmm",
+                                    timeFormat: "",
                                     timezone: localTimezone) {
             return date
         }

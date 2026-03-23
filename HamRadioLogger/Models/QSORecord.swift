@@ -55,6 +55,66 @@ class PersistenceController {
         // 启用自动合并策略
         container.viewContext.automaticallyMergesChangesFromParent = true
         container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        
+        // 执行数据迁移（如果需要）
+        migrateFrequencyDataIfNeeded()
+    }
+    
+    // MARK: - 数据迁移
+    
+    /// 迁移旧版本的频率数据（从MHz的Double格式迁移到Hz的Int64格式）
+    private func migrateFrequencyDataIfNeeded() {
+        let context = container.viewContext
+        let fetchRequest = NSFetchRequest<QSORecord>(entityName: "QSORecord")
+        
+        // 只获取需要迁移的记录（frequencyHz为0但可能有旧数据）
+        fetchRequest.predicate = NSPredicate(format: "frequencyHz == 0 OR rxFrequencyHz == 0")
+        
+        do {
+            let records = try context.fetch(fetchRequest)
+            if records.isEmpty {
+                print("✓ 无需迁移频率数据")
+                return
+            }
+            
+            print("开始迁移 \(records.count) 条记录的频率数据...")
+            var migratedCount = 0
+            
+            for record in records {
+                var needsSave = false
+                
+                // 检查是否需要迁移（通过检查旧字段是否有值）
+                if record.frequencyHz == 0 {
+                    // 尝试通过计算属性读取，会自动从旧字段读取
+                    let freq = record.frequencyMHz
+                    if freq > 0 {
+                        record.frequencyMHz = freq // 这会触发setter，将数据转换为Hz格式
+                        needsSave = true
+                    }
+                }
+                
+                if record.rxFrequencyHz == 0 {
+                    let rxFreq = record.rxFrequencyMHz
+                    if rxFreq > 0 {
+                        record.rxFrequencyMHz = rxFreq
+                        needsSave = true
+                    }
+                }
+                
+                if needsSave {
+                    migratedCount += 1
+                }
+            }
+            
+            if migratedCount > 0 {
+                try context.save()
+                print("✓ 成功迁移 \(migratedCount) 条记录的频率数据")
+            } else {
+                print("✓ 所有记录已是新格式，无需迁移")
+            }
+        } catch {
+            print("✗ 频率数据迁移失败: \(error.localizedDescription)")
+        }
     }
     
     // 创建一个用于预览的内存中存储的控制器
@@ -68,8 +128,12 @@ class PersistenceController {
             record.date = Date().addingTimeInterval(-Double(i * 86400))
             record.band = ["20m", "40m", "80m"].randomElement()!
             record.mode = ["SSB", "CW", "FT8"].randomElement()!
-            record.frequency = Double.random(in: 7.0...14.3)
-            record.rxFrequency = record.frequency + Double.random(in: -0.01...0.01)
+            
+            // 使用新的频率格式（Hz为单位的整数）
+            let freqMHz = Double.random(in: 7.0...14.3)
+            record.frequencyMHz = freqMHz // 通过计算属性自动转换为Hz
+            record.rxFrequencyMHz = freqMHz + Double.random(in: -0.01...0.01)
+            
             record.txPower = i % 4 == 0 ? nil : ["100W", "50W", "20W", "10W"].randomElement()!
             record.rstSent = "5\(Int.random(in: 1...9))"
             record.rstReceived = "5\(Int.random(in: 1...9))"
