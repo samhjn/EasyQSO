@@ -43,6 +43,9 @@ struct SettingsView: View {
     @StateObject private var documentPickerDelegate = DocumentPickerDelegate()
     @State private var documentInteractionDelegate = DocumentInteractionDelegate()
     
+    // 字段设置
+    @State private var showingFieldSettings = false
+    
     // 导入报告相关
     @State private var showingImportReport = false
     @State private var importResult: ImportResult?
@@ -54,6 +57,15 @@ struct SettingsView: View {
     @State private var useFilterForExport = false
     
     let exportFormats = ["ADIF", "CSV"]
+    
+    var fieldSettingsSummary: String {
+        let vm = FieldVisibilityManager.shared
+        var visible = 0
+        for field in ADIFFields.all {
+            if vm.visibility(for: field.id) == .visible { visible += 1 }
+        }
+        return "\(visible)/\(ADIFFields.all.count)"
+    }
     
     var filteredExportRecords: [QSORecord] {
         let records = Array(qsoRecords)
@@ -73,6 +85,30 @@ struct SettingsView: View {
     
     var body: some View {
         Form {
+                // ===== ADIF字段设置 =====
+                Section(header: Text("adif_field_config".localized)) {
+                    Button(action: {
+                        showingFieldSettings = true
+                    }) {
+                        HStack {
+                            Image(systemName: "list.bullet.rectangle")
+                            Text("adif_field_settings".localized)
+                            Spacer()
+                            Text(fieldSettingsSummary)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .foregroundColor(.primary)
+                    
+                    Text("adif_field_config_desc".localized)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                
                 // ===== 导入导出部分 =====
                 Section(header: Text(LocalizedStrings.importExport.localized)) {
                     // 导出日志
@@ -382,6 +418,9 @@ struct SettingsView: View {
                     initialTab: timezoneSettingsInitialTab
                 )
             }
+            .sheet(isPresented: $showingFieldSettings) {
+                FieldSettingsView()
+            }
             .sheet(isPresented: $showingImportReport) {
                 if let result = importResult {
                     ImportReportView(result: result)
@@ -471,36 +510,32 @@ struct SettingsView: View {
     }
     
     private func generateADIF(from records: [QSORecord]) -> Data {
-        var adif = "<ADIF_VERS:5>3.1.0<EOH>\n"
+        var adif = "<ADIF_VERS:5>3.1.7"
+        adif += "<PROGRAMID:6>EasQSO"
+        adif += "<PROGRAMVERSION:5>1.0.0"
+        adif += "<EOH>\n"
+        
+        let coreTagsHandledSpecially: Set<String> = [
+            "CALL", "QSO_DATE", "TIME_ON", "BAND", "MODE",
+            "FREQ", "FREQ_RX", "TX_PWR", "RST_SENT", "RST_RCVD",
+            "NAME", "QTH", "GRIDSQUARE", "CQZ", "ITUZ",
+            "SAT_NAME", "COMMENT", "LAT", "LON"
+        ]
+        
         for record in records {
-            // ADIF标准要求使用UTC时间
             let (dateString, timeString) = TimezoneManager.formatDateForADIF(record.date)
             adif += "<CALL:\(record.callsign.count)>\(record.callsign)"
             adif += "<QSO_DATE:8>\(dateString)"
             adif += "<TIME_ON:\(timeString.count)>\(timeString)"
             adif += "<BAND:\(record.band.count)>\(record.band)"
             adif += "<MODE:\(record.mode.count)>\(record.mode)"
+            
             if record.frequencyMHz > 0 {
-                // 使用6位小数保持完整精度（到Hz级别），移除尾随零以符合ADIF标准
-                var freqString = String(format: "%.6f", record.frequencyMHz)
-                // 移除尾随的零和可能的小数点
-                while freqString.hasSuffix("0") && freqString.contains(".") {
-                    freqString.removeLast()
-                }
-                if freqString.hasSuffix(".") {
-                    freqString.removeLast()
-                }
+                let freqString = formatFreqForADIF(record.frequencyMHz)
                 adif += "<FREQ:\(freqString.count)>\(freqString)"
             }
             if record.rxFrequencyMHz > 0 {
-                var rxFreqString = String(format: "%.6f", record.rxFrequencyMHz)
-                // 移除尾随的零和可能的小数点
-                while rxFreqString.hasSuffix("0") && rxFreqString.contains(".") {
-                    rxFreqString.removeLast()
-                }
-                if rxFreqString.hasSuffix(".") {
-                    rxFreqString.removeLast()
-                }
+                let rxFreqString = formatFreqForADIF(record.rxFrequencyMHz)
                 adif += "<FREQ_RX:\(rxFreqString.count)>\(rxFreqString)"
             }
             if let txPower = record.txPower, !txPower.isEmpty {
@@ -529,9 +564,25 @@ struct SettingsView: View {
             if let remarks = record.remarks, !remarks.isEmpty {
                 adif += "<COMMENT:\(remarks.count)>\(remarks)"
             }
+            
+            // Export all extended ADIF fields stored in JSON
+            for (tag, value) in record.adifFields where !coreTagsHandledSpecially.contains(tag) {
+                if !value.isEmpty {
+                    let byteCount = value.utf8.count
+                    adif += "<\(tag):\(byteCount)>\(value)"
+                }
+            }
+            
             adif += "<EOR>\n"
         }
         return Data(adif.utf8)
+    }
+    
+    private func formatFreqForADIF(_ mhz: Double) -> String {
+        var s = String(format: "%.6f", mhz)
+        while s.hasSuffix("0") && s.contains(".") { s.removeLast() }
+        if s.hasSuffix(".") { s.removeLast() }
+        return s
     }
     
     private func generateCSV(from records: [QSORecord]) -> Data {
@@ -706,6 +757,23 @@ struct SettingsView: View {
             newQSO.ituZone = extractField(from: trimmedRecord, fieldName: "ITUZ")
             newQSO.satellite = extractField(from: trimmedRecord, fieldName: "SAT_NAME")
             newQSO.remarks = extractField(from: trimmedRecord, fieldName: "COMMENT")
+            
+            // Import ALL additional ADIF fields losslessly
+            let coreImportTags: Set<String> = [
+                "CALL", "QSO_DATE", "TIME_ON", "BAND", "MODE", "FREQ", "FREQ_RX",
+                "TX_PWR", "RST_SENT", "RST_RCVD", "NAME", "QTH", "GRIDSQUARE",
+                "CQZ", "ITUZ", "SAT_NAME", "COMMENT"
+            ]
+            var extFields = [String: String]()
+            let allExtracted = extractAllFields(from: trimmedRecord)
+            for (tag, value) in allExtracted {
+                if !coreImportTags.contains(tag.uppercased()) && !value.isEmpty {
+                    extFields[tag.uppercased()] = value
+                }
+            }
+            if !extFields.isEmpty {
+                newQSO.adifFields = extFields
+            }
             
             // 记录成功导入
             result.successRecords.append(ImportRecord(
@@ -904,6 +972,34 @@ struct SettingsView: View {
         alertMessage = summary
         importHasDetails = result.hasIssues
         showingAlert = true
+    }
+    
+    /// Extract ALL ADIF fields from a record string for lossless import
+    private func extractAllFields(from record: String) -> [String: String] {
+        var result = [String: String]()
+        let pattern = "<([A-Za-z_][A-Za-z0-9_]*):(\\d+)(?::[A-Za-z])?>([^<]*)"
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else {
+            return result
+        }
+        let nsRange = NSRange(record.startIndex..<record.endIndex, in: record)
+        let matches = regex.matches(in: record, options: [], range: nsRange)
+        
+        for match in matches {
+            guard let nameRange = Range(match.range(at: 1), in: record),
+                  let lengthRange = Range(match.range(at: 2), in: record),
+                  let valueRange = Range(match.range(at: 3), in: record),
+                  let length = Int(record[lengthRange]) else { continue }
+            
+            let fieldName = String(record[nameRange]).uppercased()
+            if length == 0 { continue }
+            
+            let rawValue = String(record[valueRange])
+            let value = rawValue.count > length ? String(rawValue.prefix(length)) : rawValue
+            if !value.isEmpty {
+                result[fieldName] = value
+            }
+        }
+        return result
     }
     
     private func extractField(from record: String, fieldName: String) -> String? {

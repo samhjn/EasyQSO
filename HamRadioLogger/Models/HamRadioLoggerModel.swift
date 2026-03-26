@@ -180,6 +180,13 @@ class HamRadioLoggerModel {
         longitudeAttribute.defaultValue = 0.0
         properties.append(longitudeAttribute)
         
+        // ADIF扩展字段（JSON格式存储所有非核心ADIF字段）
+        let adifFieldsAttribute = NSAttributeDescription()
+        adifFieldsAttribute.name = "adifFieldsData"
+        adifFieldsAttribute.attributeType = .binaryDataAttributeType
+        adifFieldsAttribute.isOptional = true
+        properties.append(adifFieldsAttribute)
+        
         // 将属性添加到实体
         qsoRecordEntity.properties = properties
         

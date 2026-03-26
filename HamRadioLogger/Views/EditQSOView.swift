@@ -6,14 +6,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 import SwiftUI
@@ -23,13 +15,15 @@ struct EditQSOView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var qthManager = QTHManager()
-    @FocusState private var focusedField: FormField?
+    @ObservedObject private var fieldVisibility = FieldVisibilityManager.shared
+    @FocusState private var focusedField: String?
     
     let record: QSORecord
     
-    // 使用简单的@State属性，避免复杂的状态管理
+    // Core fields
     @State private var callsign: String
     @State private var date: Date
+    @State private var endDate: Date
     @State private var band: String
     @State private var mode: String
     @State private var frequency: String
@@ -49,33 +43,155 @@ struct EditQSOView: View {
     @State private var alertMessage = ""
     @State private var isValidationError = false
     
-    // 频率和波段交互控制
+    // ADIF extended fields
+    @State private var extendedFields: [String: String]
+    
     @State private var isBandChangedByFrequency = false
     
-    // 己方QTH相关状态
+    // 己方QTH
     @State private var ownQTH = ""
     @State private var ownGridSquare = ""
     @State private var ownCQZone = ""
     @State private var ownITUZone = ""
     
-    // 地图相关状态
+    // 地图
     @State private var showingMapPicker = false
     @State private var showingOwnMapPicker = false
     @State private var selectedLocation: CLLocationCoordinate2D?
     @State private var selectedOwnLocation: CLLocationCoordinate2D?
-    @State private var mapPickerID = UUID() // 添加唯一标识符
-    @State private var ownMapPickerID = UUID() // 添加唯一标识符
-    
-    // 添加状态来防止页面意外关闭
+    @State private var mapPickerID = UUID()
+    @State private var ownMapPickerID = UUID()
     @State private var isMapPickerActive = false
     
     let bands = ["160m", "80m", "40m", "30m", "20m", "17m", "15m", "12m", "10m", "6m", "2m", "70cm"]
     let modes = ["SSB", "CW", "FM", "AM", "RTTY", "PSK", "FT8", "FT4", "JT65"]
     
+    // MARK: - Group visibility
+    
+    private var dateTimeVis: ADIFFieldVisibility {
+        fieldVisibility.groupVisibility(for: "group_datetime")
+    }
+    
+    private var endDateTimeVis: ADIFFieldVisibility {
+        fieldVisibility.groupVisibility(for: "group_end_datetime")
+    }
+    
+    private var contactedQTHVis: ADIFFieldVisibility {
+        fieldVisibility.groupVisibility(for: "group_contacted_qth")
+    }
+    
+    private var ownQTHVis: ADIFFieldVisibility {
+        fieldVisibility.groupVisibility(for: "group_own_qth")
+    }
+    
+    private var showContactedStationSection: Bool {
+        contactedQTHVis == .visible || fieldVisibility.hasVisibleFields(for: .contactedStation)
+    }
+    
+    private var showOwnStationSection: Bool {
+        ownQTHVis == .visible || fieldVisibility.hasVisibleFields(for: .ownStation)
+    }
+    
+    private var hasCollapsedGroupContent: Bool {
+        dateTimeVis == .collapsed || endDateTimeVis == .collapsed ||
+        contactedQTHVis == .collapsed || ownQTHVis == .collapsed
+    }
+    
+    // MARK: - Hidden fields with existing data (for edit mode)
+    
+    private var hiddenExtendedFieldsWithValues: [ADIFFieldDef] {
+        ADIFFields.all.filter { field in
+            !ADIFFields.groupedFieldIds.contains(field.id) &&
+            field.coreProperty == nil &&
+            fieldVisibility.visibility(for: field.id) == .hidden &&
+            !(extendedFields[field.id] ?? "").isEmpty
+        }
+    }
+    
+    private var hasAnyHiddenFieldWithValue: Bool {
+        if fieldVisibility.visibility(for: "FREQ") == .hidden && !frequency.isEmpty { return true }
+        if fieldVisibility.visibility(for: "FREQ_RX") == .hidden && !rxFrequency.isEmpty { return true }
+        if fieldVisibility.visibility(for: "TX_PWR") == .hidden && !txPower.isEmpty { return true }
+        if fieldVisibility.visibility(for: "SAT_NAME") == .hidden && !satellite.isEmpty { return true }
+        if fieldVisibility.visibility(for: "NAME") == .hidden && !name.isEmpty { return true }
+        if fieldVisibility.visibility(for: "COMMENT") == .hidden && !remarks.isEmpty { return true }
+        if contactedQTHVis == .hidden &&
+           (!qth.isEmpty || !gridSquare.isEmpty || !cqZone.isEmpty || !ituZone.isEmpty) { return true }
+        if ownQTHVis == .hidden &&
+           (!ownQTH.isEmpty || !ownGridSquare.isEmpty || !ownCQZone.isEmpty || !ownITUZone.isEmpty) { return true }
+        if endDateTimeVis == .hidden &&
+           (!(extendedFields["TIME_OFF"] ?? "").isEmpty || !(extendedFields["QSO_DATE_OFF"] ?? "").isEmpty) { return true }
+        if !hiddenExtendedFieldsWithValues.isEmpty { return true }
+        return false
+    }
+    
+    // MARK: - Keyboard ordered fields
+    
+    private var keyboardOrderedFieldIDs: [String] {
+        var ids: [String] = []
+        ids.append("CALL")
+        if fieldVisibility.isCoreFieldVisible(for: "FREQ") {
+            ids.append("FREQ")
+        }
+        ids.append(contentsOf: fieldVisibility.visibleFields(for: .basic).map(\.id))
+        
+        ids.append("RST_SENT")
+        ids.append("RST_RCVD")
+        
+        let hasRxFreq = fieldVisibility.isCoreFieldVisible(for: "FREQ_RX")
+        let hasTxPwr = fieldVisibility.isCoreFieldVisible(for: "TX_PWR")
+        let hasSatName = fieldVisibility.isCoreFieldVisible(for: "SAT_NAME")
+        let hasDynTech = fieldVisibility.hasVisibleFields(for: .technical)
+        let hasDynSat = fieldVisibility.hasVisibleFields(for: .satellite)
+        if hasRxFreq || hasTxPwr || hasSatName || hasDynTech || hasDynSat {
+            if hasRxFreq { ids.append("FREQ_RX") }
+            if hasTxPwr { ids.append("TX_PWR") }
+            if hasSatName { ids.append("SAT_NAME") }
+            ids.append(contentsOf: fieldVisibility.visibleFields(for: .technical).map(\.id))
+            ids.append(contentsOf: fieldVisibility.visibleFields(for: .satellite).map(\.id))
+        }
+        
+        if contactedQTHVis == .visible {
+            ids.append(contentsOf: ["QTH", "GRIDSQUARE", "CQZ", "ITUZ"])
+        }
+        ids.append(contentsOf: fieldVisibility.visibleFields(for: .contactedStation).map(\.id))
+        
+        if ownQTHVis == .visible {
+            ids.append(contentsOf: ["MY_CITY", "MY_GRIDSQUARE", "MY_CQ_ZONE", "MY_ITU_ZONE"])
+        }
+        ids.append(contentsOf: fieldVisibility.visibleFields(for: .ownStation).map(\.id))
+        
+        let hasName = fieldVisibility.isCoreFieldVisible(for: "NAME")
+        let hasComment = fieldVisibility.isCoreFieldVisible(for: "COMMENT")
+        let hasDynOp = fieldVisibility.hasVisibleFields(for: .contactedOp)
+        let hasDynNotes = fieldVisibility.hasVisibleFields(for: .notes)
+        if hasName || hasComment || hasDynOp || hasDynNotes {
+            if hasName { ids.append("NAME") }
+            if hasComment { ids.append("COMMENT") }
+            ids.append(contentsOf: fieldVisibility.visibleFields(for: .contactedOp).map(\.id))
+            ids.append(contentsOf: fieldVisibility.visibleFields(for: .notes).map(\.id))
+        }
+        
+        for cat in dynamicOnlyCategories {
+            ids.append(contentsOf: fieldVisibility.visibleFields(for: cat).map(\.id))
+        }
+        
+        if contactedQTHVis == .collapsed {
+            ids.append(contentsOf: ["QTH", "GRIDSQUARE", "CQZ", "ITUZ"])
+        }
+        if ownQTHVis == .collapsed {
+            ids.append(contentsOf: ["MY_CITY", "MY_GRIDSQUARE", "MY_CQ_ZONE", "MY_ITU_ZONE"])
+        }
+        ids.append(contentsOf: fieldVisibility.allCollapsedFields().map(\.id))
+        
+        return ids
+    }
+    
+    // MARK: - Init
+    
     init(record: QSORecord) {
         self.record = record
         
-        // 直接初始化状态变量
         _callsign = State(initialValue: record.callsign)
         _date = State(initialValue: record.date)
         _band = State(initialValue: record.band)
@@ -92,57 +208,69 @@ struct EditQSOView: View {
         _ituZone = State(initialValue: record.ituZone ?? "")
         _satellite = State(initialValue: record.satellite ?? "")
         _remarks = State(initialValue: record.remarks ?? "")
+        _extendedFields = State(initialValue: record.adifFields)
         
-        // 坐标初始化：优先使用已存储的坐标，如果没有则尝试从网格坐标转换
+        let adif = record.adifFields
+        if let parsed = ADIFDateTimeHelper.adifToDate(dateStr: adif["QSO_DATE_OFF"], timeStr: adif["TIME_OFF"]) {
+            _endDate = State(initialValue: parsed)
+        } else {
+            _endDate = State(initialValue: record.date)
+        }
+        
         if let existingCoordinate = record.coordinate {
-            // 使用已存储的坐标
             _selectedLocation = State(initialValue: existingCoordinate)
         } else if let gridSquare = record.gridSquare, !gridSquare.isEmpty {
-            // 如果没有坐标但有网格坐标，尝试转换
             _selectedLocation = State(initialValue: QTHManager.coordinateFromGridSquare(gridSquare))
         } else {
             _selectedLocation = State(initialValue: nil)
         }
     }
     
+    // MARK: - Body
+    
     var body: some View {
         Form {
+            // ═══════════ Basic Info ═══════════
             Section(header: Text(LocalizedStrings.basicInfo.localized)) {
                 TextField(LocalizedStrings.callsign.localized, text: $callsign)
                     .autocapitalization(.allCharacters)
-                    .focused($focusedField, equals: .callsign)
+                    .focused($focusedField, equals: "CALL")
                     .onChange(of: callsign) { newValue in
                         callsign = newValue.uppercased()
                     }
                 
-                DatePicker(LocalizedStrings.dateTime.localized, selection: $date)
+                if dateTimeVis == .visible {
+                    DatePicker(LocalizedStrings.dateTime.localized, selection: $date)
+                }
                 
-                TextField(LocalizedStrings.frequency.localized, text: $frequency)
-                    .keyboardType(.decimalPad)
-                    .focused($focusedField, equals: .frequency)
-                    .onChange(of: frequency) { newValue in
-                        // 当频率改变时，自动选择对应的波段
-                        if let freq = Double(newValue), let autoBand = QSORecord.bandForFrequency(freq) {
-                            if band != autoBand {
-                                // 标记这次波段改变是由频率引起的
-                                isBandChangedByFrequency = true
-                                band = autoBand
+                if endDateTimeVis == .visible {
+                    DatePicker(
+                        ADIFFields.fieldGroups.first { $0.id == "group_end_datetime" }?.displayName ?? "end_date".localized,
+                        selection: $endDate
+                    )
+                }
+                
+                if fieldVisibility.isCoreFieldVisible(for: "FREQ") {
+                    TextField(LocalizedStrings.frequency.localized, text: $frequency)
+                        .keyboardType(.decimalPad)
+                        .focused($focusedField, equals: "FREQ")
+                        .onChange(of: frequency) { newValue in
+                            if let freq = Double(newValue), let autoBand = QSORecord.bandForFrequency(freq) {
+                                if band != autoBand {
+                                    isBandChangedByFrequency = true
+                                    band = autoBand
+                                }
                             }
                         }
-                    }
+                }
                 
                 Picker(LocalizedStrings.band.localized, selection: $band) {
-                    ForEach(bands, id: \.self) {
-                        Text($0)
-                    }
+                    ForEach(bands, id: \.self) { Text($0) }
                 }
                 .onChange(of: band) { newBand in
-                    // 如果波段改变是由频率引起的，不更新频率
                     if isBandChangedByFrequency {
-                        // 重置标志
                         isBandChangedByFrequency = false
                     } else {
-                        // 用户直接选择波段，自动填入该波段的最后使用频率
                         if let lastFreq = QSORecord.lastFrequencyForBand(newBand, context: viewContext) {
                             frequency = String(lastFreq)
                         }
@@ -150,119 +278,53 @@ struct EditQSOView: View {
                 }
                 
                 Picker(LocalizedStrings.mode.localized, selection: $mode) {
-                    ForEach(modes, id: \.self) {
-                        Text($0)
-                    }
+                    ForEach(modes, id: \.self) { Text($0) }
                 }
+                
+                ADIFDynamicFieldRows(extendedFields: $extendedFields, category: .basic, visibilityManager: fieldVisibility, focusedField: $focusedField)
             }
             
+            // ═══════════ Signal Report ═══════════
             Section(header: Text(LocalizedStrings.signalReport.localized)) {
                 TextField(LocalizedStrings.rstSent.localized, text: $rstSent)
-                    .focused($focusedField, equals: .rstSent)
+                    .focused($focusedField, equals: "RST_SENT")
                     .onChange(of: rstSent) { newValue in
                         rstSent = newValue.uppercased()
                     }
                 TextField(LocalizedStrings.rstReceived.localized, text: $rstReceived)
-                    .focused($focusedField, equals: .rstReceived)
+                    .focused($focusedField, equals: "RST_RCVD")
                     .onChange(of: rstReceived) { newValue in
                         rstReceived = newValue.uppercased()
                     }
             }
             
-            Section(header: Text(LocalizedStrings.technicalInfo.localized)) {
-                TextField(LocalizedStrings.rxFrequency.localized, text: $rxFrequency)
-                    .keyboardType(.decimalPad)
-                    .focused($focusedField, equals: .rxFrequency)
-                
-                TextField(LocalizedStrings.txPower.localized, text: $txPower)
-                    .focused($focusedField, equals: .txPower)
-                
-                TextField(LocalizedStrings.satellite.localized, text: $satellite)
-                    .focused($focusedField, equals: .satellite)
+            // ═══════════ Technical ═══════════
+            technicalSection
+            
+            // ═══════════ Contacted Station ═══════════
+            contactedStationSection
+            
+            // ═══════════ Own Station ═══════════
+            ownStationSection
+            
+            // ═══════════ Additional Info ═══════════
+            additionalInfoSection
+            
+            // ═══════════ Dynamic-only sections ═══════════
+            ForEach(dynamicOnlyCategories, id: \.self) { category in
+                ADIFDynamicSection(extendedFields: $extendedFields, category: category, visibilityManager: fieldVisibility, focusedField: $focusedField)
             }
             
-            // 己方QTH信息段落
-            Section(header: Text(LocalizedStrings.ownQthInfo.localized)) {
-                HStack {
-                    TextField(LocalizedStrings.ownQth.localized, text: $ownQTH)
-                        .focused($focusedField, equals: .ownQTH)
-                    
-                    Button(LocalizedStrings.selectOnMap.localized) {
-                        // 关闭键盘后再打开地图选择器
-                        focusedField = nil
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            ownMapPickerID = UUID()
-                            isMapPickerActive = true
-                            showingOwnMapPicker = true
-                        }
-                    }
-                    .font(.caption)
-                    .foregroundColor(.blue)
-                }
-                
-                TextField(LocalizedStrings.gridSquare.localized, text: $ownGridSquare)
-                    .focused($focusedField, equals: .ownGridSquare)
-                    .onChange(of: ownGridSquare) { newValue in
-                        // 修复网格坐标格式：前4位大写，后2位小写
-                        ownGridSquare = formatGridSquare(newValue)
-                    }
-                
-                TextField(LocalizedStrings.cqZone.localized, text: $ownCQZone)
-                    .keyboardType(.numberPad)
-                    .focused($focusedField, equals: .ownCQZone)
-                
-                TextField(LocalizedStrings.ituZone.localized, text: $ownITUZone)
-                    .keyboardType(.numberPad)
-                    .focused($focusedField, equals: .ownITUZone)
-            }
+            // ═══════════ Collapsed (unified at bottom) ═══════════
+            collapsedSection
             
-            // 对方QTH信息段落
-            Section(header: Text(LocalizedStrings.qthInfo.localized)) {
-                HStack {
-                    TextField(LocalizedStrings.qth.localized, text: $qth)
-                        .focused($focusedField, equals: .qth)
-                    
-                    Button(LocalizedStrings.selectOnMap.localized) {
-                        // 关闭键盘后再打开地图选择器
-                        focusedField = nil
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            mapPickerID = UUID()
-                            isMapPickerActive = true
-                            showingMapPicker = true
-                        }
-                    }
-                    .font(.caption)
-                    .foregroundColor(.blue)
-                }
-                
-                TextField(LocalizedStrings.gridSquare.localized, text: $gridSquare)
-                    .focused($focusedField, equals: .gridSquare)
-                    .onChange(of: gridSquare) { newValue in
-                        // 修复网格坐标格式：前4位大写，后2位小写
-                        gridSquare = formatGridSquare(newValue)
-                    }
-                
-                TextField(LocalizedStrings.cqZone.localized, text: $cqZone)
-                    .keyboardType(.numberPad)
-                    .focused($focusedField, equals: .cqZone)
-                
-                TextField(LocalizedStrings.ituZone.localized, text: $ituZone)
-                    .keyboardType(.numberPad)
-                    .focused($focusedField, equals: .ituZone)
-            }
+            // ═══════════ Hidden fields with existing data ═══════════
+            hiddenFieldsWithValuesSection
             
-            Section(header: Text(LocalizedStrings.additionalInfo.localized)) {
-                TextField(LocalizedStrings.name.localized, text: $name)
-                    .focused($focusedField, equals: .name)
-                TextField(LocalizedStrings.remarks.localized, text: $remarks)
-                    .focused($focusedField, equals: .remarks)
-            }
-            
+            // ═══════════ Save Button ═══════════
             Section {
                 Button(action: {
-                    // 先关闭键盘
                     focusedField = nil
-                    // 延迟一小会儿再执行保存，确保键盘已关闭
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         if validateInputs() {
                             updateQSO()
@@ -282,7 +344,7 @@ struct EditQSOView: View {
         }
         .navigationTitle(LocalizedStrings.editQSO.localized)
         .toolbar {
-            KeyboardToolbar(focusedField: $focusedField)
+            KeyboardToolbar(focusedField: $focusedField, orderedFields: keyboardOrderedFieldIDs)
         }
         .alert(isPresented: $showingAlert) {
             Alert(
@@ -298,9 +360,7 @@ struct EditQSOView: View {
                 editMode: .otherQTH
             )
             .id(mapPickerID)
-            .onDisappear {
-                isMapPickerActive = false
-            }
+            .onDisappear { isMapPickerActive = false }
         }
         .fullScreenCover(isPresented: $showingOwnMapPicker) {
             EnhancedMapLocationPicker(
@@ -310,20 +370,335 @@ struct EditQSOView: View {
                 editMode: .ownQTH
             )
             .id(ownMapPickerID)
-            .onDisappear {
-                isMapPickerActive = false
-            }
+            .onDisappear { isMapPickerActive = false }
         }
         .onAppear {
-            // 延迟加载己方QTH信息，避免在视图初始化时触发状态更新
             DispatchQueue.main.async {
                 loadOwnQTHInfo()
             }
         }
     }
     
+    // MARK: - Contacted Station Section
+    
+    @ViewBuilder
+    private var contactedStationSection: some View {
+        if showContactedStationSection {
+            Section(header: Text(LocalizedStrings.qthInfo.localized)) {
+                if contactedQTHVis == .visible {
+                    contactedQTHFields
+                }
+                ADIFDynamicFieldRows(extendedFields: $extendedFields, category: .contactedStation, visibilityManager: fieldVisibility, focusedField: $focusedField)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var contactedQTHFields: some View {
+        HStack {
+            TextField(LocalizedStrings.qth.localized, text: $qth)
+                .focused($focusedField, equals: "QTH")
+            
+            Button(LocalizedStrings.selectOnMap.localized) {
+                focusedField = nil
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    mapPickerID = UUID()
+                    isMapPickerActive = true
+                    showingMapPicker = true
+                }
+            }
+            .font(.caption)
+            .foregroundColor(.blue)
+        }
+        
+        TextField(LocalizedStrings.gridSquare.localized, text: $gridSquare)
+            .focused($focusedField, equals: "GRIDSQUARE")
+            .onChange(of: gridSquare) { newValue in
+                gridSquare = formatGridSquare(newValue)
+            }
+        
+        TextField(LocalizedStrings.cqZone.localized, text: $cqZone)
+            .keyboardType(.numberPad)
+            .focused($focusedField, equals: "CQZ")
+        
+        TextField(LocalizedStrings.ituZone.localized, text: $ituZone)
+            .keyboardType(.numberPad)
+            .focused($focusedField, equals: "ITUZ")
+    }
+    
+    // MARK: - Own Station Section
+    
+    @ViewBuilder
+    private var ownStationSection: some View {
+        if showOwnStationSection {
+            Section(header: Text(LocalizedStrings.ownQthInfo.localized)) {
+                if ownQTHVis == .visible {
+                    ownQTHFields
+                }
+                ADIFDynamicFieldRows(extendedFields: $extendedFields, category: .ownStation, visibilityManager: fieldVisibility, focusedField: $focusedField)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var ownQTHFields: some View {
+        HStack {
+            TextField(LocalizedStrings.ownQth.localized, text: $ownQTH)
+                .focused($focusedField, equals: "MY_CITY")
+            
+            Button(LocalizedStrings.selectOnMap.localized) {
+                focusedField = nil
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    ownMapPickerID = UUID()
+                    isMapPickerActive = true
+                    showingOwnMapPicker = true
+                }
+            }
+            .font(.caption)
+            .foregroundColor(.blue)
+        }
+        
+        TextField(LocalizedStrings.gridSquare.localized, text: $ownGridSquare)
+            .focused($focusedField, equals: "MY_GRIDSQUARE")
+            .onChange(of: ownGridSquare) { newValue in
+                ownGridSquare = formatGridSquare(newValue)
+            }
+        
+        TextField(LocalizedStrings.cqZone.localized, text: $ownCQZone)
+            .keyboardType(.numberPad)
+            .focused($focusedField, equals: "MY_CQ_ZONE")
+        
+        TextField(LocalizedStrings.ituZone.localized, text: $ownITUZone)
+            .keyboardType(.numberPad)
+            .focused($focusedField, equals: "MY_ITU_ZONE")
+    }
+    
+    // MARK: - Technical & Additional Sections
+    
+    @ViewBuilder
+    private var technicalSection: some View {
+        let hasRxFreq = fieldVisibility.isCoreFieldVisible(for: "FREQ_RX")
+        let hasTxPwr = fieldVisibility.isCoreFieldVisible(for: "TX_PWR")
+        let hasSatName = fieldVisibility.isCoreFieldVisible(for: "SAT_NAME")
+        let hasDynTech = fieldVisibility.hasVisibleFields(for: .technical)
+        let hasDynSat = fieldVisibility.hasVisibleFields(for: .satellite)
+        
+        if hasRxFreq || hasTxPwr || hasSatName || hasDynTech || hasDynSat {
+            Section(header: Text(LocalizedStrings.technicalInfo.localized)) {
+                if hasRxFreq {
+                    TextField(LocalizedStrings.rxFrequency.localized, text: $rxFrequency)
+                        .keyboardType(.decimalPad)
+                        .focused($focusedField, equals: "FREQ_RX")
+                }
+                if hasTxPwr {
+                    TextField(LocalizedStrings.txPower.localized, text: $txPower)
+                        .focused($focusedField, equals: "TX_PWR")
+                }
+                if hasSatName {
+                    TextField(LocalizedStrings.satellite.localized, text: $satellite)
+                        .focused($focusedField, equals: "SAT_NAME")
+                }
+                ADIFDynamicFieldRows(extendedFields: $extendedFields, category: .technical, visibilityManager: fieldVisibility, focusedField: $focusedField)
+                ADIFDynamicFieldRows(extendedFields: $extendedFields, category: .satellite, visibilityManager: fieldVisibility, focusedField: $focusedField)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var additionalInfoSection: some View {
+        let hasName = fieldVisibility.isCoreFieldVisible(for: "NAME")
+        let hasComment = fieldVisibility.isCoreFieldVisible(for: "COMMENT")
+        let hasDynOp = fieldVisibility.hasVisibleFields(for: .contactedOp)
+        let hasDynNotes = fieldVisibility.hasVisibleFields(for: .notes)
+        
+        if hasName || hasComment || hasDynOp || hasDynNotes {
+            Section(header: Text(LocalizedStrings.additionalInfo.localized)) {
+                if hasName {
+                    TextField(LocalizedStrings.name.localized, text: $name)
+                        .focused($focusedField, equals: "NAME")
+                }
+                if hasComment {
+                    TextField(LocalizedStrings.remarks.localized, text: $remarks)
+                        .focused($focusedField, equals: "COMMENT")
+                }
+                ADIFDynamicFieldRows(extendedFields: $extendedFields, category: .contactedOp, visibilityManager: fieldVisibility, focusedField: $focusedField)
+                ADIFDynamicFieldRows(extendedFields: $extendedFields, category: .notes, visibilityManager: fieldVisibility, focusedField: $focusedField)
+            }
+        }
+    }
+    
+    // MARK: - Collapsed Section (unified at bottom)
+    
+    @ViewBuilder
+    private var collapsedSection: some View {
+        let collapsedFields = fieldVisibility.allCollapsedFields()
+        
+        if hasCollapsedGroupContent || !collapsedFields.isEmpty {
+            Section {
+                DisclosureGroup("adif_more_fields".localized) {
+                    if dateTimeVis == .collapsed {
+                        DatePicker(LocalizedStrings.dateTime.localized, selection: $date)
+                    }
+                    if endDateTimeVis == .collapsed {
+                        DatePicker(
+                            ADIFFields.fieldGroups.first { $0.id == "group_end_datetime" }?.displayName ?? "end_date".localized,
+                            selection: $endDate
+                        )
+                    }
+                    
+                    if contactedQTHVis == .collapsed {
+                        Text(ADIFFields.fieldGroups.first { $0.id == "group_contacted_qth" }?.displayName ?? "QTH")
+                            .font(.caption).foregroundColor(.secondary)
+                        contactedQTHFields
+                    }
+                    
+                    if ownQTHVis == .collapsed {
+                        Text(ADIFFields.fieldGroups.first { $0.id == "group_own_qth" }?.displayName ?? "QTH")
+                            .font(.caption).foregroundColor(.secondary)
+                        ownQTHFields
+                    }
+                    
+                    let grouped = Dictionary(grouping: collapsedFields) { $0.category }
+                    let sortedCats = grouped.keys.sorted { $0.sortOrder < $1.sortOrder }
+                    
+                    ForEach(sortedCats, id: \.self) { category in
+                        if let fields = grouped[category] {
+                            Text(category.displayName)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .listRowSeparator(.hidden)
+                            
+                            ForEach(fields) { field in
+                                TextField(field.displayName, text: bindingForExtended(field.id))
+                                    .focused($focusedField, equals: field.id)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // MARK: - Hidden Fields With Values Section
+    
+    @ViewBuilder
+    private var hiddenFieldsWithValuesSection: some View {
+        if hasAnyHiddenFieldWithValue {
+            Section(header: Text("adif_hidden_with_data".localized)) {
+                HStack(spacing: 6) {
+                    Image(systemName: "info.circle")
+                        .foregroundColor(.orange)
+                    Text("adif_hidden_field_hint".localized)
+                }
+                .font(.caption2)
+                .foregroundColor(.orange)
+                .listRowBackground(Color.orange.opacity(0.06))
+                
+                if fieldVisibility.visibility(for: "FREQ") == .hidden && !frequency.isEmpty {
+                    hiddenFieldRow(LocalizedStrings.frequency.localized, text: $frequency)
+                }
+                if fieldVisibility.visibility(for: "FREQ_RX") == .hidden && !rxFrequency.isEmpty {
+                    hiddenFieldRow(LocalizedStrings.rxFrequency.localized, text: $rxFrequency)
+                }
+                if fieldVisibility.visibility(for: "TX_PWR") == .hidden && !txPower.isEmpty {
+                    hiddenFieldRow(LocalizedStrings.txPower.localized, text: $txPower)
+                }
+                if fieldVisibility.visibility(for: "SAT_NAME") == .hidden && !satellite.isEmpty {
+                    hiddenFieldRow(LocalizedStrings.satellite.localized, text: $satellite)
+                }
+                if fieldVisibility.visibility(for: "NAME") == .hidden && !name.isEmpty {
+                    hiddenFieldRow(LocalizedStrings.name.localized, text: $name)
+                }
+                if fieldVisibility.visibility(for: "COMMENT") == .hidden && !remarks.isEmpty {
+                    hiddenFieldRow(LocalizedStrings.remarks.localized, text: $remarks)
+                }
+                
+                if contactedQTHVis == .hidden &&
+                   (!qth.isEmpty || !gridSquare.isEmpty || !cqZone.isEmpty || !ituZone.isEmpty) {
+                    hiddenGroupHeader(ADIFFields.fieldGroups.first { $0.id == "group_contacted_qth" }?.displayName ?? "QTH")
+                    contactedQTHFields
+                }
+                
+                if ownQTHVis == .hidden &&
+                   (!ownQTH.isEmpty || !ownGridSquare.isEmpty || !ownCQZone.isEmpty || !ownITUZone.isEmpty) {
+                    hiddenGroupHeader(ADIFFields.fieldGroups.first { $0.id == "group_own_qth" }?.displayName ?? "QTH")
+                    ownQTHFields
+                }
+                
+                if endDateTimeVis == .hidden &&
+                   (!(extendedFields["TIME_OFF"] ?? "").isEmpty || !(extendedFields["QSO_DATE_OFF"] ?? "").isEmpty) {
+                    HStack {
+                        Image(systemName: "eye.slash")
+                            .font(.caption2)
+                            .foregroundColor(.orange)
+                        DatePicker(
+                            ADIFFields.fieldGroups.first { $0.id == "group_end_datetime" }?.displayName ?? "end_date".localized,
+                            selection: $endDate
+                        )
+                        Button {
+                            extendedFields.removeValue(forKey: "TIME_OFF")
+                            extendedFields.removeValue(forKey: "QSO_DATE_OFF")
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.secondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                
+                ForEach(hiddenExtendedFieldsWithValues) { field in
+                    hiddenFieldRow(field.displayName, extended: field.id)
+                }
+            }
+        }
+    }
+    
+    private func hiddenGroupHeader(_ name: String) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: "eye.slash")
+                .font(.caption)
+                .foregroundColor(.orange)
+            Text(name)
+                .font(.caption)
+                .foregroundColor(.orange)
+        }
+    }
+    
+    private func hiddenFieldRow(_ label: String, text: Binding<String>) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: "eye.slash")
+                .font(.caption2)
+                .foregroundColor(.orange)
+            TextField(label, text: text)
+        }
+    }
+    
+    private func hiddenFieldRow(_ label: String, extended fieldId: String) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: "eye.slash")
+                .font(.caption2)
+                .foregroundColor(.orange)
+            TextField(label, text: bindingForExtended(fieldId))
+                .focused($focusedField, equals: fieldId)
+        }
+    }
+    
+    private func bindingForExtended(_ fieldId: String) -> Binding<String> {
+        Binding(
+            get: { extendedFields[fieldId] ?? "" },
+            set: { newVal in
+                if newVal.isEmpty {
+                    extendedFields.removeValue(forKey: fieldId)
+                } else {
+                    extendedFields[fieldId] = newVal
+                }
+            }
+        )
+    }
+    
+    // MARK: - Data Loading
+    
     private func loadOwnQTHInfo() {
-        // 只在值不同时才更新，避免不必要的状态变化
         if ownQTH != qthManager.ownQTH.location {
             ownQTH = qthManager.ownQTH.location
         }
@@ -336,16 +711,14 @@ struct EditQSOView: View {
         if ownITUZone != qthManager.ownQTH.ituZone {
             ownITUZone = qthManager.ownQTH.ituZone
         }
-        // 比较坐标，需要手动比较经纬度
         let currentCoordinate = selectedOwnLocation
         let savedCoordinate = qthManager.ownQTH.coordinate
-        if currentCoordinate?.latitude != savedCoordinate?.latitude || 
+        if currentCoordinate?.latitude != savedCoordinate?.latitude ||
            currentCoordinate?.longitude != savedCoordinate?.longitude {
             selectedOwnLocation = qthManager.ownQTH.coordinate
         }
     }
     
-    // 格式化网格坐标：前4位大写，后2位小写
     private func formatGridSquare(_ input: String) -> String {
         let cleaned = input.uppercased().replacingOccurrences(of: " ", with: "")
         if cleaned.count <= 4 {
@@ -359,10 +732,11 @@ struct EditQSOView: View {
         }
     }
     
+    // MARK: - Validation
+    
     private func validateInputs() -> Bool {
         isValidationError = false
         
-        // 验证呼号
         if callsign.isEmpty {
             showValidationError(LocalizedStrings.callsignEmpty.localized)
             return false
@@ -376,13 +750,11 @@ struct EditQSOView: View {
             return false
         }
         
-        // 验证频率
         if !frequency.isEmpty && !isValidFrequency(frequency) {
             showValidationError(LocalizedStrings.frequencyInvalid.localized)
             return false
         }
         
-        // 验证网格坐标
         if !gridSquare.isEmpty && !QTHManager.isValidGridSquare(gridSquare) {
             showValidationError(LocalizedStrings.gridSquareInvalid.localized)
             return false
@@ -393,7 +765,6 @@ struct EditQSOView: View {
             return false
         }
         
-        // 验证CQ Zone
         if !cqZone.isEmpty && !QTHManager.isValidCQZone(cqZone) {
             showValidationError(LocalizedStrings.cqZoneInvalid.localized)
             return false
@@ -404,7 +775,6 @@ struct EditQSOView: View {
             return false
         }
         
-        // 验证ITU Zone
         if !ituZone.isEmpty && !QTHManager.isValidITUZone(ituZone) {
             showValidationError(LocalizedStrings.ituZoneInvalid.localized)
             return false
@@ -427,12 +797,12 @@ struct EditQSOView: View {
     
     private func isValidFrequency(_ freqString: String) -> Bool {
         guard let freq = Double(freqString) else { return false }
-        // 业余无线电频率范围验证 (0.1 MHz to 6000 MHz)
         return freq > 0.1 && freq < 6000
     }
     
+    // MARK: - Save
+    
     private func updateQSO() {
-        // 先保存己方QTH信息
         qthManager.updateOwnQTH(
             location: ownQTH,
             gridSquare: ownGridSquare,
@@ -457,13 +827,21 @@ struct EditQSOView: View {
         record.ituZone = ituZone.isEmpty ? nil : ituZone
         record.satellite = satellite.isEmpty ? nil : satellite
         record.remarks = remarks
-        
-        // 保存坐标信息
         record.setCoordinate(selectedLocation)
+        
+        var fields = extendedFields
+        
+        let endDateHasData = !(extendedFields["TIME_OFF"] ?? "").isEmpty ||
+                             !(extendedFields["QSO_DATE_OFF"] ?? "").isEmpty
+        if endDateTimeVis != .hidden || endDateHasData {
+            fields["QSO_DATE_OFF"] = ADIFDateTimeHelper.dateToADIFDate(endDate)
+            fields["TIME_OFF"] = ADIFDateTimeHelper.dateToADIFTime(endDate)
+        }
+        
+        record.adifFields = fields
         
         do {
             try viewContext.save()
-            // 保存成功后显示提示
             alertTitle = LocalizedStrings.saveSuccess.localized
             alertMessage = LocalizedStrings.qsoUpdated.localized
             showingAlert = true

@@ -17,21 +17,20 @@
  */
 
 import SwiftUI
+import UIKit
 
-/// 键盘工具栏组件
-struct KeyboardToolbar<Field: Hashable & CaseIterable & RawRepresentable>: ToolbarContent where Field.RawValue == Int {
-    @FocusState.Binding var focusedField: Field?
-    let fields: [Field]
+struct KeyboardToolbar: ToolbarContent {
+    @FocusState.Binding var focusedField: String?
+    let orderedFields: [String]
     
-    init(focusedField: FocusState<Field?>.Binding) {
+    init(focusedField: FocusState<String?>.Binding, orderedFields: [String]) {
         self._focusedField = focusedField
-        self.fields = Array(Field.allCases)
+        self.orderedFields = orderedFields
     }
     
     var body: some ToolbarContent {
         ToolbarItem(placement: .keyboard) {
             HStack {
-                // 上一项按钮
                 Button(LocalizedStrings.previous.localized) {
                     focusPreviousField()
                 }
@@ -39,7 +38,6 @@ struct KeyboardToolbar<Field: Hashable & CaseIterable & RawRepresentable>: Toolb
                 
                 Spacer()
                 
-                // 下一项按钮
                 Button(LocalizedStrings.next.localized) {
                     focusNextField()
                 }
@@ -47,61 +45,44 @@ struct KeyboardToolbar<Field: Hashable & CaseIterable & RawRepresentable>: Toolb
                 
                 Spacer()
                 
-                // 完成按钮
                 Button(LocalizedStrings.done.localized) {
-                    focusedField = nil
+                    dismissKeyboard()
                 }
                 .font(.system(size: 17, weight: .bold))
             }
         }
     }
     
+    private func dismissKeyboard() {
+        focusedField = nil
+        UIApplication.shared.sendAction(
+            #selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil
+        )
+    }
+    
     private func focusPreviousField() {
-        guard let currentField = focusedField,
-              let currentIndex = fields.firstIndex(of: currentField),
-              currentIndex > 0 else { return }
-        
-        focusedField = fields[currentIndex - 1]
+        guard let current = focusedField,
+              let idx = orderedFields.firstIndex(of: current),
+              idx > 0 else { return }
+        focusedField = orderedFields[idx - 1]
     }
     
     private func focusNextField() {
-        guard let currentField = focusedField,
-              let currentIndex = fields.firstIndex(of: currentField),
-              currentIndex < fields.count - 1 else { return }
-        
-        focusedField = fields[currentIndex + 1]
+        guard let current = focusedField,
+              let idx = orderedFields.firstIndex(of: current),
+              idx < orderedFields.count - 1 else { return }
+        focusedField = orderedFields[idx + 1]
     }
     
     private func canFocusPrevious() -> Bool {
-        guard let currentField = focusedField,
-              let currentIndex = fields.firstIndex(of: currentField) else { return false }
-        return currentIndex > 0
+        guard let current = focusedField,
+              let idx = orderedFields.firstIndex(of: current) else { return false }
+        return idx > 0
     }
     
     private func canFocusNext() -> Bool {
-        guard let currentField = focusedField,
-              let currentIndex = fields.firstIndex(of: currentField) else { return false }
-        return currentIndex < fields.count - 1
+        guard let current = focusedField,
+              let idx = orderedFields.firstIndex(of: current) else { return false }
+        return idx < orderedFields.count - 1
     }
 }
-
-/// 表单字段枚举
-enum FormField: Int, CaseIterable {
-    case callsign = 0
-    case frequency = 1
-    case rstSent = 2
-    case rstReceived = 3
-    case rxFrequency = 4
-    case txPower = 5
-    case satellite = 6
-    case ownQTH = 7
-    case ownGridSquare = 8
-    case ownCQZone = 9
-    case ownITUZone = 10
-    case qth = 11
-    case gridSquare = 12
-    case cqZone = 13
-    case ituZone = 14
-    case name = 15
-    case remarks = 16
-} 

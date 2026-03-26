@@ -21,6 +21,10 @@
 		D935FFB72E5FF72A00359E84 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D935FFB62E5FF72A00359E84 /* AboutView.swift */; };
 		D93CF0C02F17E24D0090CE47 /* AdvancedFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93CF0BF2F17E24D0090CE47 /* AdvancedFilterView.swift */; };
 		D93CF0C22F17E2570090CE47 /* FilterCriteria.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93CF0C12F17E2570090CE47 /* FilterCriteria.swift */; };
+		D954BCA72F74433E0000EA11 /* ADIFFields.swift in Sources */ = {isa = PBXBuildFile; fileRef = D954BCA52F74433E0000EA11 /* ADIFFields.swift */; };
+		D954BCA82F74433E0000EA11 /* FieldVisibilityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D954BCA62F74433E0000EA11 /* FieldVisibilityManager.swift */; };
+		D954BCAB2F7443490000EA11 /* ADIFDynamicFormSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = D954BCA92F7443490000EA11 /* ADIFDynamicFormSections.swift */; };
+		D954BCAC2F7443490000EA11 /* FieldSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D954BCAA2F7443490000EA11 /* FieldSettingsView.swift */; };
 		D995C37C2F174A3F004BA2F6 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D995C37B2F174A3F004BA2F6 /* SettingsView.swift */; };
 		D9DC5FB52F4487EF00867DB2 /* ImportReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9DC5FB42F4487EF00867DB2 /* ImportReportView.swift */; };
 		D9DC5FB72F44880700867DB2 /* ImportResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9DC5FB62F44880700867DB2 /* ImportResult.swift */; };
@@ -50,6 +54,10 @@
 		D935FFB62E5FF72A00359E84 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		D93CF0BF2F17E24D0090CE47 /* AdvancedFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedFilterView.swift; sourceTree = "<group>"; };
 		D93CF0C12F17E2570090CE47 /* FilterCriteria.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCriteria.swift; sourceTree = "<group>"; };
+		D954BCA52F74433E0000EA11 /* ADIFFields.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ADIFFields.swift; sourceTree = "<group>"; };
+		D954BCA62F74433E0000EA11 /* FieldVisibilityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldVisibilityManager.swift; sourceTree = "<group>"; };
+		D954BCA92F7443490000EA11 /* ADIFDynamicFormSections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ADIFDynamicFormSections.swift; sourceTree = "<group>"; };
+		D954BCAA2F7443490000EA11 /* FieldSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldSettingsView.swift; sourceTree = "<group>"; };
 		D995C37B2F174A3F004BA2F6 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		D9DC5FB42F4487EF00867DB2 /* ImportReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportReportView.swift; sourceTree = "<group>"; };
 		D9DC5FB62F44880700867DB2 /* ImportResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportResult.swift; sourceTree = "<group>"; };
@@ -111,6 +119,8 @@
 		5D5D5D5D5D5D5D5D5D5D5D5D /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				D954BCA92F7443490000EA11 /* ADIFDynamicFormSections.swift */,
+				D954BCAA2F7443490000EA11 /* FieldSettingsView.swift */,
 				D9DC5FB42F4487EF00867DB2 /* ImportReportView.swift */,
 				D93CF0BF2F17E24D0090CE47 /* AdvancedFilterView.swift */,
 				D995C37B2F174A3F004BA2F6 /* SettingsView.swift */,
@@ -130,6 +140,8 @@
 		5E5E5E5E5E5E5E5E5E5E5E5E /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				D954BCA52F74433E0000EA11 /* ADIFFields.swift */,
+				D954BCA62F74433E0000EA11 /* FieldVisibilityManager.swift */,
 				D9DC5FB62F44880700867DB2 /* ImportResult.swift */,
 				D93CF0C12F17E2570090CE47 /* FilterCriteria.swift */,
 				D9E529BE2E33D67000B01B99 /* TimezoneManager.swift */,
@@ -226,6 +238,8 @@
 			files = (
 				D935FFB72E5FF72A00359E84 /* AboutView.swift in Sources */,
 				D9E529AD2E32897400B01B99 /* EnhancedMapLocationPicker.swift in Sources */,
+				D954BCA72F74433E0000EA11 /* ADIFFields.swift in Sources */,
+				D954BCA82F74433E0000EA11 /* FieldVisibilityManager.swift in Sources */,
 				1A1A1A1A1A1A1A1A1A1A1A1A /* ContentView.swift in Sources */,
 				D9DC5FB52F4487EF00867DB2 /* ImportReportView.swift in Sources */,
 				D9E529BD2E33D64C00B01B99 /* TimezoneSettingsView.swift in Sources */,
@@ -244,6 +258,8 @@
 				1H1H1H1H1H1H1H1H1H1H1H1H /* EditQSOView.swift in Sources */,
 				D9E529BB2E33B9A000B01B99 /* KeyboardToolbar.swift in Sources */,
 				1I1I1I1I1I1I1I1I1I1I1I1I /* LogImportExportView.swift in Sources */,
+				D954BCAB2F7443490000EA11 /* ADIFDynamicFormSections.swift in Sources */,
+				D954BCAC2F7443490000EA11 /* FieldSettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

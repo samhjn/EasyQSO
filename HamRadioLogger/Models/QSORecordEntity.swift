@@ -49,6 +49,8 @@ public class QSORecord: NSManagedObject {
     // 新增坐标字段
     @NSManaged public var latitude: Double
     @NSManaged public var longitude: Double
+    // ADIF扩展字段（JSON存储）
+    @NSManaged public var adifFieldsData: Data?
     
     // MARK: - 频率访问接口（兼容旧版本）
     
@@ -187,6 +189,119 @@ public class QSORecord: NSManagedObject {
         } else {
             return String(hz)
         }
+    }
+    
+    // MARK: - ADIF扩展字段存取
+    
+    var adifFields: [String: String] {
+        get {
+            guard let data = adifFieldsData,
+                  let dict = try? JSONDecoder().decode([String: String].self, from: data) else {
+                return [:]
+            }
+            return dict
+        }
+        set {
+            let filtered = newValue.filter { !$0.value.isEmpty }
+            if filtered.isEmpty {
+                adifFieldsData = nil
+            } else {
+                adifFieldsData = try? JSONEncoder().encode(filtered)
+            }
+        }
+    }
+    
+    func adifValue(for tag: String) -> String? {
+        guard let fieldDef = ADIFFields.field(for: tag) else { return nil }
+        if let coreProp = fieldDef.coreProperty {
+            return corePropertyValue(coreProp)
+        }
+        return adifFields[tag]
+    }
+    
+    func setAdifValue(_ value: String?, for tag: String) {
+        guard let fieldDef = ADIFFields.field(for: tag) else {
+            if let v = value, !v.isEmpty {
+                var fields = adifFields
+                fields[tag] = v
+                adifFields = fields
+            }
+            return
+        }
+        if let coreProp = fieldDef.coreProperty {
+            setCorePropertyValue(coreProp, value: value)
+        } else {
+            var fields = adifFields
+            fields[tag] = value
+            adifFields = fields
+        }
+    }
+    
+    private func corePropertyValue(_ prop: String) -> String? {
+        switch prop {
+        case "callsign": return callsign.isEmpty ? nil : callsign
+        case "band": return band.isEmpty ? nil : band
+        case "mode": return mode.isEmpty ? nil : mode
+        case "rstSent": return rstSent.isEmpty ? nil : rstSent
+        case "rstReceived": return rstReceived.isEmpty ? nil : rstReceived
+        case "txPower": return txPower
+        case "name": return name
+        case "qth": return qth
+        case "gridSquare": return gridSquare
+        case "cqZone": return cqZone
+        case "ituZone": return ituZone
+        case "satellite": return satellite
+        case "remarks": return remarks
+        case "frequencyHz":
+            return frequencyMHz > 0 ? String(frequencyMHz) : nil
+        case "rxFrequencyHz":
+            return rxFrequencyMHz > 0 ? String(rxFrequencyMHz) : nil
+        case "latitude":
+            return latitude != 0 ? String(latitude) : nil
+        case "longitude":
+            return longitude != 0 ? String(longitude) : nil
+        default: return nil
+        }
+    }
+    
+    private func setCorePropertyValue(_ prop: String, value: String?) {
+        let v = value ?? ""
+        switch prop {
+        case "callsign": callsign = v
+        case "band": band = v
+        case "mode": mode = v
+        case "rstSent": rstSent = v
+        case "rstReceived": rstReceived = v
+        case "txPower": txPower = v.isEmpty ? nil : v
+        case "name": name = v.isEmpty ? nil : v
+        case "qth": qth = v.isEmpty ? nil : v
+        case "gridSquare": gridSquare = v.isEmpty ? nil : v
+        case "cqZone": cqZone = v.isEmpty ? nil : v
+        case "ituZone": ituZone = v.isEmpty ? nil : v
+        case "satellite": satellite = v.isEmpty ? nil : v
+        case "remarks": remarks = v.isEmpty ? nil : v
+        case "frequencyHz": frequencyMHz = Double(v) ?? 0.0
+        case "rxFrequencyHz": rxFrequencyMHz = Double(v) ?? 0.0
+        case "latitude": latitude = Double(v) ?? 0.0
+        case "longitude": longitude = Double(v) ?? 0.0
+        default: break
+        }
+    }
+    
+    /// 获取所有非空ADIF字段（核心+扩展），用于导出
+    func allAdifValues() -> [String: String] {
+        var result = [String: String]()
+        for field in ADIFFields.coreFields {
+            if let val = corePropertyValue(field.coreProperty!) {
+                result[field.id] = val
+            }
+        }
+        for (key, val) in adifFields {
+            if !val.isEmpty {
+                result[key] = val
+            }
+        }
+        return result
     }
     
     // 计算属性：获取坐标（如果有效）

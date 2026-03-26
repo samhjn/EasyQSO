@@ -15,8 +15,8 @@
 "basic_info" = "Basic Information";
 "signal_report" = "Signal Report";
 "technical_info" = "Technical Information";
-"own_qth_info" = "Own QTH Information";
-"qth_info" = "QTH Information";
+"own_qth_info" = "Own Station";
+"qth_info" = "Contacted Station";
 "additional_info" = "Additional Information";
 "data_management" = "Data Management";
 "export_log" = "Export Log";
@@ -214,3 +214,14 @@
 "welcome_title" = "Welcome to EasyQSO";
 "learn_gpl_license" = "Learn about GPL License";
 "view_later" = "View Later";
+
+// MARK: - ADIF Field Settings
+"adif_field_config" = "QSO Field Configuration";
+"adif_field_settings" = "Manage QSO Fields";
+"adif_field_config_desc" = "Configure which ADIF 3.1.7 fields are visible, collapsed, or hidden during QSO recording and editing.";
+"adif_search_fields" = "Search fields...";
+"adif_reset_defaults" = "Reset";
+"adif_required" = "Required";
+"adif_more_fields" = "More Fields";
+"adif_hidden_with_data" = "Hidden Fields (with data)";
+"adif_hidden_field_hint" = "These fields are hidden but contain data. Clearing a field will remove it. Re-enable in Settings.";

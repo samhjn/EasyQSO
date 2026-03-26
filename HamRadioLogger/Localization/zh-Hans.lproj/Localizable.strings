@@ -15,8 +15,8 @@
 "basic_info" = "基本信息";
 "signal_report" = "信号报告";
 "technical_info" = "技术信息";
-"own_qth_info" = "己方QTH信息";
-"qth_info" = "对方QTH信息";
+"own_qth_info" = "己方电台";
+"qth_info" = "对方电台";
 "additional_info" = "附加信息";
 "data_management" = "数据管理";
 "export_log" = "导出日志";
@@ -214,3 +214,14 @@
 "welcome_title" = "欢迎使用 EasyQSO";
 "learn_gpl_license" = "了解GPL许可证";
 "view_later" = "稍后查看";
+
+// MARK: - ADIF字段设置
+"adif_field_config" = "QSO字段配置";
+"adif_field_settings" = "管理QSO字段";
+"adif_field_config_desc" = "配置ADIF 3.1.7标准中的字段在QSO记录和编辑时的显示状态：显示、折叠或隐藏。";
+"adif_search_fields" = "搜索字段...";
+"adif_reset_defaults" = "重置";
+"adif_required" = "必填";
+"adif_more_fields" = "更多字段";
+"adif_hidden_with_data" = "已隐藏字段（含数据）";
+"adif_hidden_field_hint" = "以下字段已被隐藏但包含数据。清空后字段将不再显示，可在设置中重新启用。";
