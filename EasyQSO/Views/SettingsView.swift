@@ -45,6 +45,8 @@ struct SettingsView: View {
     
     // 字段设置
     @State private var showingFieldSettings = false
+    @ObservedObject private var modeManager = ModeManager.shared
+    
     
     // 导入报告相关
     @State private var showingImportReport = false
@@ -107,6 +109,20 @@ struct SettingsView: View {
                     Text("adif_field_config_desc".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
+                }
+                
+                // ===== 列表管理 =====
+                Section(header: Text("list_management".localized)) {
+                    NavigationLink(destination: ModeSettingsView()) {
+                        HStack {
+                            Image(systemName: "antenna.radiowaves.left.and.right")
+                            Text("mode_settings_title".localized)
+                            Spacer()
+                            Text("\(modeManager.availableModes.count)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
                 }
                 
                 // ===== 导入导出部分 =====

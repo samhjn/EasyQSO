@@ -10,18 +10,47 @@
 
 import SwiftUI
 
+// MARK: - Floating Label Modifier
+
+struct FloatingLabelModifier: ViewModifier {
+    let label: String
+    let text: String
+    
+    func body(content: Content) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            if !text.isEmpty {
+                Text(label)
+                    .font(.caption2)
+                    .foregroundColor(.accentColor)
+            }
+            content
+        }
+        .animation(.easeInOut(duration: 0.15), value: text.isEmpty)
+    }
+}
+
+extension View {
+    func floatingLabel(_ label: String, text: String) -> some View {
+        modifier(FloatingLabelModifier(label: label, text: text))
+    }
+}
+
 struct ADIFDynamicFieldRows: View {
     @Binding var extendedFields: [String: String]
     let category: ADIFFieldCategory
     @ObservedObject var visibilityManager: FieldVisibilityManager
     @FocusState.Binding var focusedField: String?
+    var excludeFieldIds: Set<String> = []
     
     var body: some View {
-        let visible = visibilityManager.visibleFields(for: category)
+        let visible = visibilityManager.visibleFields(for: category).filter {
+            !excludeFieldIds.contains($0.id)
+        }
         
         ForEach(visible) { field in
             TextField(field.displayName, text: bindingFor(field.id))
                 .focused($focusedField, equals: field.id)
+                .floatingLabel(field.displayName, text: extendedFields[field.id] ?? "")
         }
     }
     
@@ -44,15 +73,20 @@ struct ADIFDynamicSection: View {
     let category: ADIFFieldCategory
     @ObservedObject var visibilityManager: FieldVisibilityManager
     @FocusState.Binding var focusedField: String?
+    var excludeFieldIds: Set<String> = []
     
     var body: some View {
-        if visibilityManager.hasVisibleFields(for: category) {
+        let visible = visibilityManager.visibleFields(for: category).filter {
+            !excludeFieldIds.contains($0.id)
+        }
+        if !visible.isEmpty {
             Section(header: Text(category.displayName)) {
                 ADIFDynamicFieldRows(
                     extendedFields: $extendedFields,
                     category: category,
                     visibilityManager: visibilityManager,
-                    focusedField: $focusedField
+                    focusedField: $focusedField,
+                    excludeFieldIds: excludeFieldIds
                 )
             }
         }
@@ -83,6 +117,7 @@ struct ADIFCollapsedFieldsSection: View {
                             ForEach(fields) { field in
                                 TextField(field.displayName, text: bindingFor(field.id))
                                     .focused($focusedField, equals: field.id)
+                                    .floatingLabel(field.displayName, text: extendedFields[field.id] ?? "")
                             }
                         }
                     }

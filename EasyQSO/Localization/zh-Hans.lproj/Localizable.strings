@@ -215,6 +215,19 @@
 "learn_gpl_license" = "了解GPL许可证";
 "view_later" = "稍后查看";
 
+// MARK: - 自定义模式
+"custom_modes" = "自定义模式";
+"custom_modes_desc" = "添加ADIF标准以外的自定义通信模式，添加后可在QSO记录中使用";
+"new_mode_placeholder" = "输入新模式名称";
+"mode_already_exists" = "该模式已存在";
+"list_management" = "列表管理";
+"mode_settings_title" = "模式管理";
+"mode_settings_desc" = "管理QSO记录中可用的通信模式。可以显示或隐藏预置模式，也可以添加自定义模式。预置列表仅包含常用模式，并非ADIF标准的全部模式。";
+"preset_modes" = "预置模式";
+
+// MARK: - 接收波段
+"rx_band" = "接收波段";
+
 // MARK: - ADIF字段设置
 "adif_field_config" = "QSO字段配置";
 "adif_field_settings" = "管理QSO字段";

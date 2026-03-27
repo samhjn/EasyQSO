@@ -215,6 +215,19 @@
 "learn_gpl_license" = "GPLライセンスについて";
 "view_later" = "後で確認";
 
+// MARK: - カスタムモード
+"custom_modes" = "カスタムモード";
+"custom_modes_desc" = "ADIF標準以外のカスタム通信モードを追加し、QSO記録で使用できます";
+"new_mode_placeholder" = "新しいモード名を入力";
+"mode_already_exists" = "このモードは既に存在します";
+"list_management" = "リスト管理";
+"mode_settings_title" = "モード設定";
+"mode_settings_desc" = "QSO記録で使用可能な通信モードを管理します。プリセットモードの表示/非表示を切り替えたり、カスタムモードを追加できます。プリセットリストはよく使われるモードのみで、ADIF標準の全モードではありません。";
+"preset_modes" = "プリセットモード";
+
+// MARK: - 受信バンド
+"rx_band" = "受信バンド";
+
 // MARK: - ADIFフィールド設定
 "adif_field_config" = "QSOフィールド設定";
 "adif_field_settings" = "QSOフィールド管理";

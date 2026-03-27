@@ -371,6 +371,30 @@ public class QSORecord: NSManagedObject {
         }
     }
     
+    static var builtInModes: [String] { ModeManager.presetModes }
+    static var allModes: [String] { ModeManager.shared.availableModes }
+    
+    static func lastRxFrequencyForRxBand(_ rxBand: String, context: NSManagedObjectContext) -> Double? {
+        let request = NSFetchRequest<QSORecord>(entityName: "QSORecord")
+        request.predicate = NSPredicate(format: "rxFrequencyHz > 0")
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \QSORecord.date, ascending: false)]
+        request.fetchLimit = 50
+        
+        do {
+            let results = try context.fetch(request)
+            for record in results {
+                if let bandRx = record.adifFields["BAND_RX"], bandRx == rxBand {
+                    return record.rxFrequencyMHz
+                }
+                if record.rxFrequencyMHz > 0,
+                   QSORecord.bandForFrequency(record.rxFrequencyMHz) == rxBand {
+                    return record.rxFrequencyMHz
+                }
+            }
+        } catch {}
+        return nil
+    }
+    
     // 获取指定波段的最后使用频率
     static func lastFrequencyForBand(_ band: String, context: NSManagedObjectContext) -> Double? {
         let request = NSFetchRequest<QSORecord>(entityName: "QSORecord")

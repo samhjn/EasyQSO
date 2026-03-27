@@ -215,6 +215,19 @@
 "learn_gpl_license" = "Learn about GPL License";
 "view_later" = "View Later";
 
+// MARK: - Custom Modes
+"custom_modes" = "Custom Modes";
+"custom_modes_desc" = "Add custom communication modes beyond the ADIF standard for use in QSO records";
+"new_mode_placeholder" = "Enter new mode name";
+"mode_already_exists" = "This mode already exists";
+"list_management" = "List Management";
+"mode_settings_title" = "Mode Settings";
+"mode_settings_desc" = "Manage communication modes available in QSO records. You can show or hide preset modes, and add custom modes. The preset list contains commonly used modes only, not all modes defined in the ADIF standard.";
+"preset_modes" = "Preset Modes";
+
+// MARK: - RX Band
+"rx_band" = "RX Band";
+
 // MARK: - ADIF Field Settings
 "adif_field_config" = "QSO Field Configuration";
 "adif_field_settings" = "Manage QSO Fields";

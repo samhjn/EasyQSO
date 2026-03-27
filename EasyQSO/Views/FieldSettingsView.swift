@@ -22,27 +22,28 @@ struct FieldSettingsView: View {
                 searchSection
                 
                 ForEach(ADIFFields.sortedCategories, id: \.self) { category in
-                    let groups = groupsForCategory(category)
-                    let fields = fieldsForCategory(category)
-                    if !groups.isEmpty || !fields.isEmpty {
+                    let items = settingsItemsForCategory(category)
+                    if !items.isEmpty {
                         Section(header: Text(category.displayName)) {
-                            ForEach(groups) { group in
-                                GroupVisibilityRow(
-                                    group: group,
-                                    visibility: visibilityManager.groupVisibility(for: group.id),
-                                    onChange: { newVisibility in
-                                        visibilityManager.setGroupVisibility(newVisibility, for: group.id)
-                                    }
-                                )
-                            }
-                            ForEach(fields) { field in
-                                FieldVisibilityRow(
-                                    field: field,
-                                    visibility: visibilityManager.visibility(for: field.id),
-                                    onChange: { newVisibility in
-                                        visibilityManager.setVisibility(newVisibility, for: field.id)
-                                    }
-                                )
+                            ForEach(items) { item in
+                                switch item {
+                                case .group(let group):
+                                    GroupVisibilityRow(
+                                        group: group,
+                                        visibility: visibilityManager.groupVisibility(for: group.id),
+                                        onChange: { newVisibility in
+                                            visibilityManager.setGroupVisibility(newVisibility, for: group.id)
+                                        }
+                                    )
+                                case .field(let field):
+                                    FieldVisibilityRow(
+                                        field: field,
+                                        visibility: visibilityManager.visibility(for: field.id),
+                                        onChange: { newVisibility in
+                                            visibilityManager.setVisibility(newVisibility, for: field.id)
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -96,25 +97,19 @@ struct FieldSettingsView: View {
     
     // MARK: - Filtering
     
-    private func groupsForCategory(_ category: ADIFFieldCategory) -> [ADIFFieldGroup] {
-        let groups = ADIFFields.groupsForCategory(category)
-        if searchText.isEmpty { return groups }
+    private func settingsItemsForCategory(_ category: ADIFFieldCategory) -> [ADIFFields.SettingsItem] {
+        let items = ADIFFields.orderedSettingsItems(for: category)
+        if searchText.isEmpty { return items }
         let search = searchText.lowercased()
-        return groups.filter { group in
-            group.displayName.lowercased().contains(search) ||
-            group.memberFieldIds.contains { $0.lowercased().contains(search) }
-        }
-    }
-    
-    private func fieldsForCategory(_ category: ADIFFieldCategory) -> [ADIFFieldDef] {
-        let allFields = ADIFFields.fieldsForCategory(category).filter { field in
-            !ADIFFields.groupedFieldIds.contains(field.id)
-        }
-        if searchText.isEmpty { return allFields }
-        let search = searchText.lowercased()
-        return allFields.filter { field in
-            field.id.lowercased().contains(search) ||
-            field.displayName.lowercased().contains(search)
+        return items.filter { item in
+            switch item {
+            case .group(let group):
+                return group.displayName.lowercased().contains(search) ||
+                       group.memberFieldIds.contains { $0.lowercased().contains(search) }
+            case .field(let field):
+                return field.id.lowercased().contains(search) ||
+                       field.displayName.lowercased().contains(search)
+            }
         }
     }
     

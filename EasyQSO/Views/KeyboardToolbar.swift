@@ -64,14 +64,22 @@ struct KeyboardToolbar: ToolbarContent {
         guard let current = focusedField,
               let idx = orderedFields.firstIndex(of: current),
               idx > 0 else { return }
-        focusedField = orderedFields[idx - 1]
+        let target = orderedFields[idx - 1]
+        focusedField = nil
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            focusedField = target
+        }
     }
     
     private func focusNextField() {
         guard let current = focusedField,
               let idx = orderedFields.firstIndex(of: current),
               idx < orderedFields.count - 1 else { return }
-        focusedField = orderedFields[idx + 1]
+        let target = orderedFields[idx + 1]
+        focusedField = nil
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            focusedField = target
+        }
     }
     
     private func canFocusPrevious() -> Bool {

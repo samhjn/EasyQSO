@@ -215,6 +215,19 @@
 "learn_gpl_license" = "Узнать о лицензии GPL";
 "view_later" = "Позже";
 
+// MARK: - Custom Modes
+"custom_modes" = "Custom Modes";
+"custom_modes_desc" = "Add custom communication modes beyond the ADIF standard for use in QSO records";
+"new_mode_placeholder" = "Enter new mode name";
+"mode_already_exists" = "Этот режим уже существует";
+"list_management" = "Управление списками";
+"mode_settings_title" = "Настройки режимов";
+"mode_settings_desc" = "Управление режимами связи, доступными в записях QSO. Вы можете показывать или скрывать предустановленные режимы и добавлять пользовательские. Предустановленный список содержит только часто используемые режимы.";
+"preset_modes" = "Предустановленные режимы";
+
+// MARK: - RX Band
+"rx_band" = "RX Band";
+
 // MARK: - ADIF Field Settings
 "adif_field_config" = "Настройка полей QSO";
 "adif_field_settings" = "Управление полями QSO";

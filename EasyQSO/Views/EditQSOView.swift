@@ -16,6 +16,7 @@ struct EditQSOView: View {
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var qthManager = QTHManager()
     @ObservedObject private var fieldVisibility = FieldVisibilityManager.shared
+    @ObservedObject private var modeManager = ModeManager.shared
     @FocusState private var focusedField: String?
     
     let record: QSORecord
@@ -63,8 +64,24 @@ struct EditQSOView: View {
     @State private var ownMapPickerID = UUID()
     @State private var isMapPickerActive = false
     
+    @State private var rxBand: String
+    @State private var isRxBandChangedByFrequency = false
+    
     let bands = ["160m", "80m", "40m", "30m", "20m", "17m", "15m", "12m", "10m", "6m", "2m", "70cm"]
-    let modes = ["SSB", "CW", "FM", "AM", "RTTY", "PSK", "FT8", "FT4", "JT65"]
+    
+    private var modes: [String] { modeManager.pickerModes(current: mode) }
+    
+    private var isVoiceMode: Bool { ["SSB", "FM", "AM"].contains(mode) }
+    private var isCWMode: Bool { mode == "CW" }
+    
+    private var showRxBandPicker: Bool {
+        fieldVisibility.isCoreFieldVisible(for: "FREQ_RX") &&
+        fieldVisibility.visibility(for: "BAND_RX") == .visible
+    }
+    
+    private var techExcludeIds: Set<String> {
+        showRxBandPicker ? ["BAND_RX"] : []
+    }
     
     // MARK: - Group visibility
     
@@ -147,7 +164,9 @@ struct EditQSOView: View {
             if hasRxFreq { ids.append("FREQ_RX") }
             if hasTxPwr { ids.append("TX_PWR") }
             if hasSatName { ids.append("SAT_NAME") }
-            ids.append(contentsOf: fieldVisibility.visibleFields(for: .technical).map(\.id))
+            let excludeSet = techExcludeIds
+            ids.append(contentsOf: fieldVisibility.visibleFields(for: .technical)
+                .filter { !excludeSet.contains($0.id) }.map(\.id))
             ids.append(contentsOf: fieldVisibility.visibleFields(for: .satellite).map(\.id))
         }
         
@@ -209,6 +228,7 @@ struct EditQSOView: View {
         _satellite = State(initialValue: record.satellite ?? "")
         _remarks = State(initialValue: record.remarks ?? "")
         _extendedFields = State(initialValue: record.adifFields)
+        _rxBand = State(initialValue: record.adifFields["BAND_RX"] ?? "")
         
         let adif = record.adifFields
         if let parsed = ADIFDateTimeHelper.adifToDate(dateStr: adif["QSO_DATE_OFF"], timeStr: adif["TIME_OFF"]) {
@@ -238,6 +258,7 @@ struct EditQSOView: View {
                     .onChange(of: callsign) { newValue in
                         callsign = newValue.uppercased()
                     }
+                    .floatingLabel(LocalizedStrings.callsign.localized, text: callsign)
                 
                 if dateTimeVis == .visible {
                     DatePicker(LocalizedStrings.dateTime.localized, selection: $date)
@@ -262,6 +283,7 @@ struct EditQSOView: View {
                                 }
                             }
                         }
+                        .floatingLabel(LocalizedStrings.frequency.localized, text: frequency)
                 }
                 
                 Picker(LocalizedStrings.band.localized, selection: $band) {
@@ -286,16 +308,24 @@ struct EditQSOView: View {
             
             // ═══════════ Signal Report ═══════════
             Section(header: Text(LocalizedStrings.signalReport.localized)) {
-                TextField(LocalizedStrings.rstSent.localized, text: $rstSent)
-                    .focused($focusedField, equals: "RST_SENT")
-                    .onChange(of: rstSent) { newValue in
-                        rstSent = newValue.uppercased()
-                    }
-                TextField(LocalizedStrings.rstReceived.localized, text: $rstReceived)
-                    .focused($focusedField, equals: "RST_RCVD")
-                    .onChange(of: rstReceived) { newValue in
-                        rstReceived = newValue.uppercased()
-                    }
+                HStack {
+                    TextField(LocalizedStrings.rstSent.localized, text: $rstSent)
+                        .focused($focusedField, equals: "RST_SENT")
+                        .onChange(of: rstSent) { newValue in
+                            rstSent = newValue.uppercased()
+                        }
+                        .floatingLabel(LocalizedStrings.rstSent.localized, text: rstSent)
+                    rstQuickButtons(for: $rstSent)
+                }
+                HStack {
+                    TextField(LocalizedStrings.rstReceived.localized, text: $rstReceived)
+                        .focused($focusedField, equals: "RST_RCVD")
+                        .onChange(of: rstReceived) { newValue in
+                            rstReceived = newValue.uppercased()
+                        }
+                        .floatingLabel(LocalizedStrings.rstReceived.localized, text: rstReceived)
+                    rstQuickButtons(for: $rstReceived)
+                }
             }
             
             // ═══════════ Technical ═══════════
@@ -398,6 +428,7 @@ struct EditQSOView: View {
         HStack {
             TextField(LocalizedStrings.qth.localized, text: $qth)
                 .focused($focusedField, equals: "QTH")
+                .floatingLabel(LocalizedStrings.qth.localized, text: qth)
             
             Button(LocalizedStrings.selectOnMap.localized) {
                 focusedField = nil
@@ -416,14 +447,17 @@ struct EditQSOView: View {
             .onChange(of: gridSquare) { newValue in
                 gridSquare = formatGridSquare(newValue)
             }
+            .floatingLabel(LocalizedStrings.gridSquare.localized, text: gridSquare)
         
         TextField(LocalizedStrings.cqZone.localized, text: $cqZone)
             .keyboardType(.numberPad)
             .focused($focusedField, equals: "CQZ")
+            .floatingLabel(LocalizedStrings.cqZone.localized, text: cqZone)
         
         TextField(LocalizedStrings.ituZone.localized, text: $ituZone)
             .keyboardType(.numberPad)
             .focused($focusedField, equals: "ITUZ")
+            .floatingLabel(LocalizedStrings.ituZone.localized, text: ituZone)
     }
     
     // MARK: - Own Station Section
@@ -445,6 +479,7 @@ struct EditQSOView: View {
         HStack {
             TextField(LocalizedStrings.ownQth.localized, text: $ownQTH)
                 .focused($focusedField, equals: "MY_CITY")
+                .floatingLabel(LocalizedStrings.ownQth.localized, text: ownQTH)
             
             Button(LocalizedStrings.selectOnMap.localized) {
                 focusedField = nil
@@ -463,14 +498,17 @@ struct EditQSOView: View {
             .onChange(of: ownGridSquare) { newValue in
                 ownGridSquare = formatGridSquare(newValue)
             }
+            .floatingLabel(LocalizedStrings.gridSquare.localized, text: ownGridSquare)
         
         TextField(LocalizedStrings.cqZone.localized, text: $ownCQZone)
             .keyboardType(.numberPad)
             .focused($focusedField, equals: "MY_CQ_ZONE")
+            .floatingLabel(LocalizedStrings.cqZone.localized, text: ownCQZone)
         
         TextField(LocalizedStrings.ituZone.localized, text: $ownITUZone)
             .keyboardType(.numberPad)
             .focused($focusedField, equals: "MY_ITU_ZONE")
+            .floatingLabel(LocalizedStrings.ituZone.localized, text: ownITUZone)
     }
     
     // MARK: - Technical & Additional Sections
@@ -489,16 +527,42 @@ struct EditQSOView: View {
                     TextField(LocalizedStrings.rxFrequency.localized, text: $rxFrequency)
                         .keyboardType(.decimalPad)
                         .focused($focusedField, equals: "FREQ_RX")
+                        .onChange(of: rxFrequency) { newValue in
+                            if let freq = Double(newValue), let autoBand = QSORecord.bandForFrequency(freq) {
+                                if rxBand != autoBand {
+                                    isRxBandChangedByFrequency = true
+                                    rxBand = autoBand
+                                }
+                            }
+                        }
+                        .floatingLabel(LocalizedStrings.rxFrequency.localized, text: rxFrequency)
+                }
+                if showRxBandPicker {
+                    Picker("rx_band".localized, selection: $rxBand) {
+                        Text("").tag("")
+                        ForEach(bands, id: \.self) { Text($0) }
+                    }
+                    .onChange(of: rxBand) { newBand in
+                        if isRxBandChangedByFrequency {
+                            isRxBandChangedByFrequency = false
+                        } else if !newBand.isEmpty {
+                            if let lastFreq = QSORecord.lastRxFrequencyForRxBand(newBand, context: viewContext) {
+                                rxFrequency = String(lastFreq)
+                            }
+                        }
+                    }
                 }
                 if hasTxPwr {
                     TextField(LocalizedStrings.txPower.localized, text: $txPower)
                         .focused($focusedField, equals: "TX_PWR")
+                        .floatingLabel(LocalizedStrings.txPower.localized, text: txPower)
                 }
                 if hasSatName {
                     TextField(LocalizedStrings.satellite.localized, text: $satellite)
                         .focused($focusedField, equals: "SAT_NAME")
+                        .floatingLabel(LocalizedStrings.satellite.localized, text: satellite)
                 }
-                ADIFDynamicFieldRows(extendedFields: $extendedFields, category: .technical, visibilityManager: fieldVisibility, focusedField: $focusedField)
+                ADIFDynamicFieldRows(extendedFields: $extendedFields, category: .technical, visibilityManager: fieldVisibility, focusedField: $focusedField, excludeFieldIds: techExcludeIds)
                 ADIFDynamicFieldRows(extendedFields: $extendedFields, category: .satellite, visibilityManager: fieldVisibility, focusedField: $focusedField)
             }
         }
@@ -516,10 +580,12 @@ struct EditQSOView: View {
                 if hasName {
                     TextField(LocalizedStrings.name.localized, text: $name)
                         .focused($focusedField, equals: "NAME")
+                        .floatingLabel(LocalizedStrings.name.localized, text: name)
                 }
                 if hasComment {
                     TextField(LocalizedStrings.remarks.localized, text: $remarks)
                         .focused($focusedField, equals: "COMMENT")
+                        .floatingLabel(LocalizedStrings.remarks.localized, text: remarks)
                 }
                 ADIFDynamicFieldRows(extendedFields: $extendedFields, category: .contactedOp, visibilityManager: fieldVisibility, focusedField: $focusedField)
                 ADIFDynamicFieldRows(extendedFields: $extendedFields, category: .notes, visibilityManager: fieldVisibility, focusedField: $focusedField)
@@ -571,6 +637,7 @@ struct EditQSOView: View {
                             ForEach(fields) { field in
                                 TextField(field.displayName, text: bindingForExtended(field.id))
                                     .focused($focusedField, equals: field.id)
+                                    .floatingLabel(field.displayName, text: extendedFields[field.id] ?? "")
                             }
                         }
                     }
@@ -694,6 +761,46 @@ struct EditQSOView: View {
                 }
             }
         )
+    }
+    
+    // MARK: - RST Quick Input
+    
+    @ViewBuilder
+    private func rstQuickButtons(for binding: Binding<String>) -> some View {
+        if isVoiceMode {
+            Button("59") { binding.wrappedValue = "59" }
+                .buttonStyle(.borderless)
+                .font(.caption)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(Color.accentColor.opacity(0.1))
+                .cornerRadius(8)
+        } else if isCWMode {
+            HStack(spacing: 4) {
+                Button("599") { binding.wrappedValue = "599" }
+                    .buttonStyle(.borderless)
+                    .font(.caption)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 4)
+                    .background(Color.accentColor.opacity(0.1))
+                    .cornerRadius(8)
+                Button("5NN") { binding.wrappedValue = "5NN" }
+                    .buttonStyle(.borderless)
+                    .font(.caption)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 4)
+                    .background(Color.accentColor.opacity(0.1))
+                    .cornerRadius(8)
+            }
+        } else {
+            Button("-10") { binding.wrappedValue = "-10" }
+                .buttonStyle(.borderless)
+                .font(.caption)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(Color.accentColor.opacity(0.1))
+                .cornerRadius(8)
+        }
     }
     
     // MARK: - Data Loading
@@ -830,6 +937,12 @@ struct EditQSOView: View {
         record.setCoordinate(selectedLocation)
         
         var fields = extendedFields
+        
+        if !rxBand.isEmpty {
+            fields["BAND_RX"] = rxBand
+        } else {
+            fields.removeValue(forKey: "BAND_RX")
+        }
         
         let endDateHasData = !(extendedFields["TIME_OFF"] ?? "").isEmpty ||
                              !(extendedFields["QSO_DATE_OFF"] ?? "").isEmpty

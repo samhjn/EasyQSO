@@ -38,8 +38,8 @@ enum ADIFFieldCategory: String, CaseIterable, Identifiable {
         case .basic: return 0
         case .signal: return 1
         case .technical: return 2
-        case .ownStation: return 3
-        case .contactedStation: return 4
+        case .contactedStation: return 3
+        case .ownStation: return 4
         case .contactedOp: return 5
         case .satellite: return 6
         case .contest: return 7
@@ -155,23 +155,22 @@ struct ADIFFields {
         
         // ═══════════════ Technical ═══════════════
         f("FREQ_RX",      .technical, core: "rxFrequencyHz", vis: true),
+        f("BAND_RX",      .technical, vis: true),
         f("TX_PWR",       .technical, core: "txPower",       vis: true),
         f("RX_PWR",       .technical),
-        f("BAND_RX",      .technical),
         f("ANT_AZ",       .technical),
         f("ANT_EL",       .technical),
         f("ANT_PATH",     .technical),
         f("PROP_MODE",    .technical),
         f("DISTANCE",     .technical),
-        f("RIG",          .technical),
-        f("MY_RIG",       .technical),
-        f("MY_ANTENNA",   .technical),
-        f("MY_ALTITUDE",  .technical),
         
         // ═══════════════ Own Station ═══════════════
         f("STATION_CALLSIGN", .ownStation),
         f("OPERATOR",         .ownStation),
         f("OWNER_CALLSIGN",   .ownStation),
+        f("MY_RIG",           .ownStation),
+        f("MY_ANTENNA",       .ownStation),
+        f("MY_ALTITUDE",      .ownStation),
         f("MY_NAME",          .ownStation),
         f("MY_CITY",          .ownStation, vis: true),
         f("MY_COUNTRY",       .ownStation),
@@ -222,6 +221,7 @@ struct ADIFFields {
         f("ADDRESS",       .contactedStation),
         f("USACA_COUNTIES",.contactedStation),
         f("VUCC_GRIDS",    .contactedStation),
+        f("RIG",           .contactedStation),
         
         // ═══════════════ Contacted Operator ═══════════════
         f("NAME",          .contactedOp, core: "name", vis: true),
@@ -401,6 +401,44 @@ struct ADIFFields {
     
     static func groupsForCategory(_ category: ADIFFieldCategory) -> [ADIFFieldGroup] {
         groupsByCategory[category] ?? []
+    }
+    
+    // MARK: - Settings page ordering
+    
+    enum SettingsItem: Identifiable {
+        case group(ADIFFieldGroup)
+        case field(ADIFFieldDef)
+        
+        var id: String {
+            switch self {
+            case .group(let g): return "g_\(g.id)"
+            case .field(let f): return f.id
+            }
+        }
+    }
+    
+    static func orderedSettingsItems(for category: ADIFFieldCategory) -> [SettingsItem] {
+        let groups = groupsForCategory(category)
+        let fields = fieldsForCategory(category).filter { !groupedFieldIds.contains($0.id) }
+        
+        if category == .basic {
+            var items: [SettingsItem] = []
+            let explicitIds: Set<String> = ["CALL", "FREQ", "BAND", "MODE"]
+            if let f = byId["CALL"] { items.append(.field(f)) }
+            for g in groups { items.append(.group(g)) }
+            if let f = byId["FREQ"] { items.append(.field(f)) }
+            if let f = byId["BAND"] { items.append(.field(f)) }
+            if let f = byId["MODE"] { items.append(.field(f)) }
+            for f in fields where !explicitIds.contains(f.id) {
+                items.append(.field(f))
+            }
+            return items
+        }
+        
+        var items: [SettingsItem] = []
+        for g in groups { items.append(.group(g)) }
+        for f in fields { items.append(.field(f)) }
+        return items
     }
     
     /// All known ADIF tags (for lossless import - includes _INTL variants)
