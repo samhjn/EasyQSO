@@ -1,0 +1,439 @@
+/* 
+  Localizable.strings (Russian)
+  EasyQSO
+  
+  Russian localization strings file
+*/
+
+// MARK: - Main Tabs
+"record_qso" = "Запись QSO";
+"query_log" = "Поиск в журнале";
+"import_export" = "Импорт/Экспорт";
+"settings" = "Настройки";
+
+// MARK: - Form Section Headers
+"basic_info" = "Основная информация";
+"signal_report" = "Рапорт сигнала";
+"technical_info" = "Техническая информация";
+"own_qth_info" = "Своя станция";
+"qth_info" = "Станция корреспондента";
+"additional_info" = "Дополнительная информация";
+"data_management" = "Управление данными";
+"export_log" = "Экспорт журнала";
+"import_log" = "Импорт журнала";
+
+// MARK: - Field Labels
+"callsign" = "Позывной";
+"date_time" = "Дата и время";
+"band" = "Диапазон";
+"mode" = "Вид модуляции";
+"frequency" = "Частота (МГц)";
+"rx_frequency" = "Частота приёма (МГц)";
+"tx_power" = "Мощность передатчика";
+"rst_sent" = "RST передано";
+"rst_received" = "RST принято";
+"name" = "Имя";
+"qth" = "Описание QTH";
+"own_qth" = "Своё QTH";
+"grid_square" = "Грид-локатор";
+"cq_zone" = "Зона CQ";
+"itu_zone" = "Зона ITU";
+"satellite" = "Спутник";
+"remarks" = "Примечания";
+
+// MARK: - Map and Location Selection
+"select_location" = "Выбрать местоположение";
+"select_on_map" = "Выбрать на карте";
+"location_name" = "Название места";
+"coordinates" = "Координаты";
+"latitude" = "Широта";
+"longitude" = "Долгота";
+"grid_coordinate" = "Грид-координаты";
+"click_map_to_select" = "Нажмите на карту для выбора местоположения";
+"selected_location_info" = "Информация о выбранном месте";
+
+// MARK: - Buttons
+"save_qso" = "Сохранить QSO";
+"save_changes" = "Сохранить изменения";
+"export_all" = "Экспортировать все записи";
+"import_from_adif" = "Импорт из файла ADIF";
+"import_from_csv" = "Импорт из файла CSV";
+"delete" = "Удалить";
+"cancel" = "Отмена";
+"confirm" = "OK";
+
+// MARK: - Keyboard Toolbar
+"previous" = "Назад";
+"next" = "Далее";
+"done" = "Готово";
+
+// MARK: - Search and Display
+"search_placeholder" = "Поиск по позывному, диапазону, моду и т.д.";
+"record_count" = "Всего %d записей";
+"operator" = "Оператор";
+"export_format" = "Формат экспорта";
+"current_record_count" = "Текущее количество записей: %d";
+
+// MARK: - Navigation Titles
+"edit_qso" = "Редактировать QSO";
+
+// MARK: - Validation and Error Messages
+"validation_error" = "Ошибка проверки";
+"callsign_empty" = "Позывной не может быть пустым";
+"callsign_invalid" = "Неверный формат позывного, должен содержать буквы и/или цифры";
+"frequency_invalid" = "Неверный формат частоты, должно быть допустимое число в разумном диапазоне";
+"grid_square_invalid" = "Неверный формат грид-локатора, должен быть в формате AB12cd";
+"cq_zone_invalid" = "Зона CQ должна быть числом от 1 до 40";
+"itu_zone_invalid" = "Зона ITU должна быть числом от 1 до 90";
+
+// MARK: - Success Messages
+"qso_saved" = "QSO сохранено";
+"qso_saved_message" = "Запись QSO успешно сохранена";
+"save_success" = "Сохранение выполнено";
+"qso_updated" = "Запись QSO обновлена";
+"delete_success" = "Удаление выполнено";
+"delete_success_message" = "Запись QSO успешно удалена";
+"export_success" = "Экспорт выполнен";
+"export_success_message" = "Журнал экспортирован в %@";
+"import_success" = "Импорт выполнен";
+"import_success_message" = "Успешно импортировано %d записей";
+
+// MARK: - Failure Messages
+"save_failed" = "Ошибка сохранения";
+"save_failed_message" = "Не удалось сохранить запись QSO: %@";
+"delete_failed" = "Ошибка удаления";
+"delete_failed_message" = "Ошибка при удалении записи: %@";
+"export_failed" = "Ошибка экспорта";
+"import_failed" = "Ошибка импорта";
+"cannot_access_documents" = "Нет доступа к папке документов";
+"cannot_read_file" = "Не удаётся прочитать файл";
+"csv_format_incorrect" = "Неверный формат CSV-файла или файл пуст";
+"cannot_get_existing_records" = "Не удаётся получить существующие записи";
+
+// MARK: - Delete Confirmation
+"delete_record" = "Удалить запись";
+"delete_confirm_message" = "Вы уверены, что хотите удалить запись QSO с %@?";
+
+// MARK: - App Information
+"app_display_name" = "Журнал радиолюбителя";
+"documents_folder_usage" = "Доступ к папке «Документы» необходим для импорта и экспорта файлов журнала";
+
+// MARK: - Advanced Feature Strings
+"import_success_with_duplicates" = "Успешно импортировано %d записей (дублирующиеся записи были автоматически пропущены)";
+
+// MARK: - Timezone Settings
+"export_timezone" = "Часовой пояс экспорта";
+"import_timezone" = "Часовой пояс импорта";
+"timezone_settings" = "Настройки часового пояса CSV";
+"export_tab" = "Экспорт CSV";
+"import_tab" = "Импорт CSV";
+"notes" = "Примечания";
+"timezone_note_local" = "• Приложение всегда отображает местное время";
+"timezone_note_adif" = "• Файлы ADIF всегда используют время UTC";
+"timezone_note_csv" = "• Файлы CSV поддерживают выбор часового пояса";
+"timezone_note_conversion" = "• Время автоматически конвертируется при импорте/экспорте";
+"timezone_note_adif_ignore" = "• Файлы ADIF игнорируют эти настройки и всегда используют UTC";
+"export_timezone_desc" = "Выберите часовой пояс для экспорта CSV-файлов";
+"import_timezone_desc" = "Выберите предполагаемый часовой пояс для импорта CSV-файлов";
+"local_time" = "Местное время";
+"adif_uses_utc" = "Формат ADIF использует UTC по стандарту";
+"csv_timezone_only" = "Применяется только к CSV-файлам. ADIF-файлы всегда используют UTC.";
+
+// MARK: - Advanced Filter
+"advanced_filter" = "Расширенный фильтр";
+"search_mode" = "Режим поиска";
+"fuzzy_search" = "Нечёткий поиск";
+"exact_search" = "Точное совпадение";
+"fuzzy_search_desc" = "Поиск записей, содержащих ключевые слова";
+"exact_search_desc" = "Поиск точных совпадений";
+"general_search" = "Общий поиск";
+"enter_callsign" = "Введите позывной";
+"enter_band" = "Введите диапазон";
+"enter_mode" = "Введите вид модуляции";
+"or_select_bands" = "Или выберите из списка:";
+"or_select_modes" = "Или выберите из списка:";
+"date_range" = "Диапазон дат";
+"start_date" = "Дата начала";
+"end_date" = "Дата окончания";
+"clear_start_date" = "Очистить дату начала";
+"clear_end_date" = "Очистить дату окончания";
+"frequency_range" = "Диапазон частот";
+"min_frequency" = "Мин. частота";
+"max_frequency" = "Макс. частота";
+"other_filters" = "Другие фильтры";
+"reset_filters" = "Сбросить фильтры";
+"apply_filters" = "Применить фильтры";
+"active_filters" = "Активные фильтры:";
+"clear_all" = "Очистить всё";
+"operator_label" = "Оператор";
+
+// MARK: - Export Filter
+"use_filter_for_export" = "Использовать фильтр для экспорта";
+"configure_export_filter" = "Настроить фильтр экспорта";
+"export_filter_active" = "Фильтр активен";
+"records_to_export" = "Записей для экспорта: %d";
+"export_filtered" = "Экспорт отфильтрованных записей";
+
+// MARK: - Filter Descriptions
+"filter_search" = "Поиск";
+"filter_fuzzy" = "Нечёткий";
+"filter_exact" = "Точный";
+"filter_callsign" = "Позывной";
+"filter_band" = "Диапазон";
+"filter_mode" = "Мод";
+"filter_start_date" = "Дата начала";
+"filter_end_date" = "Дата окончания";
+"filter_name" = "Имя";
+"filter_qth" = "QTH";
+"filter_grid" = "Грид";
+"filter_min_freq" = "Мин. частота";
+"filter_max_freq" = "Макс. частота";
+"filter_satellite" = "Спутник";
+"filter_no_filters" = "Нет фильтров";
+
+// MARK: - About and License
+"about" = "О программе";
+"license" = "Лицензия";
+"license_type" = "Тип лицензии";
+"gpl_v3" = "Стандартная общественная лицензия GNU v3.0";
+"license_description" = "Данное ПО выпущено под лицензией GPL v3.0, что означает:";
+"license_freedom_use" = "• Вы можете свободно использовать это ПО";
+"license_freedom_modify" = "• Вы можете свободно модифицировать это ПО";
+"license_freedom_distribute" = "• Вы можете свободно распространять это ПО";
+"license_terms_apply" = "• Но вы должны соблюдать условия GPL v3.0";
+"copyright" = "Авторские права";
+"copyright_notice" = "Это свободное ПО под лицензией GPL v3.0.";
+"view_full_license" = "Просмотреть полный текст лицензии GPL v3.0";
+"view_source_code" = "Просмотреть исходный код";
+"report_issue" = "Сообщить о проблеме";
+"software_introduction" = "О программе";
+"software_description" = "EasyQSO — приложение для ведения журнала QSO, созданное для радиолюбителей. Оно предоставляет полные возможности управления записями QSO, включая запись, поиск, импорт/экспорт и многое другое.";
+"open_source_license" = "Лицензия с открытым исходным кодом";
+"version" = "Версия";
+"welcome_gpl_notice" = "Добро пожаловать в EasyQSO! Данное ПО выпущено под Стандартной общественной лицензией GNU v3.0. Нажмите «Узнать о лицензии GPL» для просмотра подробной информации.";
+"welcome_title" = "Добро пожаловать в EasyQSO";
+"learn_gpl_license" = "Узнать о лицензии GPL";
+"view_later" = "Позже";
+
+// MARK: - ADIF Field Settings
+"adif_field_config" = "Настройка полей QSO";
+"adif_field_settings" = "Управление полями QSO";
+"adif_field_config_desc" = "Настройте видимость полей ADIF 3.1.7 при записи и редактировании QSO: видимые, свёрнутые или скрытые.";
+"adif_search_fields" = "Поиск полей...";
+"adif_reset_defaults" = "Сброс";
+"adif_required" = "Обязательное";
+"adif_more_fields" = "Дополнительные поля";
+"adif_hidden_with_data" = "Скрытые поля (с данными)";
+"adif_hidden_field_hint" = "Эти поля скрыты, но содержат данные. Очистка поля удалит его. Включить обратно можно в Настройках.";
+
+// MARK: - ADIF Field Categories
+"adif_cat_basic" = "Основная информация";
+"adif_cat_signal" = "Рапорт сигнала";
+"adif_cat_technical" = "Техническая информация";
+"adif_cat_own_station" = "Своя станция";
+"adif_cat_contacted_station" = "Станция корреспондента";
+"adif_cat_contacted_op" = "Оператор корреспондента";
+"adif_cat_satellite" = "Спутник";
+"adif_cat_contest" = "Соревнования";
+"adif_cat_qsl" = "QSL";
+"adif_cat_online_services" = "Онлайн-сервисы";
+"adif_cat_awards" = "Дипломы и членство";
+"adif_cat_propagation" = "Распространение и условия";
+"adif_cat_notes" = "Заметки и комментарии";
+
+// MARK: - ADIF Field Visibility
+"adif_vis_visible" = "Видимое";
+"adif_vis_collapsed" = "Свёрнутое";
+"adif_vis_hidden" = "Скрытое";
+
+// MARK: - ADIF Field Groups
+"adif_group_datetime" = "Дата и время";
+"adif_group_end_datetime" = "Дата и время окончания";
+"adif_group_contacted_qth" = "QTH корреспондента (с картой)";
+"adif_group_own_qth" = "Своё QTH (с картой)";
+
+// MARK: - ADIF Field Names - Basic
+"adif_field_call" = "Позывной";
+"adif_field_qso_date" = "Дата QSO";
+"adif_field_time_on" = "Время начала";
+"adif_field_band" = "Диапазон";
+"adif_field_mode" = "Вид модуляции";
+"adif_field_freq" = "Частота (МГц)";
+"adif_field_submode" = "Подвид модуляции";
+"adif_field_time_off" = "Время окончания";
+"adif_field_qso_date_off" = "Дата окончания";
+
+// MARK: - ADIF Field Names - Signal
+"adif_field_rst_sent" = "RST передано";
+"adif_field_rst_rcvd" = "RST принято";
+
+// MARK: - ADIF Field Names - Technical
+"adif_field_freq_rx" = "Частота приёма (МГц)";
+"adif_field_tx_pwr" = "Мощность передатчика (Вт)";
+"adif_field_rx_pwr" = "Мощность приёмника (Вт)";
+"adif_field_band_rx" = "Диапазон приёма";
+"adif_field_ant_az" = "Азимут антенны";
+"adif_field_ant_el" = "Угол места антенны";
+"adif_field_ant_path" = "Путь сигнала";
+"adif_field_prop_mode" = "Режим распространения";
+"adif_field_distance" = "Расстояние (км)";
+"adif_field_rig" = "Аппаратура (корр.)";
+"adif_field_my_rig" = "Аппаратура (своя)";
+"adif_field_my_antenna" = "Антенна (своя)";
+"adif_field_my_altitude" = "Высота (своя, м)";
+
+// MARK: - ADIF Field Names - Own Station
+"adif_field_station_callsign" = "Позывной станции";
+"adif_field_operator" = "Оператор";
+"adif_field_owner_callsign" = "Позывной владельца";
+"adif_field_my_name" = "Моё имя";
+"adif_field_my_city" = "Мой город";
+"adif_field_my_country" = "Моя страна";
+"adif_field_my_state" = "Мой регион";
+"adif_field_my_cnty" = "Мой район";
+"adif_field_my_gridsquare" = "Мой грид-локатор";
+"adif_field_my_gridsquare_ext" = "Мой грид (расш.)";
+"adif_field_my_cq_zone" = "Моя зона CQ";
+"adif_field_my_itu_zone" = "Моя зона ITU";
+"adif_field_my_lat" = "Моя широта";
+"adif_field_my_lon" = "Моя долгота";
+"adif_field_my_dxcc" = "Мой DXCC";
+"adif_field_my_postal_code" = "Мой почтовый индекс";
+"adif_field_my_street" = "Мой адрес";
+"adif_field_my_arrl_sect" = "Мой ARRL Section";
+"adif_field_my_cnty_alt" = "Мой район (альт.)";
+"adif_field_my_darc_dok" = "Мой DARC DOK";
+"adif_field_my_fists" = "Мой FISTS №";
+"adif_field_my_iota" = "Мой IOTA";
+"adif_field_my_iota_island_id" = "Мой IOTA Island ID";
+"adif_field_my_pota_ref" = "Мой POTA Ref";
+"adif_field_my_sota_ref" = "Мой SOTA Ref";
+"adif_field_my_wwff_ref" = "Мой WWFF Ref";
+"adif_field_my_sig" = "Моя спец. активность";
+"adif_field_my_sig_info" = "Мои данные SIG";
+"adif_field_my_usaca_counties" = "Мой USACA Counties";
+"adif_field_my_vucc_grids" = "Мой VUCC Grids";
+"adif_field_my_morse_key_info" = "Мой телеграфный ключ (инфо)";
+"adif_field_my_morse_key_type" = "Мой телеграфный ключ (тип)";
+
+// MARK: - ADIF Field Names - Contacted Station
+"adif_field_qth" = "QTH";
+"adif_field_gridsquare" = "Грид-локатор";
+"adif_field_cqz" = "Зона CQ";
+"adif_field_ituz" = "Зона ITU";
+"adif_field_lat" = "Широта";
+"adif_field_lon" = "Долгота";
+"adif_field_gridsquare_ext" = "Грид-локатор (расш.)";
+"adif_field_country" = "Страна";
+"adif_field_state" = "Регион";
+"adif_field_cnty" = "Район";
+"adif_field_cnty_alt" = "Район (альт.)";
+"adif_field_dxcc" = "DXCC";
+"adif_field_cont" = "Континент";
+"adif_field_region" = "Регион";
+"adif_field_pfx" = "WPX-префикс";
+"adif_field_altitude" = "Высота (м)";
+"adif_field_address" = "Адрес";
+"adif_field_usaca_counties" = "USACA Counties";
+"adif_field_vucc_grids" = "VUCC Grids";
+
+// MARK: - ADIF Field Names - Contacted Operator
+"adif_field_name" = "Имя";
+"adif_field_age" = "Возраст";
+"adif_field_email" = "Эл. почта";
+"adif_field_web" = "Веб-сайт";
+"adif_field_contacted_op" = "Оператор корреспондента";
+"adif_field_eq_call" = "Позывной владельца";
+"adif_field_silent_key" = "Silent Key (SK)";
+"adif_field_fists" = "FISTS №";
+"adif_field_fists_cc" = "FISTS CC №";
+"adif_field_skcc" = "SKCC";
+"adif_field_ten_ten" = "Ten-Ten №";
+"adif_field_uksmg" = "UKSMG №";
+"adif_field_darc_dok" = "DARC DOK";
+"adif_field_morse_key_info" = "Телеграфный ключ (инфо)";
+"adif_field_morse_key_type" = "Телеграфный ключ (тип)";
+
+// MARK: - ADIF Field Names - Satellite
+"adif_field_sat_name" = "Название спутника";
+"adif_field_sat_mode" = "Режим спутника";
+
+// MARK: - ADIF Field Names - Contest
+"adif_field_contest_id" = "ID соревнования";
+"adif_field_check" = "Проверка";
+"adif_field_class" = "Класс";
+"adif_field_precedence" = "Приоритет";
+"adif_field_srx" = "Принятый серийный №";
+"adif_field_srx_string" = "Принятая серийная строка";
+"adif_field_stx" = "Переданный серийный №";
+"adif_field_stx_string" = "Переданная серийная строка";
+"adif_field_qso_complete" = "QSO завершено";
+"adif_field_qso_random" = "Случайное QSO";
+"adif_field_swl" = "SWL";
+"adif_field_arrl_sect" = "ARRL Section";
+
+// MARK: - ADIF Field Names - QSL
+"adif_field_qsl_sent" = "QSL отправлена";
+"adif_field_qsl_rcvd" = "QSL получена";
+"adif_field_qslsdate" = "Дата отправки QSL";
+"adif_field_qslrdate" = "Дата получения QSL";
+"adif_field_qsl_sent_via" = "QSL отправлена через";
+"adif_field_qsl_rcvd_via" = "QSL получена через";
+"adif_field_qsl_via" = "QSL через";
+"adif_field_qslmsg" = "Сообщение QSL";
+"adif_field_qslmsg_rcvd" = "Полученное сообщение QSL";
+"adif_field_eqsl_qsl_sent" = "eQSL отправлена";
+"adif_field_eqsl_qsl_rcvd" = "eQSL получена";
+"adif_field_eqsl_qslsdate" = "Дата отправки eQSL";
+"adif_field_eqsl_qslrdate" = "Дата получения eQSL";
+"adif_field_eqsl_ag" = "eQSL AG";
+"adif_field_lotw_qsl_sent" = "LoTW отправлена";
+"adif_field_lotw_qsl_rcvd" = "LoTW получена";
+"adif_field_lotw_qslsdate" = "Дата отправки LoTW";
+"adif_field_lotw_qslrdate" = "Дата получения LoTW";
+"adif_field_dcl_qsl_sent" = "DCL отправлена";
+"adif_field_dcl_qsl_rcvd" = "DCL получена";
+"adif_field_dcl_qslsdate" = "Дата отправки DCL";
+"adif_field_dcl_qslrdate" = "Дата получения DCL";
+
+// MARK: - ADIF Field Names - Online Services
+"adif_field_clublog_qso_upload_date" = "Дата загрузки Club Log";
+"adif_field_clublog_qso_upload_status" = "Статус загрузки Club Log";
+"adif_field_hamlogeu_qso_upload_date" = "Дата загрузки HAMLOG.EU";
+"adif_field_hamlogeu_qso_upload_status" = "Статус загрузки HAMLOG.EU";
+"adif_field_hamqth_qso_upload_date" = "Дата загрузки HamQTH";
+"adif_field_hamqth_qso_upload_status" = "Статус загрузки HamQTH";
+"adif_field_hrdlog_qso_upload_date" = "Дата загрузки HRDLog";
+"adif_field_hrdlog_qso_upload_status" = "Статус загрузки HRDLog";
+"adif_field_qrzcom_qso_upload_date" = "Дата загрузки QRZ.COM";
+"adif_field_qrzcom_qso_upload_status" = "Статус загрузки QRZ.COM";
+"adif_field_qrzcom_qso_download_date" = "Дата скачивания QRZ.COM";
+"adif_field_qrzcom_qso_download_status" = "Статус скачивания QRZ.COM";
+
+// MARK: - ADIF Field Names - Awards
+"adif_field_iota" = "IOTA";
+"adif_field_iota_island_id" = "IOTA Island ID";
+"adif_field_sota_ref" = "SOTA Reference";
+"adif_field_pota_ref" = "POTA Reference";
+"adif_field_wwff_ref" = "WWFF Reference";
+"adif_field_sig" = "Спец. активность";
+"adif_field_sig_info" = "Данные SIG";
+"adif_field_award_submitted" = "Поданные дипломы";
+"adif_field_award_granted" = "Полученные дипломы";
+"adif_field_credit_submitted" = "Поданные очки";
+"adif_field_credit_granted" = "Полученные очки";
+
+// MARK: - ADIF Field Names - Propagation
+"adif_field_a_index" = "Индекс A";
+"adif_field_k_index" = "Индекс K";
+"adif_field_sfi" = "Индекс солнечного потока";
+"adif_field_max_bursts" = "Макс. всплесков (с)";
+"adif_field_nr_bursts" = "Кол-во всплесков";
+"adif_field_nr_pings" = "Кол-во пингов";
+"adif_field_ms_shower" = "Метеорный поток";
+"adif_field_force_init" = "Принуд. иниц. (EME)";
+
+// MARK: - ADIF Field Names - Notes
+"adif_field_comment" = "Комментарий";
+"adif_field_notes" = "Заметки";
+"adif_field_public_key" = "Открытый ключ";

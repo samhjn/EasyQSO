@@ -53,11 +53,12 @@ class FieldVisibilityManager: ObservableObject {
         guard let group = ADIFFields.fieldGroups.first(where: { $0.id == groupId }) else {
             return .visible
         }
-        let stored = groupVisibilityMap[groupId] ?? .visible
+        let defaultVis: ADIFFieldVisibility = group.defaultVisible ? .visible : .hidden
+        let stored = groupVisibilityMap[groupId] ?? defaultVis
         if group.allowedVisibilities.contains(stored) {
             return stored
         }
-        return .visible
+        return defaultVis
     }
     
     func setGroupVisibility(_ visibility: ADIFFieldVisibility, for groupId: String) {

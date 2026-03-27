@@ -29,45 +29,8 @@ enum ADIFFieldCategory: String, CaseIterable, Identifiable {
     
     var id: String { rawValue }
     
-    var displayNameEN: String {
-        switch self {
-        case .basic: return "Basic Information"
-        case .signal: return "Signal Report"
-        case .technical: return "Technical"
-        case .ownStation: return "Own Station"
-        case .contactedStation: return "Contacted Station"
-        case .contactedOp: return "Contacted Operator"
-        case .satellite: return "Satellite"
-        case .contest: return "Contest"
-        case .qsl: return "QSL"
-        case .onlineServices: return "Online Services"
-        case .awards: return "Awards & Memberships"
-        case .propagation: return "Propagation & Conditions"
-        case .notes: return "Notes & Comments"
-        }
-    }
-    
-    var displayNameZH: String {
-        switch self {
-        case .basic: return "基本信息"
-        case .signal: return "信号报告"
-        case .technical: return "技术信息"
-        case .ownStation: return "己方电台"
-        case .contactedStation: return "对方电台"
-        case .contactedOp: return "对方操作员"
-        case .satellite: return "卫星"
-        case .contest: return "竞赛"
-        case .qsl: return "QSL"
-        case .onlineServices: return "在线服务"
-        case .awards: return "奖项与会员"
-        case .propagation: return "传播与条件"
-        case .notes: return "备注与注释"
-        }
-    }
-    
     var displayName: String {
-        let lang = Locale.preferredLanguages.first ?? "en"
-        return lang.hasPrefix("zh") ? displayNameZH : displayNameEN
+        rawValue.localized
     }
     
     var sortOrder: Int {
@@ -96,25 +59,8 @@ enum ADIFFieldVisibility: String, Codable, CaseIterable {
     case collapsed
     case hidden
     
-    var displayNameEN: String {
-        switch self {
-        case .visible: return "Visible"
-        case .collapsed: return "Collapsed"
-        case .hidden: return "Hidden"
-        }
-    }
-    
-    var displayNameZH: String {
-        switch self {
-        case .visible: return "显示"
-        case .collapsed: return "折叠"
-        case .hidden: return "隐藏"
-        }
-    }
-    
     var displayName: String {
-        let lang = Locale.preferredLanguages.first ?? "en"
-        return lang.hasPrefix("zh") ? displayNameZH : displayNameEN
+        "adif_vis_\(rawValue)".localized
     }
     
     var iconName: String {
@@ -130,16 +76,13 @@ enum ADIFFieldVisibility: String, Codable, CaseIterable {
 
 struct ADIFFieldDef: Identifiable, Hashable {
     let id: String
-    let nameEN: String
-    let nameZH: String
     let category: ADIFFieldCategory
     let coreProperty: String?
     let isRequired: Bool
     let defaultVisible: Bool
     
     var displayName: String {
-        let lang = Locale.preferredLanguages.first ?? "en"
-        return lang.hasPrefix("zh") ? nameZH : nameEN
+        "adif_field_\(id.lowercased())".localized
     }
     
     var isCore: Bool { coreProperty != nil }
@@ -153,20 +96,23 @@ struct ADIFFieldDef: Identifiable, Hashable {
 
 struct ADIFFieldGroup: Identifiable, Hashable {
     let id: String
-    let nameEN: String
-    let nameZH: String
     let memberFieldIds: [String]
     let category: ADIFFieldCategory
     let supportsCollapsed: Bool
     
     var displayName: String {
-        let lang = Locale.preferredLanguages.first ?? "en"
-        return lang.hasPrefix("zh") ? nameZH : nameEN
+        "adif_\(id)".localized
     }
     
     var hasRequiredMembers: Bool {
         memberFieldIds.contains { id in
             ADIFFields.field(for: id)?.isRequired == true
+        }
+    }
+    
+    var defaultVisible: Bool {
+        memberFieldIds.contains { id in
+            ADIFFields.field(for: id)?.defaultVisible == true
         }
     }
     
@@ -185,198 +131,198 @@ struct ADIFFieldGroup: Identifiable, Hashable {
 
 struct ADIFFields {
     
-    private static func f(_ id: String, _ en: String, _ zh: String, _ cat: ADIFFieldCategory,
+    private static func f(_ id: String, _ cat: ADIFFieldCategory,
                           core: String? = nil, req: Bool = false, vis: Bool = false) -> ADIFFieldDef {
-        ADIFFieldDef(id: id, nameEN: en, nameZH: zh, category: cat,
+        ADIFFieldDef(id: id, category: cat,
                      coreProperty: core, isRequired: req, defaultVisible: vis)
     }
     
     static let all: [ADIFFieldDef] = [
         // ═══════════════ Basic Information ═══════════════
-        f("CALL",         "Callsign",           "通联呼号",     .basic, core: "callsign", req: true, vis: true),
-        f("QSO_DATE",     "QSO Date",           "通联日期",     .basic, core: "date",      req: true, vis: true),
-        f("TIME_ON",      "Time On",            "开始时间",     .basic, core: "date",      req: true, vis: true),
-        f("BAND",         "Band",               "波段",         .basic, core: "band",      req: true, vis: true),
-        f("MODE",         "Mode",               "模式",         .basic, core: "mode",      req: true, vis: true),
-        f("FREQ",         "Frequency (MHz)",    "频率 (MHz)",   .basic, core: "frequencyHz", vis: true),
-        f("SUBMODE",      "Submode",            "子模式",       .basic),
-        f("TIME_OFF",     "Time Off",           "结束时间",     .basic),
-        f("QSO_DATE_OFF", "QSO Date Off",       "结束日期",     .basic),
+        f("CALL",         .basic, core: "callsign", req: true, vis: true),
+        f("QSO_DATE",     .basic, core: "date",      req: true, vis: true),
+        f("TIME_ON",      .basic, core: "date",      req: true, vis: true),
+        f("BAND",         .basic, core: "band",      req: true, vis: true),
+        f("MODE",         .basic, core: "mode",      req: true, vis: true),
+        f("FREQ",         .basic, core: "frequencyHz", vis: true),
+        f("SUBMODE",      .basic),
+        f("TIME_OFF",     .basic),
+        f("QSO_DATE_OFF", .basic),
         
         // ═══════════════ Signal Report ═══════════════
-        f("RST_SENT",     "RST Sent",           "发出的RST",    .signal, core: "rstSent",     req: true, vis: true),
-        f("RST_RCVD",     "RST Received",       "接收的RST",    .signal, core: "rstReceived", req: true, vis: true),
+        f("RST_SENT",     .signal, core: "rstSent",     req: true, vis: true),
+        f("RST_RCVD",     .signal, core: "rstReceived", req: true, vis: true),
         
         // ═══════════════ Technical ═══════════════
-        f("FREQ_RX",      "RX Frequency (MHz)", "接收频率 (MHz)", .technical, core: "rxFrequencyHz", vis: true),
-        f("TX_PWR",       "TX Power (W)",       "发射功率 (W)",   .technical, core: "txPower",       vis: true),
-        f("RX_PWR",       "RX Power (W)",       "接收功率 (W)",   .technical),
-        f("BAND_RX",      "RX Band",            "接收波段",       .technical),
-        f("ANT_AZ",       "Antenna Azimuth",    "天线方位角",     .technical),
-        f("ANT_EL",       "Antenna Elevation",  "天线仰角",       .technical),
-        f("ANT_PATH",     "Antenna Path",       "信号路径",       .technical),
-        f("PROP_MODE",    "Propagation Mode",   "传播模式",       .technical),
-        f("DISTANCE",     "Distance (km)",      "距离 (km)",      .technical),
-        f("RIG",          "Rig (Contacted)",     "设备 (对方)",    .technical),
-        f("MY_RIG",       "Rig (Own)",           "设备 (己方)",    .technical),
-        f("MY_ANTENNA",   "Antenna (Own)",       "天线 (己方)",    .technical),
-        f("MY_ALTITUDE",  "Altitude (Own, m)",   "海拔 (己方, m)", .technical),
+        f("FREQ_RX",      .technical, core: "rxFrequencyHz", vis: true),
+        f("TX_PWR",       .technical, core: "txPower",       vis: true),
+        f("RX_PWR",       .technical),
+        f("BAND_RX",      .technical),
+        f("ANT_AZ",       .technical),
+        f("ANT_EL",       .technical),
+        f("ANT_PATH",     .technical),
+        f("PROP_MODE",    .technical),
+        f("DISTANCE",     .technical),
+        f("RIG",          .technical),
+        f("MY_RIG",       .technical),
+        f("MY_ANTENNA",   .technical),
+        f("MY_ALTITUDE",  .technical),
         
         // ═══════════════ Own Station ═══════════════
-        f("STATION_CALLSIGN", "Station Callsign",    "电台呼号",       .ownStation),
-        f("OPERATOR",         "Operator",            "操作员",         .ownStation),
-        f("OWNER_CALLSIGN",   "Owner Callsign",      "电台所有者呼号", .ownStation),
-        f("MY_NAME",          "My Name",             "己方姓名",       .ownStation),
-        f("MY_CITY",          "My City",             "己方城市",       .ownStation),
-        f("MY_COUNTRY",       "My Country",          "己方国家",       .ownStation),
-        f("MY_STATE",         "My State/Province",   "己方州/省",      .ownStation),
-        f("MY_CNTY",          "My County",           "己方县/郡",      .ownStation),
-        f("MY_GRIDSQUARE",    "My Grid Square",      "己方网格",       .ownStation),
-        f("MY_GRIDSQUARE_EXT","My Grid Ext",         "己方网格扩展",   .ownStation),
-        f("MY_CQ_ZONE",       "My CQ Zone",          "己方CQ Zone",    .ownStation),
-        f("MY_ITU_ZONE",      "My ITU Zone",         "己方ITU Zone",   .ownStation),
-        f("MY_LAT",           "My Latitude",         "己方纬度",       .ownStation),
-        f("MY_LON",           "My Longitude",        "己方经度",       .ownStation),
-        f("MY_DXCC",          "My DXCC",             "己方DXCC",       .ownStation),
-        f("MY_POSTAL_CODE",   "My Postal Code",      "己方邮编",       .ownStation),
-        f("MY_STREET",        "My Street",           "己方街道",       .ownStation),
-        f("MY_ARRL_SECT",     "My ARRL Section",     "己方ARRL分区",   .ownStation),
-        f("MY_CNTY_ALT",      "My County (Alt)",     "己方县(替代)",   .ownStation),
-        f("MY_DARC_DOK",      "My DARC DOK",         "己方DARC DOK",   .ownStation),
-        f("MY_FISTS",         "My FISTS #",          "己方FISTS编号",  .ownStation),
-        f("MY_IOTA",          "My IOTA",             "己方IOTA",       .ownStation),
-        f("MY_IOTA_ISLAND_ID","My IOTA Island ID",   "己方IOTA岛屿ID", .ownStation),
-        f("MY_POTA_REF",      "My POTA Ref",         "己方POTA参考",   .ownStation),
-        f("MY_SOTA_REF",      "My SOTA Ref",         "己方SOTA参考",   .ownStation),
-        f("MY_WWFF_REF",      "My WWFF Ref",         "己方WWFF参考",   .ownStation),
-        f("MY_SIG",           "My Special Interest",  "己方特殊活动",   .ownStation),
-        f("MY_SIG_INFO",      "My SIG Info",          "己方活动信息",   .ownStation),
-        f("MY_USACA_COUNTIES","My USACA Counties",    "己方USACA Counties", .ownStation),
-        f("MY_VUCC_GRIDS",    "My VUCC Grids",        "己方VUCC网格",   .ownStation),
-        f("MY_MORSE_KEY_INFO","My Morse Key Info",     "己方电键信息",   .ownStation),
-        f("MY_MORSE_KEY_TYPE","My Morse Key Type",     "己方电键类型",   .ownStation),
+        f("STATION_CALLSIGN", .ownStation),
+        f("OPERATOR",         .ownStation),
+        f("OWNER_CALLSIGN",   .ownStation),
+        f("MY_NAME",          .ownStation),
+        f("MY_CITY",          .ownStation, vis: true),
+        f("MY_COUNTRY",       .ownStation),
+        f("MY_STATE",         .ownStation),
+        f("MY_CNTY",          .ownStation),
+        f("MY_GRIDSQUARE",    .ownStation, vis: true),
+        f("MY_GRIDSQUARE_EXT",.ownStation),
+        f("MY_CQ_ZONE",       .ownStation, vis: true),
+        f("MY_ITU_ZONE",      .ownStation, vis: true),
+        f("MY_LAT",           .ownStation),
+        f("MY_LON",           .ownStation),
+        f("MY_DXCC",          .ownStation),
+        f("MY_POSTAL_CODE",   .ownStation),
+        f("MY_STREET",        .ownStation),
+        f("MY_ARRL_SECT",     .ownStation),
+        f("MY_CNTY_ALT",      .ownStation),
+        f("MY_DARC_DOK",      .ownStation),
+        f("MY_FISTS",         .ownStation),
+        f("MY_IOTA",          .ownStation),
+        f("MY_IOTA_ISLAND_ID",.ownStation),
+        f("MY_POTA_REF",      .ownStation),
+        f("MY_SOTA_REF",      .ownStation),
+        f("MY_WWFF_REF",      .ownStation),
+        f("MY_SIG",           .ownStation),
+        f("MY_SIG_INFO",      .ownStation),
+        f("MY_USACA_COUNTIES",.ownStation),
+        f("MY_VUCC_GRIDS",    .ownStation),
+        f("MY_MORSE_KEY_INFO",.ownStation),
+        f("MY_MORSE_KEY_TYPE",.ownStation),
         
         // ═══════════════ Contacted Station ═══════════════
-        f("QTH",           "QTH",               "位置描述",     .contactedStation, core: "qth", vis: true),
-        f("GRIDSQUARE",    "Grid Square",        "网格信息",     .contactedStation, core: "gridSquare", vis: true),
-        f("CQZ",           "CQ Zone",            "CQ Zone",      .contactedStation, core: "cqZone", vis: true),
-        f("ITUZ",          "ITU Zone",           "ITU Zone",     .contactedStation, core: "ituZone", vis: true),
-        f("LAT",           "Latitude",           "纬度",         .contactedStation, core: "latitude"),
-        f("LON",           "Longitude",          "经度",         .contactedStation, core: "longitude"),
-        f("GRIDSQUARE_EXT","Grid Square Ext",    "网格扩展",     .contactedStation),
-        f("COUNTRY",       "Country",            "国家",         .contactedStation),
-        f("STATE",         "State/Province",     "州/省",        .contactedStation),
-        f("CNTY",          "County",             "县/郡",        .contactedStation),
-        f("CNTY_ALT",      "County (Alt)",       "县(替代)",     .contactedStation),
-        f("DXCC",          "DXCC Entity",        "DXCC实体",     .contactedStation),
-        f("CONT",          "Continent",          "大洲",         .contactedStation),
-        f("REGION",        "Region",             "区域",         .contactedStation),
-        f("PFX",           "WPX Prefix",         "WPX前缀",     .contactedStation),
-        f("ALTITUDE",      "Altitude (m)",       "海拔 (m)",     .contactedStation),
-        f("ADDRESS",       "Address",            "地址",         .contactedStation),
-        f("USACA_COUNTIES","USACA Counties",     "USACA Counties", .contactedStation),
-        f("VUCC_GRIDS",    "VUCC Grids",         "VUCC网格",     .contactedStation),
+        f("QTH",           .contactedStation, core: "qth", vis: true),
+        f("GRIDSQUARE",    .contactedStation, core: "gridSquare", vis: true),
+        f("CQZ",           .contactedStation, core: "cqZone", vis: true),
+        f("ITUZ",          .contactedStation, core: "ituZone", vis: true),
+        f("LAT",           .contactedStation, core: "latitude"),
+        f("LON",           .contactedStation, core: "longitude"),
+        f("GRIDSQUARE_EXT",.contactedStation),
+        f("COUNTRY",       .contactedStation),
+        f("STATE",         .contactedStation),
+        f("CNTY",          .contactedStation),
+        f("CNTY_ALT",      .contactedStation),
+        f("DXCC",          .contactedStation),
+        f("CONT",          .contactedStation),
+        f("REGION",        .contactedStation),
+        f("PFX",           .contactedStation),
+        f("ALTITUDE",      .contactedStation),
+        f("ADDRESS",       .contactedStation),
+        f("USACA_COUNTIES",.contactedStation),
+        f("VUCC_GRIDS",    .contactedStation),
         
         // ═══════════════ Contacted Operator ═══════════════
-        f("NAME",          "Name",               "姓名",         .contactedOp, core: "name", vis: true),
-        f("AGE",           "Age",                "年龄",         .contactedOp),
-        f("EMAIL",         "Email",              "邮箱",         .contactedOp),
-        f("WEB",           "Website",            "网站",         .contactedOp),
-        f("CONTACTED_OP",  "Contacted Operator", "对方操作员",   .contactedOp),
-        f("EQ_CALL",       "Owner Callsign",     "对方所有者呼号", .contactedOp),
-        f("SILENT_KEY",    "Silent Key",         "静默电键(SK)", .contactedOp),
-        f("FISTS",         "FISTS #",            "FISTS编号",    .contactedOp),
-        f("FISTS_CC",      "FISTS CC #",         "FISTS CC编号", .contactedOp),
-        f("SKCC",          "SKCC",               "SKCC",         .contactedOp),
-        f("TEN_TEN",       "Ten-Ten #",          "Ten-Ten编号",  .contactedOp),
-        f("UKSMG",         "UKSMG #",            "UKSMG编号",    .contactedOp),
-        f("DARC_DOK",      "DARC DOK",           "DARC DOK",     .contactedOp),
-        f("MORSE_KEY_INFO","Morse Key Info",      "电键信息",     .contactedOp),
-        f("MORSE_KEY_TYPE","Morse Key Type",      "电键类型",     .contactedOp),
+        f("NAME",          .contactedOp, core: "name", vis: true),
+        f("AGE",           .contactedOp),
+        f("EMAIL",         .contactedOp),
+        f("WEB",           .contactedOp),
+        f("CONTACTED_OP",  .contactedOp),
+        f("EQ_CALL",       .contactedOp),
+        f("SILENT_KEY",    .contactedOp),
+        f("FISTS",         .contactedOp),
+        f("FISTS_CC",      .contactedOp),
+        f("SKCC",          .contactedOp),
+        f("TEN_TEN",       .contactedOp),
+        f("UKSMG",         .contactedOp),
+        f("DARC_DOK",      .contactedOp),
+        f("MORSE_KEY_INFO",.contactedOp),
+        f("MORSE_KEY_TYPE",.contactedOp),
         
         // ═══════════════ Satellite ═══════════════
-        f("SAT_NAME",     "Satellite Name",      "卫星名称",     .satellite, core: "satellite", vis: true),
-        f("SAT_MODE",     "Satellite Mode",      "卫星模式",     .satellite),
+        f("SAT_NAME",     .satellite, core: "satellite", vis: true),
+        f("SAT_MODE",     .satellite),
         
         // ═══════════════ Contest ═══════════════
-        f("CONTEST_ID",   "Contest ID",          "竞赛ID",       .contest),
-        f("CHECK",        "Check",               "检查号",       .contest),
-        f("CLASS",        "Class",               "组别",         .contest),
-        f("PRECEDENCE",   "Precedence",          "优先级",       .contest),
-        f("SRX",          "Serial # Received",   "接收序号",     .contest),
-        f("SRX_STRING",   "Serial String Rcvd",  "接收序号字符串", .contest),
-        f("STX",          "Serial # Sent",       "发送序号",     .contest),
-        f("STX_STRING",   "Serial String Sent",  "发送序号字符串", .contest),
-        f("QSO_COMPLETE", "QSO Complete",        "通联完整性",   .contest),
-        f("QSO_RANDOM",   "QSO Random",          "随机通联",     .contest),
-        f("SWL",          "SWL",                 "短波收听",     .contest),
-        f("ARRL_SECT",    "ARRL Section",        "ARRL分区",     .contest),
+        f("CONTEST_ID",   .contest),
+        f("CHECK",        .contest),
+        f("CLASS",        .contest),
+        f("PRECEDENCE",   .contest),
+        f("SRX",          .contest),
+        f("SRX_STRING",   .contest),
+        f("STX",          .contest),
+        f("STX_STRING",   .contest),
+        f("QSO_COMPLETE", .contest),
+        f("QSO_RANDOM",   .contest),
+        f("SWL",          .contest),
+        f("ARRL_SECT",    .contest),
         
         // ═══════════════ QSL ═══════════════
-        f("QSL_SENT",       "QSL Sent",           "QSL已发送",      .qsl),
-        f("QSL_RCVD",       "QSL Received",       "QSL已接收",      .qsl),
-        f("QSLSDATE",       "QSL Sent Date",      "QSL发送日期",    .qsl),
-        f("QSLRDATE",       "QSL Received Date",  "QSL接收日期",    .qsl),
-        f("QSL_SENT_VIA",   "QSL Sent Via",       "QSL发送方式",    .qsl),
-        f("QSL_RCVD_VIA",   "QSL Received Via",   "QSL接收方式",    .qsl),
-        f("QSL_VIA",        "QSL Via",            "QSL路由",        .qsl),
-        f("QSLMSG",         "QSL Message",        "QSL消息",        .qsl),
-        f("QSLMSG_RCVD",    "QSL Message Rcvd",   "QSL收到的消息",  .qsl),
-        f("EQSL_QSL_SENT",  "eQSL Sent",          "eQSL已发送",     .qsl),
-        f("EQSL_QSL_RCVD",  "eQSL Received",      "eQSL已接收",     .qsl),
-        f("EQSL_QSLSDATE",  "eQSL Sent Date",     "eQSL发送日期",   .qsl),
-        f("EQSL_QSLRDATE",  "eQSL Rcvd Date",     "eQSL接收日期",   .qsl),
-        f("EQSL_AG",        "eQSL AG",            "eQSL认证",       .qsl),
-        f("LOTW_QSL_SENT",  "LoTW Sent",          "LoTW已发送",     .qsl),
-        f("LOTW_QSL_RCVD",  "LoTW Received",      "LoTW已接收",     .qsl),
-        f("LOTW_QSLSDATE",  "LoTW Sent Date",     "LoTW发送日期",   .qsl),
-        f("LOTW_QSLRDATE",  "LoTW Rcvd Date",     "LoTW接收日期",   .qsl),
-        f("DCL_QSL_SENT",   "DCL Sent",           "DCL已发送",      .qsl),
-        f("DCL_QSL_RCVD",   "DCL Received",       "DCL已接收",      .qsl),
-        f("DCL_QSLSDATE",   "DCL Sent Date",      "DCL发送日期",    .qsl),
-        f("DCL_QSLRDATE",   "DCL Rcvd Date",      "DCL接收日期",    .qsl),
+        f("QSL_SENT",       .qsl),
+        f("QSL_RCVD",       .qsl),
+        f("QSLSDATE",       .qsl),
+        f("QSLRDATE",       .qsl),
+        f("QSL_SENT_VIA",   .qsl),
+        f("QSL_RCVD_VIA",   .qsl),
+        f("QSL_VIA",        .qsl),
+        f("QSLMSG",         .qsl),
+        f("QSLMSG_RCVD",    .qsl),
+        f("EQSL_QSL_SENT",  .qsl),
+        f("EQSL_QSL_RCVD",  .qsl),
+        f("EQSL_QSLSDATE",  .qsl),
+        f("EQSL_QSLRDATE",  .qsl),
+        f("EQSL_AG",        .qsl),
+        f("LOTW_QSL_SENT",  .qsl),
+        f("LOTW_QSL_RCVD",  .qsl),
+        f("LOTW_QSLSDATE",  .qsl),
+        f("LOTW_QSLRDATE",  .qsl),
+        f("DCL_QSL_SENT",   .qsl),
+        f("DCL_QSL_RCVD",   .qsl),
+        f("DCL_QSLSDATE",   .qsl),
+        f("DCL_QSLRDATE",   .qsl),
         
         // ═══════════════ Online Services ═══════════════
-        f("CLUBLOG_QSO_UPLOAD_DATE",   "Club Log Upload Date",   "Club Log上传日期",   .onlineServices),
-        f("CLUBLOG_QSO_UPLOAD_STATUS", "Club Log Upload Status", "Club Log上传状态",   .onlineServices),
-        f("HAMLOGEU_QSO_UPLOAD_DATE",  "HAMLOG.EU Upload Date",  "HAMLOG.EU上传日期",  .onlineServices),
-        f("HAMLOGEU_QSO_UPLOAD_STATUS","HAMLOG.EU Upload Status", "HAMLOG.EU上传状态", .onlineServices),
-        f("HAMQTH_QSO_UPLOAD_DATE",    "HamQTH Upload Date",     "HamQTH上传日期",    .onlineServices),
-        f("HAMQTH_QSO_UPLOAD_STATUS",  "HamQTH Upload Status",   "HamQTH上传状态",    .onlineServices),
-        f("HRDLOG_QSO_UPLOAD_DATE",    "HRDLog Upload Date",     "HRDLog上传日期",    .onlineServices),
-        f("HRDLOG_QSO_UPLOAD_STATUS",  "HRDLog Upload Status",   "HRDLog上传状态",    .onlineServices),
-        f("QRZCOM_QSO_UPLOAD_DATE",    "QRZ.COM Upload Date",    "QRZ.COM上传日期",   .onlineServices),
-        f("QRZCOM_QSO_UPLOAD_STATUS",  "QRZ.COM Upload Status",  "QRZ.COM上传状态",   .onlineServices),
-        f("QRZCOM_QSO_DOWNLOAD_DATE",  "QRZ.COM Download Date",  "QRZ.COM下载日期",   .onlineServices),
-        f("QRZCOM_QSO_DOWNLOAD_STATUS","QRZ.COM Download Status", "QRZ.COM下载状态",  .onlineServices),
+        f("CLUBLOG_QSO_UPLOAD_DATE",   .onlineServices),
+        f("CLUBLOG_QSO_UPLOAD_STATUS", .onlineServices),
+        f("HAMLOGEU_QSO_UPLOAD_DATE",  .onlineServices),
+        f("HAMLOGEU_QSO_UPLOAD_STATUS",.onlineServices),
+        f("HAMQTH_QSO_UPLOAD_DATE",    .onlineServices),
+        f("HAMQTH_QSO_UPLOAD_STATUS",  .onlineServices),
+        f("HRDLOG_QSO_UPLOAD_DATE",    .onlineServices),
+        f("HRDLOG_QSO_UPLOAD_STATUS",  .onlineServices),
+        f("QRZCOM_QSO_UPLOAD_DATE",    .onlineServices),
+        f("QRZCOM_QSO_UPLOAD_STATUS",  .onlineServices),
+        f("QRZCOM_QSO_DOWNLOAD_DATE",  .onlineServices),
+        f("QRZCOM_QSO_DOWNLOAD_STATUS",.onlineServices),
         
         // ═══════════════ Awards & Memberships ═══════════════
-        f("IOTA",           "IOTA",              "IOTA",           .awards),
-        f("IOTA_ISLAND_ID", "IOTA Island ID",    "IOTA岛屿ID",    .awards),
-        f("SOTA_REF",       "SOTA Reference",    "SOTA参考",       .awards),
-        f("POTA_REF",       "POTA Reference",    "POTA参考",       .awards),
-        f("WWFF_REF",       "WWFF Reference",    "WWFF参考",       .awards),
-        f("SIG",            "Special Interest",   "特殊兴趣活动",  .awards),
-        f("SIG_INFO",       "SIG Info",           "活动信息",      .awards),
-        f("AWARD_SUBMITTED","Awards Submitted",   "已提交奖项",    .awards),
-        f("AWARD_GRANTED",  "Awards Granted",     "已获得奖项",    .awards),
-        f("CREDIT_SUBMITTED","Credits Submitted", "已提交积分",    .awards),
-        f("CREDIT_GRANTED", "Credits Granted",    "已获得积分",    .awards),
+        f("IOTA",           .awards),
+        f("IOTA_ISLAND_ID", .awards),
+        f("SOTA_REF",       .awards),
+        f("POTA_REF",       .awards),
+        f("WWFF_REF",       .awards),
+        f("SIG",            .awards),
+        f("SIG_INFO",       .awards),
+        f("AWARD_SUBMITTED",.awards),
+        f("AWARD_GRANTED",  .awards),
+        f("CREDIT_SUBMITTED",.awards),
+        f("CREDIT_GRANTED", .awards),
         
         // ═══════════════ Propagation & Conditions ═══════════════
-        f("A_INDEX",       "A Index",            "A指数",         .propagation),
-        f("K_INDEX",       "K Index",            "K指数",         .propagation),
-        f("SFI",           "Solar Flux Index",   "太阳通量指数",  .propagation),
-        f("MAX_BURSTS",    "Max Bursts (s)",     "最大突发(秒)",  .propagation),
-        f("NR_BURSTS",     "Number of Bursts",   "突发数量",      .propagation),
-        f("NR_PINGS",      "Number of Pings",    "Ping数量",      .propagation),
-        f("MS_SHOWER",     "Meteor Shower",      "流星雨",        .propagation),
-        f("FORCE_INIT",    "Force Init (EME)",   "强制初始(EME)", .propagation),
+        f("A_INDEX",       .propagation),
+        f("K_INDEX",       .propagation),
+        f("SFI",           .propagation),
+        f("MAX_BURSTS",    .propagation),
+        f("NR_BURSTS",     .propagation),
+        f("NR_PINGS",      .propagation),
+        f("MS_SHOWER",     .propagation),
+        f("FORCE_INIT",    .propagation),
         
         // ═══════════════ Notes & Comments ═══════════════
-        f("COMMENT",       "Comment",            "备注",          .notes, core: "remarks", vis: true),
-        f("NOTES",         "Notes",              "笔记",          .notes),
-        f("PUBLIC_KEY",    "Public Key",         "公钥",          .notes),
+        f("COMMENT",       .notes, core: "remarks", vis: true),
+        f("NOTES",         .notes),
+        f("PUBLIC_KEY",    .notes),
     ]
     
     // MARK: - Lookup helpers
@@ -411,25 +357,21 @@ struct ADIFFields {
     static let fieldGroups: [ADIFFieldGroup] = [
         ADIFFieldGroup(
             id: "group_datetime",
-            nameEN: "Date & Time", nameZH: "日期时间",
             memberFieldIds: ["QSO_DATE", "TIME_ON"],
             category: .basic, supportsCollapsed: true
         ),
         ADIFFieldGroup(
             id: "group_end_datetime",
-            nameEN: "End Date & Time", nameZH: "结束日期时间",
             memberFieldIds: ["TIME_OFF", "QSO_DATE_OFF"],
             category: .basic, supportsCollapsed: true
         ),
         ADIFFieldGroup(
             id: "group_contacted_qth",
-            nameEN: "Contacted QTH (with Map)", nameZH: "对方QTH (含地图)",
             memberFieldIds: ["QTH", "GRIDSQUARE", "CQZ", "ITUZ", "LAT", "LON"],
             category: .contactedStation, supportsCollapsed: true
         ),
         ADIFFieldGroup(
             id: "group_own_qth",
-            nameEN: "Own QTH (with Map)", nameZH: "己方QTH (含地图)",
             memberFieldIds: ["MY_CITY", "MY_GRIDSQUARE", "MY_CQ_ZONE", "MY_ITU_ZONE", "MY_LAT", "MY_LON"],
             category: .ownStation, supportsCollapsed: true
         ),

@@ -225,3 +225,215 @@
 "adif_more_fields" = "More Fields";
 "adif_hidden_with_data" = "Hidden Fields (with data)";
 "adif_hidden_field_hint" = "These fields are hidden but contain data. Clearing a field will remove it. Re-enable in Settings.";
+
+// MARK: - ADIF Field Categories
+"adif_cat_basic" = "Basic Information";
+"adif_cat_signal" = "Signal Report";
+"adif_cat_technical" = "Technical";
+"adif_cat_own_station" = "Own Station";
+"adif_cat_contacted_station" = "Contacted Station";
+"adif_cat_contacted_op" = "Contacted Operator";
+"adif_cat_satellite" = "Satellite";
+"adif_cat_contest" = "Contest";
+"adif_cat_qsl" = "QSL";
+"adif_cat_online_services" = "Online Services";
+"adif_cat_awards" = "Awards & Memberships";
+"adif_cat_propagation" = "Propagation & Conditions";
+"adif_cat_notes" = "Notes & Comments";
+
+// MARK: - ADIF Field Visibility
+"adif_vis_visible" = "Visible";
+"adif_vis_collapsed" = "Collapsed";
+"adif_vis_hidden" = "Hidden";
+
+// MARK: - ADIF Field Groups
+"adif_group_datetime" = "Date & Time";
+"adif_group_end_datetime" = "End Date & Time";
+"adif_group_contacted_qth" = "Contacted QTH (with Map)";
+"adif_group_own_qth" = "Own QTH (with Map)";
+
+// MARK: - ADIF Field Names - Basic
+"adif_field_call" = "Callsign";
+"adif_field_qso_date" = "QSO Date";
+"adif_field_time_on" = "Time On";
+"adif_field_band" = "Band";
+"adif_field_mode" = "Mode";
+"adif_field_freq" = "Frequency (MHz)";
+"adif_field_submode" = "Submode";
+"adif_field_time_off" = "Time Off";
+"adif_field_qso_date_off" = "QSO Date Off";
+
+// MARK: - ADIF Field Names - Signal
+"adif_field_rst_sent" = "RST Sent";
+"adif_field_rst_rcvd" = "RST Received";
+
+// MARK: - ADIF Field Names - Technical
+"adif_field_freq_rx" = "RX Frequency (MHz)";
+"adif_field_tx_pwr" = "TX Power (W)";
+"adif_field_rx_pwr" = "RX Power (W)";
+"adif_field_band_rx" = "RX Band";
+"adif_field_ant_az" = "Antenna Azimuth";
+"adif_field_ant_el" = "Antenna Elevation";
+"adif_field_ant_path" = "Antenna Path";
+"adif_field_prop_mode" = "Propagation Mode";
+"adif_field_distance" = "Distance (km)";
+"adif_field_rig" = "Rig (Contacted)";
+"adif_field_my_rig" = "Rig (Own)";
+"adif_field_my_antenna" = "Antenna (Own)";
+"adif_field_my_altitude" = "Altitude (Own, m)";
+
+// MARK: - ADIF Field Names - Own Station
+"adif_field_station_callsign" = "Station Callsign";
+"adif_field_operator" = "Operator";
+"adif_field_owner_callsign" = "Owner Callsign";
+"adif_field_my_name" = "My Name";
+"adif_field_my_city" = "My City";
+"adif_field_my_country" = "My Country";
+"adif_field_my_state" = "My State/Province";
+"adif_field_my_cnty" = "My County";
+"adif_field_my_gridsquare" = "My Grid Square";
+"adif_field_my_gridsquare_ext" = "My Grid Ext";
+"adif_field_my_cq_zone" = "My CQ Zone";
+"adif_field_my_itu_zone" = "My ITU Zone";
+"adif_field_my_lat" = "My Latitude";
+"adif_field_my_lon" = "My Longitude";
+"adif_field_my_dxcc" = "My DXCC";
+"adif_field_my_postal_code" = "My Postal Code";
+"adif_field_my_street" = "My Street";
+"adif_field_my_arrl_sect" = "My ARRL Section";
+"adif_field_my_cnty_alt" = "My County (Alt)";
+"adif_field_my_darc_dok" = "My DARC DOK";
+"adif_field_my_fists" = "My FISTS #";
+"adif_field_my_iota" = "My IOTA";
+"adif_field_my_iota_island_id" = "My IOTA Island ID";
+"adif_field_my_pota_ref" = "My POTA Ref";
+"adif_field_my_sota_ref" = "My SOTA Ref";
+"adif_field_my_wwff_ref" = "My WWFF Ref";
+"adif_field_my_sig" = "My Special Interest";
+"adif_field_my_sig_info" = "My SIG Info";
+"adif_field_my_usaca_counties" = "My USACA Counties";
+"adif_field_my_vucc_grids" = "My VUCC Grids";
+"adif_field_my_morse_key_info" = "My Morse Key Info";
+"adif_field_my_morse_key_type" = "My Morse Key Type";
+
+// MARK: - ADIF Field Names - Contacted Station
+"adif_field_qth" = "QTH";
+"adif_field_gridsquare" = "Grid Square";
+"adif_field_cqz" = "CQ Zone";
+"adif_field_ituz" = "ITU Zone";
+"adif_field_lat" = "Latitude";
+"adif_field_lon" = "Longitude";
+"adif_field_gridsquare_ext" = "Grid Square Ext";
+"adif_field_country" = "Country";
+"adif_field_state" = "State/Province";
+"adif_field_cnty" = "County";
+"adif_field_cnty_alt" = "County (Alt)";
+"adif_field_dxcc" = "DXCC Entity";
+"adif_field_cont" = "Continent";
+"adif_field_region" = "Region";
+"adif_field_pfx" = "WPX Prefix";
+"adif_field_altitude" = "Altitude (m)";
+"adif_field_address" = "Address";
+"adif_field_usaca_counties" = "USACA Counties";
+"adif_field_vucc_grids" = "VUCC Grids";
+
+// MARK: - ADIF Field Names - Contacted Operator
+"adif_field_name" = "Name";
+"adif_field_age" = "Age";
+"adif_field_email" = "Email";
+"adif_field_web" = "Website";
+"adif_field_contacted_op" = "Contacted Operator";
+"adif_field_eq_call" = "Owner Callsign";
+"adif_field_silent_key" = "Silent Key";
+"adif_field_fists" = "FISTS #";
+"adif_field_fists_cc" = "FISTS CC #";
+"adif_field_skcc" = "SKCC";
+"adif_field_ten_ten" = "Ten-Ten #";
+"adif_field_uksmg" = "UKSMG #";
+"adif_field_darc_dok" = "DARC DOK";
+"adif_field_morse_key_info" = "Morse Key Info";
+"adif_field_morse_key_type" = "Morse Key Type";
+
+// MARK: - ADIF Field Names - Satellite
+"adif_field_sat_name" = "Satellite Name";
+"adif_field_sat_mode" = "Satellite Mode";
+
+// MARK: - ADIF Field Names - Contest
+"adif_field_contest_id" = "Contest ID";
+"adif_field_check" = "Check";
+"adif_field_class" = "Class";
+"adif_field_precedence" = "Precedence";
+"adif_field_srx" = "Serial # Received";
+"adif_field_srx_string" = "Serial String Rcvd";
+"adif_field_stx" = "Serial # Sent";
+"adif_field_stx_string" = "Serial String Sent";
+"adif_field_qso_complete" = "QSO Complete";
+"adif_field_qso_random" = "QSO Random";
+"adif_field_swl" = "SWL";
+"adif_field_arrl_sect" = "ARRL Section";
+
+// MARK: - ADIF Field Names - QSL
+"adif_field_qsl_sent" = "QSL Sent";
+"adif_field_qsl_rcvd" = "QSL Received";
+"adif_field_qslsdate" = "QSL Sent Date";
+"adif_field_qslrdate" = "QSL Received Date";
+"adif_field_qsl_sent_via" = "QSL Sent Via";
+"adif_field_qsl_rcvd_via" = "QSL Received Via";
+"adif_field_qsl_via" = "QSL Via";
+"adif_field_qslmsg" = "QSL Message";
+"adif_field_qslmsg_rcvd" = "QSL Message Rcvd";
+"adif_field_eqsl_qsl_sent" = "eQSL Sent";
+"adif_field_eqsl_qsl_rcvd" = "eQSL Received";
+"adif_field_eqsl_qslsdate" = "eQSL Sent Date";
+"adif_field_eqsl_qslrdate" = "eQSL Rcvd Date";
+"adif_field_eqsl_ag" = "eQSL AG";
+"adif_field_lotw_qsl_sent" = "LoTW Sent";
+"adif_field_lotw_qsl_rcvd" = "LoTW Received";
+"adif_field_lotw_qslsdate" = "LoTW Sent Date";
+"adif_field_lotw_qslrdate" = "LoTW Rcvd Date";
+"adif_field_dcl_qsl_sent" = "DCL Sent";
+"adif_field_dcl_qsl_rcvd" = "DCL Received";
+"adif_field_dcl_qslsdate" = "DCL Sent Date";
+"adif_field_dcl_qslrdate" = "DCL Rcvd Date";
+
+// MARK: - ADIF Field Names - Online Services
+"adif_field_clublog_qso_upload_date" = "Club Log Upload Date";
+"adif_field_clublog_qso_upload_status" = "Club Log Upload Status";
+"adif_field_hamlogeu_qso_upload_date" = "HAMLOG.EU Upload Date";
+"adif_field_hamlogeu_qso_upload_status" = "HAMLOG.EU Upload Status";
+"adif_field_hamqth_qso_upload_date" = "HamQTH Upload Date";
+"adif_field_hamqth_qso_upload_status" = "HamQTH Upload Status";
+"adif_field_hrdlog_qso_upload_date" = "HRDLog Upload Date";
+"adif_field_hrdlog_qso_upload_status" = "HRDLog Upload Status";
+"adif_field_qrzcom_qso_upload_date" = "QRZ.COM Upload Date";
+"adif_field_qrzcom_qso_upload_status" = "QRZ.COM Upload Status";
+"adif_field_qrzcom_qso_download_date" = "QRZ.COM Download Date";
+"adif_field_qrzcom_qso_download_status" = "QRZ.COM Download Status";
+
+// MARK: - ADIF Field Names - Awards
+"adif_field_iota" = "IOTA";
+"adif_field_iota_island_id" = "IOTA Island ID";
+"adif_field_sota_ref" = "SOTA Reference";
+"adif_field_pota_ref" = "POTA Reference";
+"adif_field_wwff_ref" = "WWFF Reference";
+"adif_field_sig" = "Special Interest";
+"adif_field_sig_info" = "SIG Info";
+"adif_field_award_submitted" = "Awards Submitted";
+"adif_field_award_granted" = "Awards Granted";
+"adif_field_credit_submitted" = "Credits Submitted";
+"adif_field_credit_granted" = "Credits Granted";
+
+// MARK: - ADIF Field Names - Propagation
+"adif_field_a_index" = "A Index";
+"adif_field_k_index" = "K Index";
+"adif_field_sfi" = "Solar Flux Index";
+"adif_field_max_bursts" = "Max Bursts (s)";
+"adif_field_nr_bursts" = "Number of Bursts";
+"adif_field_nr_pings" = "Number of Pings";
+"adif_field_ms_shower" = "Meteor Shower";
+"adif_field_force_init" = "Force Init (EME)";
+
+// MARK: - ADIF Field Names - Notes
+"adif_field_comment" = "Comment";
+"adif_field_notes" = "Notes";
+"adif_field_public_key" = "Public Key";

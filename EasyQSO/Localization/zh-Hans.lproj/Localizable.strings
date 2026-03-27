@@ -225,3 +225,215 @@
 "adif_more_fields" = "更多字段";
 "adif_hidden_with_data" = "已隐藏字段（含数据）";
 "adif_hidden_field_hint" = "以下字段已被隐藏但包含数据。清空后字段将不再显示，可在设置中重新启用。";
+
+// MARK: - ADIF字段分类
+"adif_cat_basic" = "基本信息";
+"adif_cat_signal" = "信号报告";
+"adif_cat_technical" = "技术信息";
+"adif_cat_own_station" = "己方电台";
+"adif_cat_contacted_station" = "对方电台";
+"adif_cat_contacted_op" = "对方操作员";
+"adif_cat_satellite" = "卫星";
+"adif_cat_contest" = "竞赛";
+"adif_cat_qsl" = "QSL";
+"adif_cat_online_services" = "在线服务";
+"adif_cat_awards" = "奖项与会员";
+"adif_cat_propagation" = "传播与条件";
+"adif_cat_notes" = "备注与注释";
+
+// MARK: - ADIF字段可见性
+"adif_vis_visible" = "显示";
+"adif_vis_collapsed" = "折叠";
+"adif_vis_hidden" = "隐藏";
+
+// MARK: - ADIF字段组
+"adif_group_datetime" = "时间";
+"adif_group_end_datetime" = "结束时间";
+"adif_group_contacted_qth" = "对方QTH (含地图)";
+"adif_group_own_qth" = "己方QTH (含地图)";
+
+// MARK: - ADIF字段名称 - 基本
+"adif_field_call" = "通联呼号";
+"adif_field_qso_date" = "通联日期";
+"adif_field_time_on" = "开始时间";
+"adif_field_band" = "波段";
+"adif_field_mode" = "模式";
+"adif_field_freq" = "频率 (MHz)";
+"adif_field_submode" = "子模式";
+"adif_field_time_off" = "结束时间";
+"adif_field_qso_date_off" = "结束日期";
+
+// MARK: - ADIF字段名称 - 信号
+"adif_field_rst_sent" = "发出的RST";
+"adif_field_rst_rcvd" = "接收的RST";
+
+// MARK: - ADIF字段名称 - 技术
+"adif_field_freq_rx" = "接收频率 (MHz)";
+"adif_field_tx_pwr" = "发射功率 (W)";
+"adif_field_rx_pwr" = "接收功率 (W)";
+"adif_field_band_rx" = "接收波段";
+"adif_field_ant_az" = "天线方位角";
+"adif_field_ant_el" = "天线仰角";
+"adif_field_ant_path" = "信号路径";
+"adif_field_prop_mode" = "传播模式";
+"adif_field_distance" = "距离 (km)";
+"adif_field_rig" = "设备 (对方)";
+"adif_field_my_rig" = "设备 (己方)";
+"adif_field_my_antenna" = "天线 (己方)";
+"adif_field_my_altitude" = "海拔 (己方, m)";
+
+// MARK: - ADIF字段名称 - 己方电台
+"adif_field_station_callsign" = "电台呼号";
+"adif_field_operator" = "操作员";
+"adif_field_owner_callsign" = "电台所有者呼号";
+"adif_field_my_name" = "己方姓名";
+"adif_field_my_city" = "己方城市";
+"adif_field_my_country" = "己方国家";
+"adif_field_my_state" = "己方州/省";
+"adif_field_my_cnty" = "己方县/郡";
+"adif_field_my_gridsquare" = "己方网格";
+"adif_field_my_gridsquare_ext" = "己方网格扩展";
+"adif_field_my_cq_zone" = "己方CQ Zone";
+"adif_field_my_itu_zone" = "己方ITU Zone";
+"adif_field_my_lat" = "己方纬度";
+"adif_field_my_lon" = "己方经度";
+"adif_field_my_dxcc" = "己方DXCC";
+"adif_field_my_postal_code" = "己方邮编";
+"adif_field_my_street" = "己方街道";
+"adif_field_my_arrl_sect" = "己方ARRL分区";
+"adif_field_my_cnty_alt" = "己方县(替代)";
+"adif_field_my_darc_dok" = "己方DARC DOK";
+"adif_field_my_fists" = "己方FISTS编号";
+"adif_field_my_iota" = "己方IOTA";
+"adif_field_my_iota_island_id" = "己方IOTA岛屿ID";
+"adif_field_my_pota_ref" = "己方POTA参考";
+"adif_field_my_sota_ref" = "己方SOTA参考";
+"adif_field_my_wwff_ref" = "己方WWFF参考";
+"adif_field_my_sig" = "己方特殊活动";
+"adif_field_my_sig_info" = "己方活动信息";
+"adif_field_my_usaca_counties" = "己方USACA Counties";
+"adif_field_my_vucc_grids" = "己方VUCC网格";
+"adif_field_my_morse_key_info" = "己方电键信息";
+"adif_field_my_morse_key_type" = "己方电键类型";
+
+// MARK: - ADIF字段名称 - 对方电台
+"adif_field_qth" = "位置描述";
+"adif_field_gridsquare" = "网格信息";
+"adif_field_cqz" = "CQ Zone";
+"adif_field_ituz" = "ITU Zone";
+"adif_field_lat" = "纬度";
+"adif_field_lon" = "经度";
+"adif_field_gridsquare_ext" = "网格扩展";
+"adif_field_country" = "国家";
+"adif_field_state" = "州/省";
+"adif_field_cnty" = "县/郡";
+"adif_field_cnty_alt" = "县(替代)";
+"adif_field_dxcc" = "DXCC实体";
+"adif_field_cont" = "大洲";
+"adif_field_region" = "区域";
+"adif_field_pfx" = "WPX前缀";
+"adif_field_altitude" = "海拔 (m)";
+"adif_field_address" = "地址";
+"adif_field_usaca_counties" = "USACA Counties";
+"adif_field_vucc_grids" = "VUCC网格";
+
+// MARK: - ADIF字段名称 - 对方操作员
+"adif_field_name" = "姓名";
+"adif_field_age" = "年龄";
+"adif_field_email" = "邮箱";
+"adif_field_web" = "网站";
+"adif_field_contacted_op" = "对方操作员";
+"adif_field_eq_call" = "对方所有者呼号";
+"adif_field_silent_key" = "静默电键(SK)";
+"adif_field_fists" = "FISTS编号";
+"adif_field_fists_cc" = "FISTS CC编号";
+"adif_field_skcc" = "SKCC";
+"adif_field_ten_ten" = "Ten-Ten编号";
+"adif_field_uksmg" = "UKSMG编号";
+"adif_field_darc_dok" = "DARC DOK";
+"adif_field_morse_key_info" = "电键信息";
+"adif_field_morse_key_type" = "电键类型";
+
+// MARK: - ADIF字段名称 - 卫星
+"adif_field_sat_name" = "卫星名称";
+"adif_field_sat_mode" = "卫星模式";
+
+// MARK: - ADIF字段名称 - 竞赛
+"adif_field_contest_id" = "竞赛ID";
+"adif_field_check" = "检查号";
+"adif_field_class" = "组别";
+"adif_field_precedence" = "优先级";
+"adif_field_srx" = "接收序号";
+"adif_field_srx_string" = "接收序号字符串";
+"adif_field_stx" = "发送序号";
+"adif_field_stx_string" = "发送序号字符串";
+"adif_field_qso_complete" = "通联完整性";
+"adif_field_qso_random" = "随机通联";
+"adif_field_swl" = "短波收听";
+"adif_field_arrl_sect" = "ARRL分区";
+
+// MARK: - ADIF字段名称 - QSL
+"adif_field_qsl_sent" = "QSL已发送";
+"adif_field_qsl_rcvd" = "QSL已接收";
+"adif_field_qslsdate" = "QSL发送日期";
+"adif_field_qslrdate" = "QSL接收日期";
+"adif_field_qsl_sent_via" = "QSL发送方式";
+"adif_field_qsl_rcvd_via" = "QSL接收方式";
+"adif_field_qsl_via" = "QSL路由";
+"adif_field_qslmsg" = "QSL消息";
+"adif_field_qslmsg_rcvd" = "QSL收到的消息";
+"adif_field_eqsl_qsl_sent" = "eQSL已发送";
+"adif_field_eqsl_qsl_rcvd" = "eQSL已接收";
+"adif_field_eqsl_qslsdate" = "eQSL发送日期";
+"adif_field_eqsl_qslrdate" = "eQSL接收日期";
+"adif_field_eqsl_ag" = "eQSL认证";
+"adif_field_lotw_qsl_sent" = "LoTW已发送";
+"adif_field_lotw_qsl_rcvd" = "LoTW已接收";
+"adif_field_lotw_qslsdate" = "LoTW发送日期";
+"adif_field_lotw_qslrdate" = "LoTW接收日期";
+"adif_field_dcl_qsl_sent" = "DCL已发送";
+"adif_field_dcl_qsl_rcvd" = "DCL已接收";
+"adif_field_dcl_qslsdate" = "DCL发送日期";
+"adif_field_dcl_qslrdate" = "DCL接收日期";
+
+// MARK: - ADIF字段名称 - 在线服务
+"adif_field_clublog_qso_upload_date" = "Club Log上传日期";
+"adif_field_clublog_qso_upload_status" = "Club Log上传状态";
+"adif_field_hamlogeu_qso_upload_date" = "HAMLOG.EU上传日期";
+"adif_field_hamlogeu_qso_upload_status" = "HAMLOG.EU上传状态";
+"adif_field_hamqth_qso_upload_date" = "HamQTH上传日期";
+"adif_field_hamqth_qso_upload_status" = "HamQTH上传状态";
+"adif_field_hrdlog_qso_upload_date" = "HRDLog上传日期";
+"adif_field_hrdlog_qso_upload_status" = "HRDLog上传状态";
+"adif_field_qrzcom_qso_upload_date" = "QRZ.COM上传日期";
+"adif_field_qrzcom_qso_upload_status" = "QRZ.COM上传状态";
+"adif_field_qrzcom_qso_download_date" = "QRZ.COM下载日期";
+"adif_field_qrzcom_qso_download_status" = "QRZ.COM下载状态";
+
+// MARK: - ADIF字段名称 - 奖项
+"adif_field_iota" = "IOTA";
+"adif_field_iota_island_id" = "IOTA岛屿ID";
+"adif_field_sota_ref" = "SOTA参考";
+"adif_field_pota_ref" = "POTA参考";
+"adif_field_wwff_ref" = "WWFF参考";
+"adif_field_sig" = "特殊兴趣活动";
+"adif_field_sig_info" = "活动信息";
+"adif_field_award_submitted" = "已提交奖项";
+"adif_field_award_granted" = "已获得奖项";
+"adif_field_credit_submitted" = "已提交积分";
+"adif_field_credit_granted" = "已获得积分";
+
+// MARK: - ADIF字段名称 - 传播
+"adif_field_a_index" = "A指数";
+"adif_field_k_index" = "K指数";
+"adif_field_sfi" = "太阳通量指数";
+"adif_field_max_bursts" = "最大突发(秒)";
+"adif_field_nr_bursts" = "突发数量";
+"adif_field_nr_pings" = "Ping数量";
+"adif_field_ms_shower" = "流星雨";
+"adif_field_force_init" = "强制初始(EME)";
+
+// MARK: - ADIF字段名称 - 备注
+"adif_field_comment" = "备注";
+"adif_field_notes" = "笔记";
+"adif_field_public_key" = "公钥";

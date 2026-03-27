@@ -1,0 +1,439 @@
+/* 
+  Localizable.strings (Korean)
+  EasyQSO
+  
+  한국어 로컬라이제이션 문자열 파일
+*/
+
+// MARK: - 메인 탭
+"record_qso" = "QSO 기록";
+"query_log" = "로그 검색";
+"import_export" = "가져오기/보내기";
+"settings" = "설정";
+
+// MARK: - 폼 섹션 헤더
+"basic_info" = "기본 정보";
+"signal_report" = "신호 리포트";
+"technical_info" = "기술 정보";
+"own_qth_info" = "자국 정보";
+"qth_info" = "상대국 정보";
+"additional_info" = "추가 정보";
+"data_management" = "데이터 관리";
+"export_log" = "로그보내기";
+"import_log" = "로그 가져오기";
+
+// MARK: - 필드 라벨
+"callsign" = "콜사인";
+"date_time" = "날짜 및 시간";
+"band" = "밴드";
+"mode" = "모드";
+"frequency" = "주파수 (MHz)";
+"rx_frequency" = "수신 주파수 (MHz)";
+"tx_power" = "송신 출력";
+"rst_sent" = "송신 RST";
+"rst_received" = "수신 RST";
+"name" = "이름";
+"qth" = "QTH 설명";
+"own_qth" = "자국 QTH";
+"grid_square" = "그리드 로케이터";
+"cq_zone" = "CQ Zone";
+"itu_zone" = "ITU Zone";
+"satellite" = "위성";
+"remarks" = "비고";
+
+// MARK: - 지도 및 위치 선택
+"select_location" = "위치 선택";
+"select_on_map" = "지도에서 선택";
+"location_name" = "장소 이름";
+"coordinates" = "좌표";
+"latitude" = "위도";
+"longitude" = "경도";
+"grid_coordinate" = "그리드 좌표";
+"click_map_to_select" = "지도를 클릭하여 위치를 선택하세요";
+"selected_location_info" = "선택한 위치 정보";
+
+// MARK: - 버튼
+"save_qso" = "QSO 기록 저장";
+"save_changes" = "변경 사항 저장";
+"export_all" = "모든 기록보내기";
+"import_from_adif" = "ADIF 파일에서 가져오기";
+"import_from_csv" = "CSV 파일에서 가져오기";
+"delete" = "삭제";
+"cancel" = "취소";
+"confirm" = "확인";
+
+// MARK: - 키보드 툴바
+"previous" = "이전";
+"next" = "다음";
+"done" = "완료";
+
+// MARK: - 검색 및 표시
+"search_placeholder" = "콜사인, 밴드, 모드 등 검색";
+"record_count" = "총 %d개의 기록";
+"operator" = "운용자";
+"export_format" = "보내기 형식";
+"current_record_count" = "현재 기록 수: %d";
+
+// MARK: - 내비게이션 타이틀
+"edit_qso" = "QSO 편집";
+
+// MARK: - 유효성 검사 및 오류 메시지
+"validation_error" = "유효성 검사 오류";
+"callsign_empty" = "콜사인을 입력해 주세요";
+"callsign_invalid" = "콜사인 형식이 올바르지 않습니다. 문자와/또는 숫자를 포함해야 합니다";
+"frequency_invalid" = "주파수 형식이 올바르지 않습니다. 유효한 숫자여야 합니다";
+"grid_square_invalid" = "그리드 로케이터 형식이 올바르지 않습니다. AB12cd 형식이어야 합니다";
+"cq_zone_invalid" = "CQ Zone은 1~40 사이의 숫자여야 합니다";
+"itu_zone_invalid" = "ITU Zone은 1~90 사이의 숫자여야 합니다";
+
+// MARK: - 성공 메시지
+"qso_saved" = "QSO 저장됨";
+"qso_saved_message" = "QSO 기록이 성공적으로 저장되었습니다";
+"save_success" = "저장 성공";
+"qso_updated" = "QSO 기록이 업데이트되었습니다";
+"delete_success" = "삭제 성공";
+"delete_success_message" = "QSO 기록이 성공적으로 삭제되었습니다";
+"export_success" = "보내기 성공";
+"export_success_message" = "로그가 %@(으)로보내졌습니다";
+"import_success" = "가져오기 성공";
+"import_success_message" = "%d개의 기록을 성공적으로 가져왔습니다";
+
+// MARK: - 실패 메시지
+"save_failed" = "저장 실패";
+"save_failed_message" = "QSO 기록 저장에 실패했습니다: %@";
+"delete_failed" = "삭제 실패";
+"delete_failed_message" = "기록 삭제 중 오류가 발생했습니다: %@";
+"export_failed" = "보내기 실패";
+"import_failed" = "가져오기 실패";
+"cannot_access_documents" = "문서 디렉토리에 접근할 수 없습니다";
+"cannot_read_file" = "파일을 읽을 수 없습니다";
+"csv_format_incorrect" = "CSV 파일 형식이 올바르지 않거나 비어 있습니다";
+"cannot_get_existing_records" = "기존 기록을 가져올 수 없습니다";
+
+// MARK: - 삭제 확인
+"delete_record" = "기록 삭제";
+"delete_confirm_message" = "%@와(과)의 QSO 기록을 삭제하시겠습니까?";
+
+// MARK: - 앱 정보
+"app_display_name" = "아마추어 무선 로그";
+"documents_folder_usage" = "로그 파일을 가져오고보내려면 문서 폴더에 대한 접근이 필요합니다";
+
+// MARK: - 고급 기능
+"import_success_with_duplicates" = "%d개의 기록을 성공적으로 가져왔습니다 (중복 기록은 자동으로 건너뛰었습니다)";
+
+// MARK: - 시간대 설정
+"export_timezone" = "보내기 시간대";
+"import_timezone" = "가져오기 시간대";
+"timezone_settings" = "CSV 시간대 설정";
+"export_tab" = "CSV보내기";
+"import_tab" = "CSV 가져오기";
+"notes" = "참고";
+"timezone_note_local" = "• 앱은 항상 현지 시간으로 표시합니다";
+"timezone_note_adif" = "• ADIF 파일은 항상 UTC 시간을 사용합니다";
+"timezone_note_csv" = "• CSV 파일은 사용자 정의 시간대를 지원합니다";
+"timezone_note_conversion" = "• 가져오기/보내기 시 시간이 자동 변환됩니다";
+"timezone_note_adif_ignore" = "• ADIF 파일은 이 설정을 무시하고 항상 UTC를 사용합니다";
+"export_timezone_desc" = "CSV 파일보내기 시 사용할 시간대 선택";
+"import_timezone_desc" = "CSV 파일 가져오기 시 가정할 시간대 선택";
+"local_time" = "현지 시간";
+"adif_uses_utc" = "ADIF 형식은 표준에 따라 UTC 시간을 사용합니다";
+"csv_timezone_only" = "CSV 파일에만 적용됩니다. ADIF 파일은 항상 UTC를 사용합니다.";
+
+// MARK: - 고급 필터
+"advanced_filter" = "고급 필터";
+"search_mode" = "검색 모드";
+"fuzzy_search" = "유사 검색";
+"exact_search" = "정확히 일치";
+"fuzzy_search_desc" = "키워드를 포함하는 기록 검색";
+"exact_search_desc" = "정확히 일치하는 기록 검색";
+"general_search" = "일반 검색";
+"enter_callsign" = "콜사인 입력";
+"enter_band" = "밴드 입력";
+"enter_mode" = "모드 입력";
+"or_select_bands" = "또는 목록에서 선택:";
+"or_select_modes" = "또는 목록에서 선택:";
+"date_range" = "날짜 범위";
+"start_date" = "시작일";
+"end_date" = "종료일";
+"clear_start_date" = "시작일 지우기";
+"clear_end_date" = "종료일 지우기";
+"frequency_range" = "주파수 범위";
+"min_frequency" = "최소 주파수";
+"max_frequency" = "최대 주파수";
+"other_filters" = "기타 필터";
+"reset_filters" = "필터 초기화";
+"apply_filters" = "필터 적용";
+"active_filters" = "활성 필터:";
+"clear_all" = "모두 지우기";
+"operator_label" = "운용자";
+
+// MARK: -보내기 필터
+"use_filter_for_export" = "필터를 사용하여보내기";
+"configure_export_filter" = "보내기 필터 설정";
+"export_filter_active" = "필터 활성";
+"records_to_export" = "보낼 기록: %d개";
+"export_filtered" = "필터링된 기록보내기";
+
+// MARK: - 필터 설명
+"filter_search" = "검색";
+"filter_fuzzy" = "유사";
+"filter_exact" = "정확";
+"filter_callsign" = "콜사인";
+"filter_band" = "밴드";
+"filter_mode" = "모드";
+"filter_start_date" = "시작일";
+"filter_end_date" = "종료일";
+"filter_name" = "이름";
+"filter_qth" = "QTH";
+"filter_grid" = "그리드";
+"filter_min_freq" = "최소 주파수";
+"filter_max_freq" = "최대 주파수";
+"filter_satellite" = "위성";
+"filter_no_filters" = "필터 없음";
+
+// MARK: - 정보 및 라이선스
+"about" = "정보";
+"license" = "라이선스";
+"license_type" = "라이선스 유형";
+"gpl_v3" = "GNU 일반 공중 사용 허가서 v3.0";
+"license_description" = "이 소프트웨어는 GPL v3.0으로 배포됩니다:";
+"license_freedom_use" = "• 이 소프트웨어를 자유롭게 사용할 수 있습니다";
+"license_freedom_modify" = "• 이 소프트웨어를 자유롭게 수정할 수 있습니다";
+"license_freedom_distribute" = "• 이 소프트웨어를 자유롭게 배포할 수 있습니다";
+"license_terms_apply" = "• 단, GPL v3.0의 조건을 준수해야 합니다";
+"copyright" = "저작권";
+"copyright_notice" = "이 소프트웨어는 GPL v3.0 라이선스에 따른 자유 소프트웨어입니다.";
+"view_full_license" = "GPL v3.0 라이선스 전문 보기";
+"view_source_code" = "소스 코드 보기";
+"report_issue" = "문제 보고";
+"software_introduction" = "소프트웨어 소개";
+"software_description" = "EasyQSO는 아마추어 무선 애호가를 위해 설계된 QSO 로깅 애플리케이션입니다. 기록, 검색, 가져오기/보내기 등 포괄적인 QSO 기록 관리 기능을 제공합니다.";
+"open_source_license" = "오픈소스 라이선스";
+"version" = "버전";
+"welcome_gpl_notice" = "EasyQSO에 오신 것을 환영합니다! 이 소프트웨어는 GNU 일반 공중 사용 허가서 v3.0으로 배포됩니다. \"GPL 라이선스 알아보기\"를 클릭하여 자세한 정보를 확인하세요.";
+"welcome_title" = "EasyQSO에 오신 것을 환영합니다";
+"learn_gpl_license" = "GPL 라이선스 알아보기";
+"view_later" = "나중에 보기";
+
+// MARK: - ADIF 필드 설정
+"adif_field_config" = "QSO 필드 설정";
+"adif_field_settings" = "QSO 필드 관리";
+"adif_field_config_desc" = "QSO 기록 및 편집 시 ADIF 3.1.7 필드의 표시 상태를 설정합니다: 표시, 접힘 또는 숨김.";
+"adif_search_fields" = "필드 검색...";
+"adif_reset_defaults" = "초기화";
+"adif_required" = "필수";
+"adif_more_fields" = "추가 필드";
+"adif_hidden_with_data" = "숨겨진 필드 (데이터 있음)";
+"adif_hidden_field_hint" = "이 필드는 숨겨져 있지만 데이터가 포함되어 있습니다. 필드를 지우면 제거됩니다. 설정에서 다시 활성화할 수 있습니다.";
+
+// MARK: - ADIF 필드 카테고리
+"adif_cat_basic" = "기본 정보";
+"adif_cat_signal" = "신호 리포트";
+"adif_cat_technical" = "기술 정보";
+"adif_cat_own_station" = "자국 정보";
+"adif_cat_contacted_station" = "상대국 정보";
+"adif_cat_contacted_op" = "상대 운용자";
+"adif_cat_satellite" = "위성";
+"adif_cat_contest" = "콘테스트";
+"adif_cat_qsl" = "QSL";
+"adif_cat_online_services" = "온라인 서비스";
+"adif_cat_awards" = "어워드 및 멤버십";
+"adif_cat_propagation" = "전파 전파 및 컨디션";
+"adif_cat_notes" = "메모 및 코멘트";
+
+// MARK: - ADIF 필드 가시성
+"adif_vis_visible" = "표시";
+"adif_vis_collapsed" = "접힘";
+"adif_vis_hidden" = "숨김";
+
+// MARK: - ADIF 필드 그룹
+"adif_group_datetime" = "날짜 및 시간";
+"adif_group_end_datetime" = "종료 날짜 및 시간";
+"adif_group_contacted_qth" = "상대국 QTH (지도 포함)";
+"adif_group_own_qth" = "자국 QTH (지도 포함)";
+
+// MARK: - ADIF 필드명 - 기본
+"adif_field_call" = "콜사인";
+"adif_field_qso_date" = "QSO 날짜";
+"adif_field_time_on" = "시작 시간";
+"adif_field_band" = "밴드";
+"adif_field_mode" = "모드";
+"adif_field_freq" = "주파수 (MHz)";
+"adif_field_submode" = "서브모드";
+"adif_field_time_off" = "종료 시간";
+"adif_field_qso_date_off" = "종료 날짜";
+
+// MARK: - ADIF 필드명 - 신호
+"adif_field_rst_sent" = "송신 RST";
+"adif_field_rst_rcvd" = "수신 RST";
+
+// MARK: - ADIF 필드명 - 기술
+"adif_field_freq_rx" = "수신 주파수 (MHz)";
+"adif_field_tx_pwr" = "송신 출력 (W)";
+"adif_field_rx_pwr" = "수신 전력 (W)";
+"adif_field_band_rx" = "수신 밴드";
+"adif_field_ant_az" = "안테나 방위각";
+"adif_field_ant_el" = "안테나 고도각";
+"adif_field_ant_path" = "안테나 경로";
+"adif_field_prop_mode" = "전파 전파 모드";
+"adif_field_distance" = "거리 (km)";
+"adif_field_rig" = "장비 (상대국)";
+"adif_field_my_rig" = "장비 (자국)";
+"adif_field_my_antenna" = "안테나 (자국)";
+"adif_field_my_altitude" = "고도 (자국, m)";
+
+// MARK: - ADIF 필드명 - 자국
+"adif_field_station_callsign" = "국 콜사인";
+"adif_field_operator" = "운용자";
+"adif_field_owner_callsign" = "소유자 콜사인";
+"adif_field_my_name" = "내 이름";
+"adif_field_my_city" = "내 도시";
+"adif_field_my_country" = "내 국가";
+"adif_field_my_state" = "내 시/도";
+"adif_field_my_cnty" = "내 군/구";
+"adif_field_my_gridsquare" = "내 그리드";
+"adif_field_my_gridsquare_ext" = "내 그리드 확장";
+"adif_field_my_cq_zone" = "내 CQ Zone";
+"adif_field_my_itu_zone" = "내 ITU Zone";
+"adif_field_my_lat" = "내 위도";
+"adif_field_my_lon" = "내 경도";
+"adif_field_my_dxcc" = "내 DXCC";
+"adif_field_my_postal_code" = "내 우편번호";
+"adif_field_my_street" = "내 주소";
+"adif_field_my_arrl_sect" = "내 ARRL Section";
+"adif_field_my_cnty_alt" = "내 군(대체)";
+"adif_field_my_darc_dok" = "내 DARC DOK";
+"adif_field_my_fists" = "내 FISTS 번호";
+"adif_field_my_iota" = "내 IOTA";
+"adif_field_my_iota_island_id" = "내 IOTA Island ID";
+"adif_field_my_pota_ref" = "내 POTA Ref";
+"adif_field_my_sota_ref" = "내 SOTA Ref";
+"adif_field_my_wwff_ref" = "내 WWFF Ref";
+"adif_field_my_sig" = "내 특별 활동";
+"adif_field_my_sig_info" = "내 SIG 정보";
+"adif_field_my_usaca_counties" = "내 USACA Counties";
+"adif_field_my_vucc_grids" = "내 VUCC Grids";
+"adif_field_my_morse_key_info" = "내 모스 키 정보";
+"adif_field_my_morse_key_type" = "내 모스 키 유형";
+
+// MARK: - ADIF 필드명 - 상대국
+"adif_field_qth" = "QTH";
+"adif_field_gridsquare" = "그리드 로케이터";
+"adif_field_cqz" = "CQ Zone";
+"adif_field_ituz" = "ITU Zone";
+"adif_field_lat" = "위도";
+"adif_field_lon" = "경도";
+"adif_field_gridsquare_ext" = "그리드 확장";
+"adif_field_country" = "국가";
+"adif_field_state" = "시/도";
+"adif_field_cnty" = "군/구";
+"adif_field_cnty_alt" = "군(대체)";
+"adif_field_dxcc" = "DXCC 엔티티";
+"adif_field_cont" = "대륙";
+"adif_field_region" = "지역";
+"adif_field_pfx" = "WPX 프리픽스";
+"adif_field_altitude" = "고도 (m)";
+"adif_field_address" = "주소";
+"adif_field_usaca_counties" = "USACA Counties";
+"adif_field_vucc_grids" = "VUCC Grids";
+
+// MARK: - ADIF 필드명 - 상대 운용자
+"adif_field_name" = "이름";
+"adif_field_age" = "나이";
+"adif_field_email" = "이메일";
+"adif_field_web" = "웹사이트";
+"adif_field_contacted_op" = "상대 운용자";
+"adif_field_eq_call" = "소유자 콜사인";
+"adif_field_silent_key" = "Silent Key (SK)";
+"adif_field_fists" = "FISTS 번호";
+"adif_field_fists_cc" = "FISTS CC 번호";
+"adif_field_skcc" = "SKCC";
+"adif_field_ten_ten" = "Ten-Ten 번호";
+"adif_field_uksmg" = "UKSMG 번호";
+"adif_field_darc_dok" = "DARC DOK";
+"adif_field_morse_key_info" = "모스 키 정보";
+"adif_field_morse_key_type" = "모스 키 유형";
+
+// MARK: - ADIF 필드명 - 위성
+"adif_field_sat_name" = "위성 이름";
+"adif_field_sat_mode" = "위성 모드";
+
+// MARK: - ADIF 필드명 - 콘테스트
+"adif_field_contest_id" = "콘테스트 ID";
+"adif_field_check" = "체크";
+"adif_field_class" = "클래스";
+"adif_field_precedence" = "프리시던스";
+"adif_field_srx" = "수신 일련번호";
+"adif_field_srx_string" = "수신 일련번호 문자열";
+"adif_field_stx" = "송신 일련번호";
+"adif_field_stx_string" = "송신 일련번호 문자열";
+"adif_field_qso_complete" = "QSO 완료";
+"adif_field_qso_random" = "랜덤 QSO";
+"adif_field_swl" = "SWL";
+"adif_field_arrl_sect" = "ARRL Section";
+
+// MARK: - ADIF 필드명 - QSL
+"adif_field_qsl_sent" = "QSL 발송";
+"adif_field_qsl_rcvd" = "QSL 수신";
+"adif_field_qslsdate" = "QSL 발송일";
+"adif_field_qslrdate" = "QSL 수신일";
+"adif_field_qsl_sent_via" = "QSL 발송 방법";
+"adif_field_qsl_rcvd_via" = "QSL 수신 방법";
+"adif_field_qsl_via" = "QSL 경유";
+"adif_field_qslmsg" = "QSL 메시지";
+"adif_field_qslmsg_rcvd" = "QSL 수신 메시지";
+"adif_field_eqsl_qsl_sent" = "eQSL 발송";
+"adif_field_eqsl_qsl_rcvd" = "eQSL 수신";
+"adif_field_eqsl_qslsdate" = "eQSL 발송일";
+"adif_field_eqsl_qslrdate" = "eQSL 수신일";
+"adif_field_eqsl_ag" = "eQSL AG";
+"adif_field_lotw_qsl_sent" = "LoTW 발송";
+"adif_field_lotw_qsl_rcvd" = "LoTW 수신";
+"adif_field_lotw_qslsdate" = "LoTW 발송일";
+"adif_field_lotw_qslrdate" = "LoTW 수신일";
+"adif_field_dcl_qsl_sent" = "DCL 발송";
+"adif_field_dcl_qsl_rcvd" = "DCL 수신";
+"adif_field_dcl_qslsdate" = "DCL 발송일";
+"adif_field_dcl_qslrdate" = "DCL 수신일";
+
+// MARK: - ADIF 필드명 - 온라인 서비스
+"adif_field_clublog_qso_upload_date" = "Club Log 업로드 날짜";
+"adif_field_clublog_qso_upload_status" = "Club Log 업로드 상태";
+"adif_field_hamlogeu_qso_upload_date" = "HAMLOG.EU 업로드 날짜";
+"adif_field_hamlogeu_qso_upload_status" = "HAMLOG.EU 업로드 상태";
+"adif_field_hamqth_qso_upload_date" = "HamQTH 업로드 날짜";
+"adif_field_hamqth_qso_upload_status" = "HamQTH 업로드 상태";
+"adif_field_hrdlog_qso_upload_date" = "HRDLog 업로드 날짜";
+"adif_field_hrdlog_qso_upload_status" = "HRDLog 업로드 상태";
+"adif_field_qrzcom_qso_upload_date" = "QRZ.COM 업로드 날짜";
+"adif_field_qrzcom_qso_upload_status" = "QRZ.COM 업로드 상태";
+"adif_field_qrzcom_qso_download_date" = "QRZ.COM 다운로드 날짜";
+"adif_field_qrzcom_qso_download_status" = "QRZ.COM 다운로드 상태";
+
+// MARK: - ADIF 필드명 - 어워드
+"adif_field_iota" = "IOTA";
+"adif_field_iota_island_id" = "IOTA Island ID";
+"adif_field_sota_ref" = "SOTA Reference";
+"adif_field_pota_ref" = "POTA Reference";
+"adif_field_wwff_ref" = "WWFF Reference";
+"adif_field_sig" = "특별 활동";
+"adif_field_sig_info" = "SIG 정보";
+"adif_field_award_submitted" = "제출한 어워드";
+"adif_field_award_granted" = "받은 어워드";
+"adif_field_credit_submitted" = "제출한 크레딧";
+"adif_field_credit_granted" = "받은 크레딧";
+
+// MARK: - ADIF 필드명 - 전파
+"adif_field_a_index" = "A 지수";
+"adif_field_k_index" = "K 지수";
+"adif_field_sfi" = "태양 플럭스 지수";
+"adif_field_max_bursts" = "최대 버스트 (초)";
+"adif_field_nr_bursts" = "버스트 수";
+"adif_field_nr_pings" = "핑 수";
+"adif_field_ms_shower" = "유성우";
+"adif_field_force_init" = "강제 초기화 (EME)";
+
+// MARK: - ADIF 필드명 - 메모
+"adif_field_comment" = "코멘트";
+"adif_field_notes" = "노트";
+"adif_field_public_key" = "공개 키";

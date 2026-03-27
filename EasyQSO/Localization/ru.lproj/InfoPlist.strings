@@ -1,0 +1,7 @@
+/* 
+  InfoPlist.strings (Russian)
+  EasyQSO
+*/
+
+"CFBundleDisplayName" = "EasyQSO";
+"NSDocumentsFolderUsageDescription" = "Доступ к папке «Документы» необходим для импорта и экспорта файлов журнала";

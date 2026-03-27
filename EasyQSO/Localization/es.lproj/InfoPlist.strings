@@ -1,0 +1,7 @@
+/* 
+  InfoPlist.strings (Spanish)
+  EasyQSO
+*/
+
+"CFBundleDisplayName" = "EasyQSO";
+"NSDocumentsFolderUsageDescription" = "Se necesita acceso a la carpeta de Documentos para importar y exportar archivos de registro"; 

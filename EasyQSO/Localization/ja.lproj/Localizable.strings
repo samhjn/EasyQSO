@@ -1,0 +1,439 @@
+/* 
+  Localizable.strings (Japanese)
+  EasyQSO
+  
+  日本語ローカライズ文字列ファイル
+*/
+
+// MARK: - メインタブ
+"record_qso" = "QSO記録";
+"query_log" = "ログ検索";
+"import_export" = "インポート/エクスポート";
+"settings" = "設定";
+
+// MARK: - フォームセクションヘッダー
+"basic_info" = "基本情報";
+"signal_report" = "シグナルレポート";
+"technical_info" = "技術情報";
+"own_qth_info" = "自局情報";
+"qth_info" = "相手局情報";
+"additional_info" = "追加情報";
+"data_management" = "データ管理";
+"export_log" = "ログエクスポート";
+"import_log" = "ログインポート";
+
+// MARK: - フィールドラベル
+"callsign" = "コールサイン";
+"date_time" = "日時";
+"band" = "バンド";
+"mode" = "モード";
+"frequency" = "周波数 (MHz)";
+"rx_frequency" = "受信周波数 (MHz)";
+"tx_power" = "送信出力";
+"rst_sent" = "送信RST";
+"rst_received" = "受信RST";
+"name" = "名前";
+"qth" = "QTH説明";
+"own_qth" = "自局QTH";
+"grid_square" = "グリッドスクエア";
+"cq_zone" = "CQゾーン";
+"itu_zone" = "ITUゾーン";
+"satellite" = "衛星";
+"remarks" = "備考";
+
+// MARK: - 地図と位置選択
+"select_location" = "位置を選択";
+"select_on_map" = "地図上で選択";
+"location_name" = "場所の名前";
+"coordinates" = "座標";
+"latitude" = "緯度";
+"longitude" = "経度";
+"grid_coordinate" = "グリッド座標";
+"click_map_to_select" = "地図をクリックして位置を選択";
+"selected_location_info" = "選択した位置情報";
+
+// MARK: - ボタン
+"save_qso" = "QSO記録を保存";
+"save_changes" = "変更を保存";
+"export_all" = "全記録をエクスポート";
+"import_from_adif" = "ADIFファイルからインポート";
+"import_from_csv" = "CSVファイルからインポート";
+"delete" = "削除";
+"cancel" = "キャンセル";
+"confirm" = "OK";
+
+// MARK: - キーボードツールバー
+"previous" = "前へ";
+"next" = "次へ";
+"done" = "完了";
+
+// MARK: - 検索と表示
+"search_placeholder" = "コールサイン、バンド、モードなどを検索";
+"record_count" = "合計 %d 件の記録";
+"operator" = "オペレーター";
+"export_format" = "エクスポート形式";
+"current_record_count" = "現在の記録数: %d";
+
+// MARK: - ナビゲーションタイトル
+"edit_qso" = "QSOを編集";
+
+// MARK: - バリデーションとエラーメッセージ
+"validation_error" = "入力エラー";
+"callsign_empty" = "コールサインを入力してください";
+"callsign_invalid" = "コールサインの形式が正しくありません。英字と数字を含む必要があります";
+"frequency_invalid" = "周波数の形式が正しくありません。有効な数値で適切な範囲内である必要があります";
+"grid_square_invalid" = "グリッドスクエアの形式が正しくありません。AB12cd形式である必要があります";
+"cq_zone_invalid" = "CQゾーンは1〜40の数値である必要があります";
+"itu_zone_invalid" = "ITUゾーンは1〜90の数値である必要があります";
+
+// MARK: - 成功メッセージ
+"qso_saved" = "QSOを保存しました";
+"qso_saved_message" = "QSO記録が正常に保存されました";
+"save_success" = "保存成功";
+"qso_updated" = "QSO記録が更新されました";
+"delete_success" = "削除成功";
+"delete_success_message" = "QSO記録が正常に削除されました";
+"export_success" = "エクスポート成功";
+"export_success_message" = "ログが %@ にエクスポートされました";
+"import_success" = "インポート成功";
+"import_success_message" = "%d 件の記録をインポートしました";
+
+// MARK: - 失敗メッセージ
+"save_failed" = "保存失敗";
+"save_failed_message" = "QSO記録の保存に失敗しました: %@";
+"delete_failed" = "削除失敗";
+"delete_failed_message" = "記録の削除中にエラーが発生しました: %@";
+"export_failed" = "エクスポート失敗";
+"import_failed" = "インポート失敗";
+"cannot_access_documents" = "ドキュメントディレクトリにアクセスできません";
+"cannot_read_file" = "ファイルを読み取れません";
+"csv_format_incorrect" = "CSVファイルの形式が正しくないか、空です";
+"cannot_get_existing_records" = "既存の記録を取得できません";
+
+// MARK: - 削除確認
+"delete_record" = "記録を削除";
+"delete_confirm_message" = "%@ とのQSO記録を削除してもよろしいですか？";
+
+// MARK: - アプリ情報
+"app_display_name" = "アマチュア無線ログ";
+"documents_folder_usage" = "ログファイルのインポートとエクスポートにドキュメントフォルダへのアクセスが必要です";
+
+// MARK: - 高度な機能文字列
+"import_success_with_duplicates" = "%d 件の記録をインポートしました（重複記録は自動的にスキップされました）";
+
+// MARK: - タイムゾーン設定
+"export_timezone" = "エクスポートタイムゾーン";
+"import_timezone" = "インポートタイムゾーン";
+"timezone_settings" = "CSVタイムゾーン設定";
+"export_tab" = "CSVエクスポート";
+"import_tab" = "CSVインポート";
+"notes" = "備考";
+"timezone_note_local" = "• アプリ内は常にローカル時間で表示されます";
+"timezone_note_adif" = "• ADIFファイルは常にUTC時間を使用します";
+"timezone_note_csv" = "• CSVファイルはカスタムタイムゾーンに対応しています";
+"timezone_note_conversion" = "• インポート/エクスポート時に時間が自動変換されます";
+"timezone_note_adif_ignore" = "• ADIFファイルはこれらの設定を無視し、常にUTCを使用します";
+"export_timezone_desc" = "CSVファイルエクスポート時のタイムゾーンを選択";
+"import_timezone_desc" = "CSVファイルインポート時の想定タイムゾーンを選択";
+"local_time" = "ローカル時間";
+"adif_uses_utc" = "ADIF形式は標準に従いUTC時間を使用します";
+"csv_timezone_only" = "CSVファイルにのみ適用されます。ADIFファイルは常にUTCを使用します。";
+
+// MARK: - 高度なフィルター
+"advanced_filter" = "詳細フィルター";
+"search_mode" = "検索モード";
+"fuzzy_search" = "あいまい検索";
+"exact_search" = "完全一致";
+"fuzzy_search_desc" = "キーワードを含む記録を検索";
+"exact_search_desc" = "完全に一致する記録を検索";
+"general_search" = "一般検索";
+"enter_callsign" = "コールサインを入力";
+"enter_band" = "バンドを入力";
+"enter_mode" = "モードを入力";
+"or_select_bands" = "またはリストから選択：";
+"or_select_modes" = "またはリストから選択：";
+"date_range" = "期間";
+"start_date" = "開始日";
+"end_date" = "終了日";
+"clear_start_date" = "開始日をクリア";
+"clear_end_date" = "終了日をクリア";
+"frequency_range" = "周波数範囲";
+"min_frequency" = "最小周波数";
+"max_frequency" = "最大周波数";
+"other_filters" = "その他のフィルター";
+"reset_filters" = "フィルターをリセット";
+"apply_filters" = "フィルターを適用";
+"active_filters" = "適用中のフィルター：";
+"clear_all" = "すべてクリア";
+"operator_label" = "オペレーター";
+
+// MARK: - エクスポートフィルター
+"use_filter_for_export" = "フィルターを使用してエクスポート";
+"configure_export_filter" = "エクスポートフィルターを設定";
+"export_filter_active" = "フィルター有効";
+"records_to_export" = "エクスポート対象: %d 件";
+"export_filtered" = "フィルター適用記録をエクスポート";
+
+// MARK: - フィルター説明
+"filter_search" = "検索";
+"filter_fuzzy" = "あいまい";
+"filter_exact" = "完全一致";
+"filter_callsign" = "コールサイン";
+"filter_band" = "バンド";
+"filter_mode" = "モード";
+"filter_start_date" = "開始日";
+"filter_end_date" = "終了日";
+"filter_name" = "名前";
+"filter_qth" = "QTH";
+"filter_grid" = "グリッド";
+"filter_min_freq" = "最小周波数";
+"filter_max_freq" = "最大周波数";
+"filter_satellite" = "衛星";
+"filter_no_filters" = "フィルターなし";
+
+// MARK: - 情報とライセンス
+"about" = "このアプリについて";
+"license" = "ライセンス";
+"license_type" = "ライセンス種別";
+"gpl_v3" = "GNU一般公衆利用許諾書 v3.0";
+"license_description" = "本ソフトウェアはGPL v3.0に基づいてリリースされています：";
+"license_freedom_use" = "• 本ソフトウェアを自由に使用できます";
+"license_freedom_modify" = "• 本ソフトウェアを自由に改変できます";
+"license_freedom_distribute" = "• 本ソフトウェアを自由に配布できます";
+"license_terms_apply" = "• ただしGPL v3.0の条項に従う必要があります";
+"copyright" = "著作権表示";
+"copyright_notice" = "本ソフトウェアはGPL v3.0ライセンスに基づくフリーソフトウェアです。";
+"view_full_license" = "GPL v3.0ライセンス全文を表示";
+"view_source_code" = "ソースコードを表示";
+"report_issue" = "問題を報告";
+"software_introduction" = "ソフトウェア紹介";
+"software_description" = "EasyQSOはアマチュア無線愛好家のために設計されたQSOログ記録アプリケーションです。記録、検索、インポート/エクスポートなど、包括的なQSO記録管理機能を提供します。";
+"open_source_license" = "オープンソースライセンス";
+"version" = "バージョン";
+"welcome_gpl_notice" = "EasyQSOへようこそ！本ソフトウェアはGNU一般公衆利用許諾書v3.0に基づいてリリースされています。「GPLライセンスについて」をクリックして詳細をご覧ください。";
+"welcome_title" = "EasyQSOへようこそ";
+"learn_gpl_license" = "GPLライセンスについて";
+"view_later" = "後で確認";
+
+// MARK: - ADIFフィールド設定
+"adif_field_config" = "QSOフィールド設定";
+"adif_field_settings" = "QSOフィールド管理";
+"adif_field_config_desc" = "ADIF 3.1.7標準のフィールドについて、QSO記録・編集時の表示状態（表示・折りたたみ・非表示）を設定します。";
+"adif_search_fields" = "フィールドを検索...";
+"adif_reset_defaults" = "リセット";
+"adif_required" = "必須";
+"adif_more_fields" = "その他のフィールド";
+"adif_hidden_with_data" = "非表示フィールド（データあり）";
+"adif_hidden_field_hint" = "以下のフィールドは非表示ですがデータが含まれています。クリアするとフィールドは表示されなくなります。設定で再度有効にできます。";
+
+// MARK: - ADIFフィールドカテゴリ
+"adif_cat_basic" = "基本情報";
+"adif_cat_signal" = "シグナルレポート";
+"adif_cat_technical" = "技術情報";
+"adif_cat_own_station" = "自局情報";
+"adif_cat_contacted_station" = "相手局情報";
+"adif_cat_contacted_op" = "相手オペレーター";
+"adif_cat_satellite" = "衛星";
+"adif_cat_contest" = "コンテスト";
+"adif_cat_qsl" = "QSL";
+"adif_cat_online_services" = "オンラインサービス";
+"adif_cat_awards" = "アワード・メンバーシップ";
+"adif_cat_propagation" = "伝搬・コンディション";
+"adif_cat_notes" = "メモ・コメント";
+
+// MARK: - ADIFフィールド可視性
+"adif_vis_visible" = "表示";
+"adif_vis_collapsed" = "折りたたみ";
+"adif_vis_hidden" = "非表示";
+
+// MARK: - ADIFフィールドグループ
+"adif_group_datetime" = "日時";
+"adif_group_end_datetime" = "終了日時";
+"adif_group_contacted_qth" = "相手QTH（地図付き）";
+"adif_group_own_qth" = "自局QTH（地図付き）";
+
+// MARK: - ADIFフィールド名 - 基本
+"adif_field_call" = "コールサイン";
+"adif_field_qso_date" = "QSO日付";
+"adif_field_time_on" = "開始時間";
+"adif_field_band" = "バンド";
+"adif_field_mode" = "モード";
+"adif_field_freq" = "周波数 (MHz)";
+"adif_field_submode" = "サブモード";
+"adif_field_time_off" = "終了時間";
+"adif_field_qso_date_off" = "終了日付";
+
+// MARK: - ADIFフィールド名 - 信号
+"adif_field_rst_sent" = "送信RST";
+"adif_field_rst_rcvd" = "受信RST";
+
+// MARK: - ADIFフィールド名 - 技術
+"adif_field_freq_rx" = "受信周波数 (MHz)";
+"adif_field_tx_pwr" = "送信出力 (W)";
+"adif_field_rx_pwr" = "受信電力 (W)";
+"adif_field_band_rx" = "受信バンド";
+"adif_field_ant_az" = "アンテナ方位角";
+"adif_field_ant_el" = "アンテナ仰角";
+"adif_field_ant_path" = "アンテナパス";
+"adif_field_prop_mode" = "伝搬モード";
+"adif_field_distance" = "距離 (km)";
+"adif_field_rig" = "リグ（相手局）";
+"adif_field_my_rig" = "リグ（自局）";
+"adif_field_my_antenna" = "アンテナ（自局）";
+"adif_field_my_altitude" = "標高（自局, m）";
+
+// MARK: - ADIFフィールド名 - 自局
+"adif_field_station_callsign" = "局コールサイン";
+"adif_field_operator" = "オペレーター";
+"adif_field_owner_callsign" = "所有者コールサイン";
+"adif_field_my_name" = "自局名前";
+"adif_field_my_city" = "自局都市";
+"adif_field_my_country" = "自局国";
+"adif_field_my_state" = "自局州/県";
+"adif_field_my_cnty" = "自局郡";
+"adif_field_my_gridsquare" = "自局グリッド";
+"adif_field_my_gridsquare_ext" = "自局グリッド拡張";
+"adif_field_my_cq_zone" = "自局CQゾーン";
+"adif_field_my_itu_zone" = "自局ITUゾーン";
+"adif_field_my_lat" = "自局緯度";
+"adif_field_my_lon" = "自局経度";
+"adif_field_my_dxcc" = "自局DXCC";
+"adif_field_my_postal_code" = "自局郵便番号";
+"adif_field_my_street" = "自局住所";
+"adif_field_my_arrl_sect" = "自局ARRLセクション";
+"adif_field_my_cnty_alt" = "自局郡（代替）";
+"adif_field_my_darc_dok" = "自局DARC DOK";
+"adif_field_my_fists" = "自局FISTS番号";
+"adif_field_my_iota" = "自局IOTA";
+"adif_field_my_iota_island_id" = "自局IOTA島ID";
+"adif_field_my_pota_ref" = "自局POTA参照";
+"adif_field_my_sota_ref" = "自局SOTA参照";
+"adif_field_my_wwff_ref" = "自局WWFF参照";
+"adif_field_my_sig" = "自局特別活動";
+"adif_field_my_sig_info" = "自局SIG情報";
+"adif_field_my_usaca_counties" = "自局USACA Counties";
+"adif_field_my_vucc_grids" = "自局VUCCグリッド";
+"adif_field_my_morse_key_info" = "自局モールスキー情報";
+"adif_field_my_morse_key_type" = "自局モールスキー種類";
+
+// MARK: - ADIFフィールド名 - 相手局
+"adif_field_qth" = "QTH";
+"adif_field_gridsquare" = "グリッドスクエア";
+"adif_field_cqz" = "CQゾーン";
+"adif_field_ituz" = "ITUゾーン";
+"adif_field_lat" = "緯度";
+"adif_field_lon" = "経度";
+"adif_field_gridsquare_ext" = "グリッド拡張";
+"adif_field_country" = "国";
+"adif_field_state" = "州/県";
+"adif_field_cnty" = "郡";
+"adif_field_cnty_alt" = "郡（代替）";
+"adif_field_dxcc" = "DXCCエンティティ";
+"adif_field_cont" = "大陸";
+"adif_field_region" = "地域";
+"adif_field_pfx" = "WPXプレフィックス";
+"adif_field_altitude" = "標高 (m)";
+"adif_field_address" = "住所";
+"adif_field_usaca_counties" = "USACA Counties";
+"adif_field_vucc_grids" = "VUCCグリッド";
+
+// MARK: - ADIFフィールド名 - 相手オペレーター
+"adif_field_name" = "名前";
+"adif_field_age" = "年齢";
+"adif_field_email" = "メール";
+"adif_field_web" = "ウェブサイト";
+"adif_field_contacted_op" = "相手オペレーター";
+"adif_field_eq_call" = "所有者コールサイン";
+"adif_field_silent_key" = "サイレントキー(SK)";
+"adif_field_fists" = "FISTS番号";
+"adif_field_fists_cc" = "FISTS CC番号";
+"adif_field_skcc" = "SKCC";
+"adif_field_ten_ten" = "Ten-Ten番号";
+"adif_field_uksmg" = "UKSMG番号";
+"adif_field_darc_dok" = "DARC DOK";
+"adif_field_morse_key_info" = "モールスキー情報";
+"adif_field_morse_key_type" = "モールスキー種類";
+
+// MARK: - ADIFフィールド名 - 衛星
+"adif_field_sat_name" = "衛星名";
+"adif_field_sat_mode" = "衛星モード";
+
+// MARK: - ADIFフィールド名 - コンテスト
+"adif_field_contest_id" = "コンテストID";
+"adif_field_check" = "チェック";
+"adif_field_class" = "クラス";
+"adif_field_precedence" = "プリシーデンス";
+"adif_field_srx" = "受信シリアル番号";
+"adif_field_srx_string" = "受信シリアル文字列";
+"adif_field_stx" = "送信シリアル番号";
+"adif_field_stx_string" = "送信シリアル文字列";
+"adif_field_qso_complete" = "QSO完了";
+"adif_field_qso_random" = "ランダムQSO";
+"adif_field_swl" = "SWL";
+"adif_field_arrl_sect" = "ARRLセクション";
+
+// MARK: - ADIFフィールド名 - QSL
+"adif_field_qsl_sent" = "QSL送信済";
+"adif_field_qsl_rcvd" = "QSL受信済";
+"adif_field_qslsdate" = "QSL送信日";
+"adif_field_qslrdate" = "QSL受信日";
+"adif_field_qsl_sent_via" = "QSL送信方法";
+"adif_field_qsl_rcvd_via" = "QSL受信方法";
+"adif_field_qsl_via" = "QSL経由";
+"adif_field_qslmsg" = "QSLメッセージ";
+"adif_field_qslmsg_rcvd" = "QSL受信メッセージ";
+"adif_field_eqsl_qsl_sent" = "eQSL送信済";
+"adif_field_eqsl_qsl_rcvd" = "eQSL受信済";
+"adif_field_eqsl_qslsdate" = "eQSL送信日";
+"adif_field_eqsl_qslrdate" = "eQSL受信日";
+"adif_field_eqsl_ag" = "eQSL AG";
+"adif_field_lotw_qsl_sent" = "LoTW送信済";
+"adif_field_lotw_qsl_rcvd" = "LoTW受信済";
+"adif_field_lotw_qslsdate" = "LoTW送信日";
+"adif_field_lotw_qslrdate" = "LoTW受信日";
+"adif_field_dcl_qsl_sent" = "DCL送信済";
+"adif_field_dcl_qsl_rcvd" = "DCL受信済";
+"adif_field_dcl_qslsdate" = "DCL送信日";
+"adif_field_dcl_qslrdate" = "DCL受信日";
+
+// MARK: - ADIFフィールド名 - オンラインサービス
+"adif_field_clublog_qso_upload_date" = "Club Logアップロード日";
+"adif_field_clublog_qso_upload_status" = "Club Logアップロード状態";
+"adif_field_hamlogeu_qso_upload_date" = "HAMLOG.EUアップロード日";
+"adif_field_hamlogeu_qso_upload_status" = "HAMLOG.EUアップロード状態";
+"adif_field_hamqth_qso_upload_date" = "HamQTHアップロード日";
+"adif_field_hamqth_qso_upload_status" = "HamQTHアップロード状態";
+"adif_field_hrdlog_qso_upload_date" = "HRDLogアップロード日";
+"adif_field_hrdlog_qso_upload_status" = "HRDLogアップロード状態";
+"adif_field_qrzcom_qso_upload_date" = "QRZ.COMアップロード日";
+"adif_field_qrzcom_qso_upload_status" = "QRZ.COMアップロード状態";
+"adif_field_qrzcom_qso_download_date" = "QRZ.COMダウンロード日";
+"adif_field_qrzcom_qso_download_status" = "QRZ.COMダウンロード状態";
+
+// MARK: - ADIFフィールド名 - アワード
+"adif_field_iota" = "IOTA";
+"adif_field_iota_island_id" = "IOTA島ID";
+"adif_field_sota_ref" = "SOTA参照";
+"adif_field_pota_ref" = "POTA参照";
+"adif_field_wwff_ref" = "WWFF参照";
+"adif_field_sig" = "特別活動";
+"adif_field_sig_info" = "SIG情報";
+"adif_field_award_submitted" = "申請済アワード";
+"adif_field_award_granted" = "取得済アワード";
+"adif_field_credit_submitted" = "申請済クレジット";
+"adif_field_credit_granted" = "取得済クレジット";
+
+// MARK: - ADIFフィールド名 - 伝搬
+"adif_field_a_index" = "A指数";
+"adif_field_k_index" = "K指数";
+"adif_field_sfi" = "太陽フラックス指数";
+"adif_field_max_bursts" = "最大バースト(秒)";
+"adif_field_nr_bursts" = "バースト数";
+"adif_field_nr_pings" = "ピング数";
+"adif_field_ms_shower" = "流星群";
+"adif_field_force_init" = "強制初期化(EME)";
+
+// MARK: - ADIFフィールド名 - メモ
+"adif_field_comment" = "コメント";
+"adif_field_notes" = "ノート";
+"adif_field_public_key" = "公開鍵";

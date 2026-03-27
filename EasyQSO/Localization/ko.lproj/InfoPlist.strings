@@ -1,0 +1,7 @@
+/* 
+  InfoPlist.strings (Korean)
+  EasyQSO
+*/
+
+"CFBundleDisplayName" = "EasyQSO";
+"NSDocumentsFolderUsageDescription" = "로그 파일을 가져오고보내려면 문서 폴더에 대한 접근이 필요합니다";

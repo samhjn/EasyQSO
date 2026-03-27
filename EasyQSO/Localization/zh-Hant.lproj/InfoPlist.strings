@@ -1,0 +1,12 @@
+/* 
+  InfoPlist.strings (Chinese Traditional)
+  EasyQSO
+  
+  用於本地化 Info.plist 中的字串
+*/
+
+// 應用程式顯示名稱
+"CFBundleDisplayName" = "通聯日誌";
+
+// 權限描述
+"NSDocumentsFolderUsageDescription" = "需要存取文件資料夾以匯入和匯出日誌檔案"; 

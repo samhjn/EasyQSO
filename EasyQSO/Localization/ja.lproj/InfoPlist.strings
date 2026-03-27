@@ -1,0 +1,12 @@
+/* 
+  InfoPlist.strings (Japanese)
+  EasyQSO
+  
+  Info.plist文字列のローカライズ用
+*/
+
+// アプリ表示名
+"CFBundleDisplayName" = "EasyQSO";
+
+// 権限の説明
+"NSDocumentsFolderUsageDescription" = "ログファイルのインポートとエクスポートにドキュメントフォルダへのアクセスが必要です"; 

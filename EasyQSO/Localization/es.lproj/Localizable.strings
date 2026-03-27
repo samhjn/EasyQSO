@@ -1,0 +1,439 @@
+/* 
+  Localizable.strings (Spanish)
+  EasyQSO
+  
+  Archivo de localización en español
+*/
+
+// MARK: - Pestañas principales
+"record_qso" = "Registrar QSO";
+"query_log" = "Buscar en el log";
+"import_export" = "Importar/Exportar";
+"settings" = "Ajustes";
+
+// MARK: - Encabezados de secciones
+"basic_info" = "Información básica";
+"signal_report" = "Reporte de señal";
+"technical_info" = "Información técnica";
+"own_qth_info" = "Mi estación";
+"qth_info" = "Estación contactada";
+"additional_info" = "Información adicional";
+"data_management" = "Gestión de datos";
+"export_log" = "Exportar log";
+"import_log" = "Importar log";
+
+// MARK: - Etiquetas de campos
+"callsign" = "Indicativo";
+"date_time" = "Fecha y hora";
+"band" = "Banda";
+"mode" = "Modo";
+"frequency" = "Frecuencia (MHz)";
+"rx_frequency" = "Frecuencia RX (MHz)";
+"tx_power" = "Potencia TX";
+"rst_sent" = "RST enviado";
+"rst_received" = "RST recibido";
+"name" = "Nombre";
+"qth" = "Descripción QTH";
+"own_qth" = "Mi QTH";
+"grid_square" = "Locator";
+"cq_zone" = "Zona CQ";
+"itu_zone" = "Zona ITU";
+"satellite" = "Satélite";
+"remarks" = "Observaciones";
+
+// MARK: - Mapa y selección de ubicación
+"select_location" = "Seleccionar ubicación";
+"select_on_map" = "Seleccionar en el mapa";
+"location_name" = "Nombre del lugar";
+"coordinates" = "Coordenadas";
+"latitude" = "Latitud";
+"longitude" = "Longitud";
+"grid_coordinate" = "Coordenadas de cuadrícula";
+"click_map_to_select" = "Toque el mapa para seleccionar una ubicación";
+"selected_location_info" = "Información de ubicación seleccionada";
+
+// MARK: - Botones
+"save_qso" = "Guardar QSO";
+"save_changes" = "Guardar cambios";
+"export_all" = "Exportar todos los registros";
+"import_from_adif" = "Importar desde archivo ADIF";
+"import_from_csv" = "Importar desde archivo CSV";
+"delete" = "Eliminar";
+"cancel" = "Cancelar";
+"confirm" = "Aceptar";
+
+// MARK: - Barra de herramientas del teclado
+"previous" = "Anterior";
+"next" = "Siguiente";
+"done" = "Hecho";
+
+// MARK: - Búsqueda y visualización
+"search_placeholder" = "Buscar indicativo, banda, modo, etc.";
+"record_count" = "Total %d registros";
+"operator" = "Operador";
+"export_format" = "Formato de exportación";
+"current_record_count" = "Registros actuales: %d";
+
+// MARK: - Títulos de navegación
+"edit_qso" = "Editar QSO";
+
+// MARK: - Mensajes de validación y error
+"validation_error" = "Error de validación";
+"callsign_empty" = "El indicativo no puede estar vacío";
+"callsign_invalid" = "Formato de indicativo no válido, debe contener letras y/o números";
+"frequency_invalid" = "Formato de frecuencia no válido, debe ser un número válido dentro de un rango razonable";
+"grid_square_invalid" = "Formato de locator no válido, debe ser formato AB12cd";
+"cq_zone_invalid" = "La zona CQ debe ser un número entre 1 y 40";
+"itu_zone_invalid" = "La zona ITU debe ser un número entre 1 y 90";
+
+// MARK: - Mensajes de éxito
+"qso_saved" = "QSO guardado";
+"qso_saved_message" = "El registro QSO se ha guardado correctamente";
+"save_success" = "Guardado exitoso";
+"qso_updated" = "Registro QSO actualizado";
+"delete_success" = "Eliminación exitosa";
+"delete_success_message" = "El registro QSO se ha eliminado correctamente";
+"export_success" = "Exportación exitosa";
+"export_success_message" = "Log exportado a %@";
+"import_success" = "Importación exitosa";
+"import_success_message" = "Se importaron %d registros correctamente";
+
+// MARK: - Mensajes de error
+"save_failed" = "Error al guardar";
+"save_failed_message" = "No se pudo guardar el registro QSO: %@";
+"delete_failed" = "Error al eliminar";
+"delete_failed_message" = "Error al eliminar el registro: %@";
+"export_failed" = "Error de exportación";
+"import_failed" = "Error de importación";
+"cannot_access_documents" = "No se puede acceder al directorio de documentos";
+"cannot_read_file" = "No se puede leer el archivo";
+"csv_format_incorrect" = "Formato de archivo CSV incorrecto o vacío";
+"cannot_get_existing_records" = "No se pueden obtener los registros existentes";
+
+// MARK: - Confirmación de eliminación
+"delete_record" = "Eliminar registro";
+"delete_confirm_message" = "¿Está seguro de que desea eliminar el registro QSO con %@?";
+
+// MARK: - Información de la aplicación
+"app_display_name" = "Registro de radioaficionado";
+"documents_folder_usage" = "Se necesita acceso a la carpeta de Documentos para importar y exportar archivos de registro";
+
+// MARK: - Funcionalidades avanzadas
+"import_success_with_duplicates" = "Se importaron %d registros correctamente (los registros duplicados se omitieron automáticamente)";
+
+// MARK: - Configuración de zona horaria
+"export_timezone" = "Zona horaria de exportación";
+"import_timezone" = "Zona horaria de importación";
+"timezone_settings" = "Configuración de zona horaria CSV";
+"export_tab" = "Exportación CSV";
+"import_tab" = "Importación CSV";
+"notes" = "Notas";
+"timezone_note_local" = "• La aplicación siempre muestra la hora local";
+"timezone_note_adif" = "• Los archivos ADIF siempre usan hora UTC";
+"timezone_note_csv" = "• Los archivos CSV soportan zonas horarias personalizadas";
+"timezone_note_conversion" = "• La hora se convierte automáticamente durante la importación/exportación";
+"timezone_note_adif_ignore" = "• Los archivos ADIF ignoran estos ajustes y siempre usan UTC";
+"export_timezone_desc" = "Seleccione la zona horaria para exportar archivos CSV";
+"import_timezone_desc" = "Seleccione la zona horaria asumida para importar archivos CSV";
+"local_time" = "Hora local";
+"adif_uses_utc" = "El formato ADIF usa hora UTC según el estándar";
+"csv_timezone_only" = "Solo aplica a archivos CSV. Los archivos ADIF siempre usan UTC.";
+
+// MARK: - Filtro avanzado
+"advanced_filter" = "Filtro avanzado";
+"search_mode" = "Modo de búsqueda";
+"fuzzy_search" = "Búsqueda aproximada";
+"exact_search" = "Coincidencia exacta";
+"fuzzy_search_desc" = "Buscar registros que contengan las palabras clave";
+"exact_search_desc" = "Buscar coincidencias exactas";
+"general_search" = "Búsqueda general";
+"enter_callsign" = "Ingrese indicativo";
+"enter_band" = "Ingrese banda";
+"enter_mode" = "Ingrese modo";
+"or_select_bands" = "O seleccione de la lista:";
+"or_select_modes" = "O seleccione de la lista:";
+"date_range" = "Rango de fechas";
+"start_date" = "Fecha de inicio";
+"end_date" = "Fecha de fin";
+"clear_start_date" = "Borrar fecha de inicio";
+"clear_end_date" = "Borrar fecha de fin";
+"frequency_range" = "Rango de frecuencias";
+"min_frequency" = "Frecuencia mín.";
+"max_frequency" = "Frecuencia máx.";
+"other_filters" = "Otros filtros";
+"reset_filters" = "Restablecer filtros";
+"apply_filters" = "Aplicar filtros";
+"active_filters" = "Filtros activos:";
+"clear_all" = "Borrar todo";
+"operator_label" = "Operador";
+
+// MARK: - Filtro de exportación
+"use_filter_for_export" = "Usar filtro para exportación";
+"configure_export_filter" = "Configurar filtro de exportación";
+"export_filter_active" = "Filtro activo";
+"records_to_export" = "Registros a exportar: %d";
+"export_filtered" = "Exportar registros filtrados";
+
+// MARK: - Descripciones de filtros
+"filter_search" = "Búsqueda";
+"filter_fuzzy" = "Aproximada";
+"filter_exact" = "Exacta";
+"filter_callsign" = "Indicativo";
+"filter_band" = "Banda";
+"filter_mode" = "Modo";
+"filter_start_date" = "Fecha inicio";
+"filter_end_date" = "Fecha fin";
+"filter_name" = "Nombre";
+"filter_qth" = "QTH";
+"filter_grid" = "Locator";
+"filter_min_freq" = "Frec. mín.";
+"filter_max_freq" = "Frec. máx.";
+"filter_satellite" = "Satélite";
+"filter_no_filters" = "Sin filtros";
+
+// MARK: - Acerca de y licencia
+"about" = "Acerca de";
+"license" = "Licencia";
+"license_type" = "Tipo de licencia";
+"gpl_v3" = "Licencia Pública General de GNU v3.0";
+"license_description" = "Este software se distribuye bajo la licencia GPL v3.0, lo que significa:";
+"license_freedom_use" = "• Puede usar libremente este software";
+"license_freedom_modify" = "• Puede modificar libremente este software";
+"license_freedom_distribute" = "• Puede distribuir libremente este software";
+"license_terms_apply" = "• Pero debe cumplir con los términos de la GPL v3.0";
+"copyright" = "Derechos de autor";
+"copyright_notice" = "Este es software libre bajo licencia GPL v3.0.";
+"view_full_license" = "Ver licencia GPL v3.0 completa";
+"view_source_code" = "Ver código fuente";
+"report_issue" = "Reportar un problema";
+"software_introduction" = "Introducción del software";
+"software_description" = "EasyQSO es una aplicación de registro de QSO diseñada para radioaficionados. Ofrece funciones completas de gestión de registros QSO, incluyendo registro, búsqueda, importación/exportación y más.";
+"open_source_license" = "Licencia de código abierto";
+"version" = "Versión";
+"welcome_gpl_notice" = "¡Bienvenido a EasyQSO! Este software se distribuye bajo la Licencia Pública General de GNU v3.0. Toque \"Más sobre la licencia GPL\" para ver información detallada.";
+"welcome_title" = "Bienvenido a EasyQSO";
+"learn_gpl_license" = "Más sobre la licencia GPL";
+"view_later" = "Ver después";
+
+// MARK: - Configuración de campos ADIF
+"adif_field_config" = "Configuración de campos QSO";
+"adif_field_settings" = "Gestionar campos QSO";
+"adif_field_config_desc" = "Configure la visibilidad de los campos ADIF 3.1.7 durante el registro y edición de QSO: visible, plegado u oculto.";
+"adif_search_fields" = "Buscar campos...";
+"adif_reset_defaults" = "Restablecer";
+"adif_required" = "Obligatorio";
+"adif_more_fields" = "Más campos";
+"adif_hidden_with_data" = "Campos ocultos (con datos)";
+"adif_hidden_field_hint" = "Estos campos están ocultos pero contienen datos. Al borrarlos se eliminará el campo. Reactive en Ajustes.";
+
+// MARK: - Categorías de campos ADIF
+"adif_cat_basic" = "Información básica";
+"adif_cat_signal" = "Reporte de señal";
+"adif_cat_technical" = "Información técnica";
+"adif_cat_own_station" = "Mi estación";
+"adif_cat_contacted_station" = "Estación contactada";
+"adif_cat_contacted_op" = "Operador contactado";
+"adif_cat_satellite" = "Satélite";
+"adif_cat_contest" = "Concurso";
+"adif_cat_qsl" = "QSL";
+"adif_cat_online_services" = "Servicios en línea";
+"adif_cat_awards" = "Diplomas y membresías";
+"adif_cat_propagation" = "Propagación y condiciones";
+"adif_cat_notes" = "Notas y comentarios";
+
+// MARK: - Visibilidad de campos ADIF
+"adif_vis_visible" = "Visible";
+"adif_vis_collapsed" = "Plegado";
+"adif_vis_hidden" = "Oculto";
+
+// MARK: - Grupos de campos ADIF
+"adif_group_datetime" = "Fecha y hora";
+"adif_group_end_datetime" = "Fecha y hora de fin";
+"adif_group_contacted_qth" = "QTH contactado (con mapa)";
+"adif_group_own_qth" = "Mi QTH (con mapa)";
+
+// MARK: - Nombres de campos ADIF - Básico
+"adif_field_call" = "Indicativo";
+"adif_field_qso_date" = "Fecha del QSO";
+"adif_field_time_on" = "Hora de inicio";
+"adif_field_band" = "Banda";
+"adif_field_mode" = "Modo";
+"adif_field_freq" = "Frecuencia (MHz)";
+"adif_field_submode" = "Submodo";
+"adif_field_time_off" = "Hora de fin";
+"adif_field_qso_date_off" = "Fecha de fin";
+
+// MARK: - Nombres de campos ADIF - Señal
+"adif_field_rst_sent" = "RST enviado";
+"adif_field_rst_rcvd" = "RST recibido";
+
+// MARK: - Nombres de campos ADIF - Técnico
+"adif_field_freq_rx" = "Frecuencia RX (MHz)";
+"adif_field_tx_pwr" = "Potencia TX (W)";
+"adif_field_rx_pwr" = "Potencia RX (W)";
+"adif_field_band_rx" = "Banda RX";
+"adif_field_ant_az" = "Azimut de antena";
+"adif_field_ant_el" = "Elevación de antena";
+"adif_field_ant_path" = "Trayecto de antena";
+"adif_field_prop_mode" = "Modo de propagación";
+"adif_field_distance" = "Distancia (km)";
+"adif_field_rig" = "Equipo (contactado)";
+"adif_field_my_rig" = "Equipo (propio)";
+"adif_field_my_antenna" = "Antena (propia)";
+"adif_field_my_altitude" = "Altitud (propia, m)";
+
+// MARK: - Nombres de campos ADIF - Mi estación
+"adif_field_station_callsign" = "Indicativo de estación";
+"adif_field_operator" = "Operador";
+"adif_field_owner_callsign" = "Indicativo del propietario";
+"adif_field_my_name" = "Mi nombre";
+"adif_field_my_city" = "Mi ciudad";
+"adif_field_my_country" = "Mi país";
+"adif_field_my_state" = "Mi estado/provincia";
+"adif_field_my_cnty" = "Mi condado";
+"adif_field_my_gridsquare" = "Mi locator";
+"adif_field_my_gridsquare_ext" = "Mi locator (ext.)";
+"adif_field_my_cq_zone" = "Mi zona CQ";
+"adif_field_my_itu_zone" = "Mi zona ITU";
+"adif_field_my_lat" = "Mi latitud";
+"adif_field_my_lon" = "Mi longitud";
+"adif_field_my_dxcc" = "Mi DXCC";
+"adif_field_my_postal_code" = "Mi código postal";
+"adif_field_my_street" = "Mi dirección";
+"adif_field_my_arrl_sect" = "Mi sección ARRL";
+"adif_field_my_cnty_alt" = "Mi condado (alt.)";
+"adif_field_my_darc_dok" = "Mi DARC DOK";
+"adif_field_my_fists" = "Mi FISTS n.°";
+"adif_field_my_iota" = "Mi IOTA";
+"adif_field_my_iota_island_id" = "Mi IOTA Island ID";
+"adif_field_my_pota_ref" = "Mi POTA Ref";
+"adif_field_my_sota_ref" = "Mi SOTA Ref";
+"adif_field_my_wwff_ref" = "Mi WWFF Ref";
+"adif_field_my_sig" = "Mi actividad especial";
+"adif_field_my_sig_info" = "Mi info SIG";
+"adif_field_my_usaca_counties" = "Mis USACA Counties";
+"adif_field_my_vucc_grids" = "Mis VUCC Grids";
+"adif_field_my_morse_key_info" = "Mi llave Morse (info)";
+"adif_field_my_morse_key_type" = "Mi llave Morse (tipo)";
+
+// MARK: - Nombres de campos ADIF - Estación contactada
+"adif_field_qth" = "QTH";
+"adif_field_gridsquare" = "Locator";
+"adif_field_cqz" = "Zona CQ";
+"adif_field_ituz" = "Zona ITU";
+"adif_field_lat" = "Latitud";
+"adif_field_lon" = "Longitud";
+"adif_field_gridsquare_ext" = "Locator (ext.)";
+"adif_field_country" = "País";
+"adif_field_state" = "Estado/Provincia";
+"adif_field_cnty" = "Condado";
+"adif_field_cnty_alt" = "Condado (alt.)";
+"adif_field_dxcc" = "Entidad DXCC";
+"adif_field_cont" = "Continente";
+"adif_field_region" = "Región";
+"adif_field_pfx" = "Prefijo WPX";
+"adif_field_altitude" = "Altitud (m)";
+"adif_field_address" = "Dirección";
+"adif_field_usaca_counties" = "USACA Counties";
+"adif_field_vucc_grids" = "VUCC Grids";
+
+// MARK: - Nombres de campos ADIF - Operador contactado
+"adif_field_name" = "Nombre";
+"adif_field_age" = "Edad";
+"adif_field_email" = "Correo electrónico";
+"adif_field_web" = "Sitio web";
+"adif_field_contacted_op" = "Operador contactado";
+"adif_field_eq_call" = "Indicativo del propietario";
+"adif_field_silent_key" = "Silent Key (SK)";
+"adif_field_fists" = "FISTS n.°";
+"adif_field_fists_cc" = "FISTS CC n.°";
+"adif_field_skcc" = "SKCC";
+"adif_field_ten_ten" = "Ten-Ten n.°";
+"adif_field_uksmg" = "UKSMG n.°";
+"adif_field_darc_dok" = "DARC DOK";
+"adif_field_morse_key_info" = "Info llave Morse";
+"adif_field_morse_key_type" = "Tipo llave Morse";
+
+// MARK: - Nombres de campos ADIF - Satélite
+"adif_field_sat_name" = "Nombre del satélite";
+"adif_field_sat_mode" = "Modo satélite";
+
+// MARK: - Nombres de campos ADIF - Concurso
+"adif_field_contest_id" = "ID de concurso";
+"adif_field_check" = "Verificación";
+"adif_field_class" = "Clase";
+"adif_field_precedence" = "Precedencia";
+"adif_field_srx" = "N.° serie recibido";
+"adif_field_srx_string" = "Cadena serie recibida";
+"adif_field_stx" = "N.° serie enviado";
+"adif_field_stx_string" = "Cadena serie enviada";
+"adif_field_qso_complete" = "QSO completo";
+"adif_field_qso_random" = "QSO aleatorio";
+"adif_field_swl" = "SWL";
+"adif_field_arrl_sect" = "Sección ARRL";
+
+// MARK: - Nombres de campos ADIF - QSL
+"adif_field_qsl_sent" = "QSL enviada";
+"adif_field_qsl_rcvd" = "QSL recibida";
+"adif_field_qslsdate" = "Fecha envío QSL";
+"adif_field_qslrdate" = "Fecha recepción QSL";
+"adif_field_qsl_sent_via" = "QSL enviada vía";
+"adif_field_qsl_rcvd_via" = "QSL recibida vía";
+"adif_field_qsl_via" = "QSL vía";
+"adif_field_qslmsg" = "Mensaje QSL";
+"adif_field_qslmsg_rcvd" = "Mensaje QSL recibido";
+"adif_field_eqsl_qsl_sent" = "eQSL enviada";
+"adif_field_eqsl_qsl_rcvd" = "eQSL recibida";
+"adif_field_eqsl_qslsdate" = "Fecha envío eQSL";
+"adif_field_eqsl_qslrdate" = "Fecha recepción eQSL";
+"adif_field_eqsl_ag" = "eQSL AG";
+"adif_field_lotw_qsl_sent" = "LoTW enviado";
+"adif_field_lotw_qsl_rcvd" = "LoTW recibido";
+"adif_field_lotw_qslsdate" = "Fecha envío LoTW";
+"adif_field_lotw_qslrdate" = "Fecha recepción LoTW";
+"adif_field_dcl_qsl_sent" = "DCL enviado";
+"adif_field_dcl_qsl_rcvd" = "DCL recibido";
+"adif_field_dcl_qslsdate" = "Fecha envío DCL";
+"adif_field_dcl_qslrdate" = "Fecha recepción DCL";
+
+// MARK: - Nombres de campos ADIF - Servicios en línea
+"adif_field_clublog_qso_upload_date" = "Fecha subida Club Log";
+"adif_field_clublog_qso_upload_status" = "Estado subida Club Log";
+"adif_field_hamlogeu_qso_upload_date" = "Fecha subida HAMLOG.EU";
+"adif_field_hamlogeu_qso_upload_status" = "Estado subida HAMLOG.EU";
+"adif_field_hamqth_qso_upload_date" = "Fecha subida HamQTH";
+"adif_field_hamqth_qso_upload_status" = "Estado subida HamQTH";
+"adif_field_hrdlog_qso_upload_date" = "Fecha subida HRDLog";
+"adif_field_hrdlog_qso_upload_status" = "Estado subida HRDLog";
+"adif_field_qrzcom_qso_upload_date" = "Fecha subida QRZ.COM";
+"adif_field_qrzcom_qso_upload_status" = "Estado subida QRZ.COM";
+"adif_field_qrzcom_qso_download_date" = "Fecha descarga QRZ.COM";
+"adif_field_qrzcom_qso_download_status" = "Estado descarga QRZ.COM";
+
+// MARK: - Nombres de campos ADIF - Diplomas
+"adif_field_iota" = "IOTA";
+"adif_field_iota_island_id" = "IOTA Island ID";
+"adif_field_sota_ref" = "Referencia SOTA";
+"adif_field_pota_ref" = "Referencia POTA";
+"adif_field_wwff_ref" = "Referencia WWFF";
+"adif_field_sig" = "Actividad especial";
+"adif_field_sig_info" = "Info SIG";
+"adif_field_award_submitted" = "Diplomas enviados";
+"adif_field_award_granted" = "Diplomas obtenidos";
+"adif_field_credit_submitted" = "Créditos enviados";
+"adif_field_credit_granted" = "Créditos obtenidos";
+
+// MARK: - Nombres de campos ADIF - Propagación
+"adif_field_a_index" = "Índice A";
+"adif_field_k_index" = "Índice K";
+"adif_field_sfi" = "Índice de flujo solar";
+"adif_field_max_bursts" = "Ráfagas máx. (s)";
+"adif_field_nr_bursts" = "Número de ráfagas";
+"adif_field_nr_pings" = "Número de pings";
+"adif_field_ms_shower" = "Lluvia de meteoros";
+"adif_field_force_init" = "Inicio forzado (EME)";
+
+// MARK: - Nombres de campos ADIF - Notas
+"adif_field_comment" = "Comentario";
+"adif_field_notes" = "Notas";
+"adif_field_public_key" = "Clave pública";

@@ -1,0 +1,7 @@
+/* 
+  InfoPlist.strings (Italian)
+  EasyQSO
+*/
+
+"CFBundleDisplayName" = "EasyQSO";
+"NSDocumentsFolderUsageDescription" = "L'accesso alla cartella Documenti è necessario per importare ed esportare i file di log"; 

@@ -101,8 +101,7 @@ struct FieldSettingsView: View {
         if searchText.isEmpty { return groups }
         let search = searchText.lowercased()
         return groups.filter { group in
-            group.nameEN.lowercased().contains(search) ||
-            group.nameZH.contains(search) ||
+            group.displayName.lowercased().contains(search) ||
             group.memberFieldIds.contains { $0.lowercased().contains(search) }
         }
     }
@@ -115,8 +114,7 @@ struct FieldSettingsView: View {
         let search = searchText.lowercased()
         return allFields.filter { field in
             field.id.lowercased().contains(search) ||
-            field.nameEN.lowercased().contains(search) ||
-            field.nameZH.contains(search)
+            field.displayName.lowercased().contains(search)
         }
     }
     
