@@ -20,7 +20,7 @@ import Foundation
 import CoreData
 
 // 这个类负责设置Core Data模型
-class HamRadioLoggerModel {
+class EasyQSOModel {
     static func createModel() -> NSManagedObjectModel {
         let model = NSManagedObjectModel()
         
@@ -200,8 +200,8 @@ class HamRadioLoggerModel {
 // 扩展PersistenceController以使用我们的模型
 extension PersistenceController {
     static func createContainer() -> NSPersistentContainer {
-        let model = HamRadioLoggerModel.createModel()
-        let container = NSPersistentContainer(name: "HamRadioLogger", managedObjectModel: model)
+        let model = EasyQSOModel.createModel()
+        let container = NSPersistentContainer(name: "EasyQSO", managedObjectModel: model)
         return container
     }
 }

@@ -30,7 +30,7 @@
 
 ## 项目结构
 
-- `HamRadioLoggerApp.swift` - 应用程序入口
+- `EasyQSOApp.swift` - 应用程序入口
 - `ContentView.swift` - 主视图，包含标签导航
 - `QSORecordView.swift` - 记录QSO的视图
 - `LogQueryView.swift` - 查询日志的视图
@@ -38,7 +38,7 @@
 - `LogImportExportView.swift` - 导入导出功能的视图
 - `QSORecord.swift` - 持久化控制器
 - `QSORecordEntity.swift` - QSO记录实体定义
-- `HamRadioLoggerModel.swift` - Core Data模型定义
+- `EasyQSOModel.swift` - Core Data模型定义
 
 ## 构建和运行
 

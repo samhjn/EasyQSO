@@ -37,7 +37,7 @@ EasyQSO is an iOS application designed for amateur radio enthusiasts to record, 
 
 ## Project Structure
 
-- `HamRadioLoggerApp.swift` - Application entry point
+- `EasyQSOApp.swift` - Application entry point
 - `ContentView.swift` - Main view with tab navigation
 - `QSORecordView.swift` - QSO recording view
 - `LogQueryView.swift` - Log query view
@@ -46,7 +46,7 @@ EasyQSO is an iOS application designed for amateur radio enthusiasts to record, 
 - `AboutView.swift` - About and license information view
 - `QSORecord.swift` - Persistence controller
 - `QSORecordEntity.swift` - QSO record entity definition
-- `HamRadioLoggerModel.swift` - Core Data model definition
+- `EasyQSOModel.swift` - Core Data model definition
 
 ## Building and Running
 

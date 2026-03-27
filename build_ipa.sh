@@ -3,8 +3,8 @@
 # Configuration
 # Use absolute path for PWD to avoid relative path issues
 PROJECT_ROOT="$(pwd)"
-PROJECT_NAME="HamRadioLogger"
-SCHEME_NAME="HamRadioLogger"
+PROJECT_NAME="EasyQSO"
+SCHEME_NAME="EasyQSO"
 BUILD_DIR="${PROJECT_ROOT}/build"
 ARCHIVE_PATH="${BUILD_DIR}/${PROJECT_NAME}.xcarchive"
 EXPORT_DIR="${BUILD_DIR}/Export"

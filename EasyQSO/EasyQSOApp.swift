@@ -19,7 +19,7 @@
 import SwiftUI
 
 @main
-struct HamRadioLoggerApp: App {
+struct EasyQSOApp: App {
     // 使用共享的持久化控制器
     let persistenceController = PersistenceController.shared
     
@@ -52,7 +52,7 @@ struct HamRadioLoggerApp: App {
 }
 
 // 为SwiftUI预览提供预览版本
-struct HamRadioLoggerApp_Previews: PreviewProvider {
+struct EasyQSOApp_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
             .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
