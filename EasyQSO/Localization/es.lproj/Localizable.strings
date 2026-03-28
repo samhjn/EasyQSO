@@ -446,6 +446,12 @@
 "adif_field_ms_shower" = "Lluvia de meteoros";
 "adif_field_force_init" = "Inicio forzado (EME)";
 
+// MARK: - Cambios sin guardar
+"edit_unsaved_title" = "Cambios sin guardar";
+"edit_unsaved_message" = "Tiene cambios sin guardar. ¿Qué desea hacer?";
+"edit_unsaved_save" = "Guardar y salir";
+"edit_unsaved_discard" = "Descartar cambios";
+
 // MARK: - Nombres de campos ADIF - Notas
 "adif_field_comment" = "Comentario";
 "adif_field_notes" = "Notas";

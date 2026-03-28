@@ -446,6 +446,12 @@
 "adif_field_ms_shower" = "流星雨";
 "adif_field_force_init" = "強制初始(EME)";
 
+// MARK: - 編輯未儲存提示
+"edit_unsaved_title" = "未儲存的變更";
+"edit_unsaved_message" = "目前的編輯尚未儲存，您要如何處理？";
+"edit_unsaved_save" = "儲存並離開";
+"edit_unsaved_discard" = "捨棄變更";
+
 // MARK: - ADIF欄位名稱 - 備註
 "adif_field_comment" = "備註";
 "adif_field_notes" = "筆記";

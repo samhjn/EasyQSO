@@ -67,6 +67,55 @@ struct EditQSOView: View {
     @State private var rxBand: String
     @State private var isRxBandChangedByFrequency = false
     
+    // Unsaved changes detection
+    @State private var savedSnapshot: FormSnapshot
+    @State private var showingUnsavedAlert = false
+    
+    private struct FormSnapshot: Equatable {
+        var callsign: String
+        var date: Date
+        var endDate: Date
+        var band: String
+        var mode: String
+        var frequency: String
+        var rxFrequency: String
+        var txPower: String
+        var rstSent: String
+        var rstReceived: String
+        var name: String
+        var qth: String
+        var gridSquare: String
+        var cqZone: String
+        var ituZone: String
+        var satellite: String
+        var remarks: String
+        var extendedFields: [String: String]
+        var rxBand: String
+        var ownQTH: String
+        var ownGridSquare: String
+        var ownCQZone: String
+        var ownITUZone: String
+    }
+    
+    private var currentSnapshot: FormSnapshot {
+        FormSnapshot(
+            callsign: callsign, date: date, endDate: endDate,
+            band: band, mode: mode, frequency: frequency,
+            rxFrequency: rxFrequency, txPower: txPower,
+            rstSent: rstSent, rstReceived: rstReceived,
+            name: name, qth: qth, gridSquare: gridSquare,
+            cqZone: cqZone, ituZone: ituZone,
+            satellite: satellite, remarks: remarks,
+            extendedFields: extendedFields, rxBand: rxBand,
+            ownQTH: ownQTH, ownGridSquare: ownGridSquare,
+            ownCQZone: ownCQZone, ownITUZone: ownITUZone
+        )
+    }
+    
+    private var hasUnsavedChanges: Bool {
+        currentSnapshot != savedSnapshot
+    }
+    
     let bands = ["160m", "80m", "40m", "30m", "20m", "17m", "15m", "12m", "10m", "6m", "2m", "70cm"]
     
     private var modes: [String] { modeManager.pickerModes(current: mode) }
@@ -231,11 +280,28 @@ struct EditQSOView: View {
         _rxBand = State(initialValue: record.adifFields["BAND_RX"] ?? "")
         
         let adif = record.adifFields
+        let endDateVal: Date
         if let parsed = ADIFDateTimeHelper.adifToDate(dateStr: adif["QSO_DATE_OFF"], timeStr: adif["TIME_OFF"]) {
-            _endDate = State(initialValue: parsed)
+            endDateVal = parsed
         } else {
-            _endDate = State(initialValue: record.date)
+            endDateVal = record.date
         }
+        _endDate = State(initialValue: endDateVal)
+        
+        _savedSnapshot = State(initialValue: FormSnapshot(
+            callsign: record.callsign, date: record.date, endDate: endDateVal,
+            band: record.band, mode: record.mode,
+            frequency: record.frequencyMHz > 0 ? String(record.frequencyMHz) : "",
+            rxFrequency: record.rxFrequencyMHz > 0 ? String(record.rxFrequencyMHz) : "",
+            txPower: record.txPower ?? "",
+            rstSent: record.rstSent, rstReceived: record.rstReceived,
+            name: record.name ?? "", qth: record.qth ?? "",
+            gridSquare: record.gridSquare ?? "",
+            cqZone: record.cqZone ?? "", ituZone: record.ituZone ?? "",
+            satellite: record.satellite ?? "", remarks: record.remarks ?? "",
+            extendedFields: adif, rxBand: adif["BAND_RX"] ?? "",
+            ownQTH: "", ownGridSquare: "", ownCQZone: "", ownITUZone: ""
+        ))
         
         if let existingCoordinate = record.coordinate {
             _selectedLocation = State(initialValue: existingCoordinate)
@@ -373,7 +439,22 @@ struct EditQSOView: View {
             }
         }
         .navigationTitle(LocalizedStrings.editQSO.localized)
+        .navigationBarBackButtonHidden(true)
         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    if hasUnsavedChanges {
+                        showingUnsavedAlert = true
+                    } else {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.backward")
+                        Text(LocalizedStrings.queryLog.localized)
+                    }
+                }
+            }
             KeyboardToolbar(focusedField: $focusedField, orderedFields: keyboardOrderedFieldIDs)
         }
         .alert(isPresented: $showingAlert) {
@@ -381,6 +462,17 @@ struct EditQSOView: View {
                 title: Text(alertTitle),
                 message: Text(alertMessage)
             )
+        }
+        .alert("edit_unsaved_title".localized, isPresented: $showingUnsavedAlert) {
+            Button("edit_unsaved_save".localized) {
+                saveAndDismiss()
+            }
+            Button("edit_unsaved_discard".localized, role: .destructive) {
+                presentationMode.wrappedValue.dismiss()
+            }
+            Button(LocalizedStrings.cancel.localized, role: .cancel) {}
+        } message: {
+            Text("edit_unsaved_message".localized)
         }
         .fullScreenCover(isPresented: $showingMapPicker) {
             EnhancedMapLocationPicker(
@@ -405,6 +497,7 @@ struct EditQSOView: View {
         .onAppear {
             DispatchQueue.main.async {
                 loadOwnQTHInfo()
+                savedSnapshot = currentSnapshot
             }
         }
     }
@@ -737,6 +830,7 @@ struct EditQSOView: View {
                 .font(.caption2)
                 .foregroundColor(.orange)
             TextField(label, text: text)
+                .floatingLabel(label, text: text.wrappedValue)
         }
     }
     
@@ -747,6 +841,7 @@ struct EditQSOView: View {
                 .foregroundColor(.orange)
             TextField(label, text: bindingForExtended(fieldId))
                 .focused($focusedField, equals: fieldId)
+                .floatingLabel(label, text: extendedFields[fieldId] ?? "")
         }
     }
     
@@ -909,7 +1004,8 @@ struct EditQSOView: View {
     
     // MARK: - Save
     
-    private func updateQSO() {
+    @discardableResult
+    private func performSave() -> Bool {
         qthManager.updateOwnQTH(
             location: ownQTH,
             gridSquare: ownGridSquare,
@@ -955,13 +1051,32 @@ struct EditQSOView: View {
         
         do {
             try viewContext.save()
-            alertTitle = LocalizedStrings.saveSuccess.localized
-            alertMessage = LocalizedStrings.qsoUpdated.localized
-            showingAlert = true
+            savedSnapshot = currentSnapshot
+            return true
         } catch {
             alertTitle = LocalizedStrings.saveFailed.localized
             alertMessage = String(format: LocalizedStrings.saveFailedMessage.localized, error.localizedDescription)
             showingAlert = true
+            return false
+        }
+    }
+    
+    private func updateQSO() {
+        if performSave() {
+            alertTitle = LocalizedStrings.saveSuccess.localized
+            alertMessage = LocalizedStrings.qsoUpdated.localized
+            showingAlert = true
+        }
+    }
+    
+    private func saveAndDismiss() {
+        focusedField = nil
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            if validateInputs() {
+                if performSave() {
+                    presentationMode.wrappedValue.dismiss()
+                }
+            }
         }
     }
 }

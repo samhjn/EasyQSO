@@ -446,6 +446,12 @@
 "adif_field_ms_shower" = "Sciame meteorico";
 "adif_field_force_init" = "Inizio forzato (EME)";
 
+// MARK: - Modifiche non salvate
+"edit_unsaved_title" = "Modifiche non salvate";
+"edit_unsaved_message" = "Ci sono modifiche non salvate. Cosa vuoi fare?";
+"edit_unsaved_save" = "Salva ed esci";
+"edit_unsaved_discard" = "Annulla modifiche";
+
 // MARK: - Nomi campi ADIF - Note
 "adif_field_comment" = "Commento";
 "adif_field_notes" = "Note";
