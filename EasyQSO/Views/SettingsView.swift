@@ -29,7 +29,6 @@ struct SettingsView: View {
         animation: .default)
     private var qsoRecords: FetchedResults<QSORecord>
     
-    @State private var isExporting = false
     @State private var exportFormat = "ADIF"
     @State private var exportTimezone = TimezoneManager.getExportTimezone()
     @State private var importTimezone = TimezoneManager.getImportTimezone()
@@ -348,26 +347,6 @@ struct SettingsView: View {
                     availableModes: availableModes
                 )
             }
-            .fileExporter(
-                isPresented: $isExporting,
-                document: LogExportDocument(
-                    data: exportFormat == "ADIF" ? generateADIF(from: filteredExportRecords) : generateCSV(from: filteredExportRecords),
-                    format: exportFormat
-                ),
-                contentType: exportFormat == "ADIF" ? .adifType : .csvType,
-                defaultFilename: "HamLog_\(formattedDate())"
-            ) { result in
-                switch result {
-                case .success(let url):
-                    alertTitle = LocalizedStrings.exportSuccess.localized
-                    alertMessage = String(format: LocalizedStrings.exportSuccessMessage.localized, url.lastPathComponent)
-                    showingAlert = true
-                case .failure(let error):
-                    alertTitle = LocalizedStrings.exportFailed.localized
-                    alertMessage = error.localizedDescription
-                    showingAlert = true
-                }
-            }
             .fileImporter(
                 isPresented: $showingImportPicker,
                 allowedContentTypes: [.adifType, .csvType],
@@ -459,49 +438,58 @@ struct SettingsView: View {
     }
     
     private func exportLogs() {
-        if #available(iOS 15.0, *) {
-            isExporting = true
-        } else {
-            // 对于iOS 14及以下版本，使用传统的文件共享方法
-            legacyExportLogs()
-        }
-    }
-    
-    private func legacyExportLogs() {
-        // 创建临时文件
         let fileName = "HamLog_\(formattedDate())"
         let fileExtension = exportFormat == "ADIF" ? "adi" : "csv"
         let fileData = exportFormat == "ADIF" ? generateADIF(from: filteredExportRecords) : generateCSV(from: filteredExportRecords)
         
-        guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            alertTitle = LocalizedStrings.exportFailed.localized
-            alertMessage = LocalizedStrings.cannotAccessDocuments.localized
-            showingAlert = true
-            return
-        }
-        
-        let fileURL = documentsDirectory.appendingPathComponent("\(fileName).\(fileExtension)")
+        let tempDir = FileManager.default.temporaryDirectory
+        let fileURL = tempDir.appendingPathComponent("\(fileName).\(fileExtension)")
         
         do {
             try fileData.write(to: fileURL)
-            
-            // 使用文档交互控制器分享文件
-            DispatchQueue.main.async {
-                let docController = UIDocumentInteractionController(url: fileURL)
-                docController.delegate = documentInteractionDelegate
-                
-                // 获取当前的UIViewController
-                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                   let rootViewController = windowScene.windows.first?.rootViewController {
-                    documentInteractionDelegate.presentationController = rootViewController
-                    docController.presentOptionsMenu(from: CGRect.zero, in: rootViewController.view, animated: true)
-                }
-            }
+            presentShareSheet(for: fileURL)
         } catch {
             alertTitle = LocalizedStrings.exportFailed.localized
             alertMessage = error.localizedDescription
             showingAlert = true
         }
+    }
+    
+    private func presentShareSheet(for url: URL) {
+        let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+        
+        activityVC.completionWithItemsHandler = { _, completed, _, error in
+            try? FileManager.default.removeItem(at: url)
+            if let error = error {
+                alertTitle = LocalizedStrings.exportFailed.localized
+                alertMessage = error.localizedDescription
+                showingAlert = true
+            } else if completed {
+                alertTitle = LocalizedStrings.exportSuccess.localized
+                alertMessage = String(format: LocalizedStrings.exportSuccessMessage.localized, url.lastPathComponent)
+                showingAlert = true
+            }
+        }
+        
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              var topController = windowScene.windows.first?.rootViewController else {
+            return
+        }
+        while let presented = topController.presentedViewController {
+            topController = presented
+        }
+        
+        if let popover = activityVC.popoverPresentationController {
+            popover.sourceView = topController.view
+            popover.sourceRect = CGRect(
+                x: topController.view.bounds.midX,
+                y: topController.view.bounds.midY,
+                width: 0, height: 0
+            )
+            popover.permittedArrowDirections = []
+        }
+        
+        topController.present(activityVC, animated: true)
     }
     
     private func presentLegacyDocumentPicker(fileType: String) {
