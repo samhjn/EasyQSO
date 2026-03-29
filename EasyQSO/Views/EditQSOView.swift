@@ -438,6 +438,11 @@ struct EditQSOView: View {
                 .listRowBackground(Color.clear)
             }
         }
+        .background(
+            SwipeBackInterceptor(hasUnsavedChanges: hasUnsavedChanges) {
+                showingUnsavedAlert = true
+            }
+        )
         .navigationTitle(LocalizedStrings.editQSO.localized)
         .navigationBarBackButtonHidden(true)
         .toolbar {
@@ -1076,6 +1081,47 @@ struct EditQSOView: View {
                 if performSave() {
                     presentationMode.wrappedValue.dismiss()
                 }
+            }
+        }
+    }
+    
+    // MARK: - Swipe Back Gesture Interceptor
+    
+    private struct SwipeBackInterceptor: UIViewControllerRepresentable {
+        let hasUnsavedChanges: Bool
+        let onAttemptPop: () -> Void
+        
+        func makeCoordinator() -> Coordinator {
+            Coordinator(parent: self)
+        }
+        
+        func makeUIViewController(context: Context) -> UIViewController {
+            UIViewController()
+        }
+        
+        func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+            context.coordinator.parent = self
+            DispatchQueue.main.async {
+                if let nav = uiViewController.navigationController {
+                    nav.interactivePopGestureRecognizer?.isEnabled = true
+                    nav.interactivePopGestureRecognizer?.delegate = context.coordinator
+                }
+            }
+        }
+        
+        class Coordinator: NSObject, UIGestureRecognizerDelegate {
+            var parent: SwipeBackInterceptor
+            
+            init(parent: SwipeBackInterceptor) {
+                self.parent = parent
+            }
+            
+            func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+                if parent.hasUnsavedChanges {
+                    parent.onAttemptPop()
+                    return false
+                }
+                return true
             }
         }
     }
