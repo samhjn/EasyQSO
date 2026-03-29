@@ -446,6 +446,22 @@
 "adif_field_ms_shower" = "Метеорный поток";
 "adif_field_force_init" = "Принуд. иниц. (EME)";
 
+// MARK: - Выбор местоположения на карте
+"map_set_own_location" = "Установить моё местоположение";
+"map_search_placeholder" = "Поиск места...";
+"map_search" = "Поиск";
+"map_locating" = "Определение...";
+"map_get_my_location" = "Определить моё местоположение";
+"map_navigate_to_me" = "Перейти к моему местоположению";
+"map_location_info" = "Информация о месте";
+"map_coordinates_label" = "Координаты:";
+"map_grid_label" = "Грид:";
+"map_search_hint" = "Или используйте поиск для нахождения места";
+"map_unknown_location" = "Неизвестное место";
+"map_location_notice" = "Уведомление о местоположении";
+"map_enable_location" = "Включите разрешение на определение местоположения в Настройках";
+"map_location_failed" = "Не удалось определить текущее местоположение. Проверьте разрешения геолокации";
+
 // MARK: - Несохранённые изменения
 "edit_unsaved_title" = "Несохранённые изменения";
 "edit_unsaved_message" = "У вас есть несохранённые изменения. Что вы хотите сделать?";

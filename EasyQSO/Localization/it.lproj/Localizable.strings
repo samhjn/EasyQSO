@@ -446,6 +446,22 @@
 "adif_field_ms_shower" = "Sciame meteorico";
 "adif_field_force_init" = "Inizio forzato (EME)";
 
+// MARK: - Selettore posizione mappa
+"map_set_own_location" = "Imposta la mia posizione";
+"map_search_placeholder" = "Cerca luogo...";
+"map_search" = "Cerca";
+"map_locating" = "Localizzazione...";
+"map_get_my_location" = "Ottieni la mia posizione";
+"map_navigate_to_me" = "Vai alla mia posizione";
+"map_location_info" = "Info posizione";
+"map_coordinates_label" = "Coordinate:";
+"map_grid_label" = "Griglia:";
+"map_search_hint" = "Oppure usa la ricerca per trovare un luogo";
+"map_unknown_location" = "Luogo sconosciuto";
+"map_location_notice" = "Avviso posizione";
+"map_enable_location" = "Abilita i permessi di localizzazione nelle Impostazioni";
+"map_location_failed" = "Impossibile ottenere la posizione attuale. Controlla i permessi di localizzazione";
+
 // MARK: - Modifiche non salvate
 "edit_unsaved_title" = "Modifiche non salvate";
 "edit_unsaved_message" = "Ci sono modifiche non salvate. Cosa vuoi fare?";

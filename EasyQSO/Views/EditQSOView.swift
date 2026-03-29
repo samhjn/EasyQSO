@@ -1087,7 +1087,7 @@ struct EditQSOView: View {
     
     // MARK: - Swipe Back Gesture Interceptor
     
-    private struct SwipeBackInterceptor: UIViewControllerRepresentable {
+    private struct SwipeBackInterceptor: UIViewRepresentable {
         let hasUnsavedChanges: Bool
         let onAttemptPop: () -> Void
         
@@ -1095,17 +1095,19 @@ struct EditQSOView: View {
             Coordinator(parent: self)
         }
         
-        func makeUIViewController(context: Context) -> UIViewController {
-            UIViewController()
+        func makeUIView(context: Context) -> UIView {
+            let view = UIView()
+            view.isHidden = true
+            view.isUserInteractionEnabled = false
+            return view
         }
         
-        func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+        func updateUIView(_ uiView: UIView, context: Context) {
             context.coordinator.parent = self
             DispatchQueue.main.async {
-                if let nav = uiViewController.navigationController {
-                    nav.interactivePopGestureRecognizer?.isEnabled = true
-                    nav.interactivePopGestureRecognizer?.delegate = context.coordinator
-                }
+                guard let nav = uiView.findNavigationController() else { return }
+                nav.interactivePopGestureRecognizer?.isEnabled = true
+                nav.interactivePopGestureRecognizer?.delegate = context.coordinator
             }
         }
         
@@ -1124,5 +1126,18 @@ struct EditQSOView: View {
                 return true
             }
         }
+    }
+}
+
+private extension UIView {
+    func findNavigationController() -> UINavigationController? {
+        var responder: UIResponder? = self
+        while let next = responder?.next {
+            if let nav = next as? UINavigationController {
+                return nav
+            }
+            responder = next
+        }
+        return nil
     }
 }

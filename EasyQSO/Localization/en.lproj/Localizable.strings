@@ -446,6 +446,22 @@
 "adif_field_ms_shower" = "Meteor Shower";
 "adif_field_force_init" = "Force Init (EME)";
 
+// MARK: - Map Location Picker
+"map_set_own_location" = "Set Own Location";
+"map_search_placeholder" = "Search location...";
+"map_search" = "Search";
+"map_locating" = "Locating...";
+"map_get_my_location" = "Get My Location";
+"map_navigate_to_me" = "Navigate to Me";
+"map_location_info" = "Location Info";
+"map_coordinates_label" = "Coordinates:";
+"map_grid_label" = "Grid:";
+"map_search_hint" = "Or use search to find a location";
+"map_unknown_location" = "Unknown Location";
+"map_location_notice" = "Location Notice";
+"map_enable_location" = "Please enable location permission in Settings";
+"map_location_failed" = "Unable to get current location. Please check location permissions";
+
 // MARK: - Edit Unsaved Changes
 "edit_unsaved_title" = "Unsaved Changes";
 "edit_unsaved_message" = "You have unsaved changes. What would you like to do?";

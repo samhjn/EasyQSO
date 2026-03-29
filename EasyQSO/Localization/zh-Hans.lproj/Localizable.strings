@@ -446,6 +446,22 @@
 "adif_field_ms_shower" = "流星雨";
 "adif_field_force_init" = "强制初始(EME)";
 
+// MARK: - 地图选点
+"map_set_own_location" = "设置己方位置";
+"map_search_placeholder" = "搜索地点...";
+"map_search" = "搜索";
+"map_locating" = "正在定位...";
+"map_get_my_location" = "获取我的位置";
+"map_navigate_to_me" = "定位到我的位置";
+"map_location_info" = "位置信息";
+"map_coordinates_label" = "坐标:";
+"map_grid_label" = "网格:";
+"map_search_hint" = "或使用搜索功能查找地点";
+"map_unknown_location" = "未知地点";
+"map_location_notice" = "定位提示";
+"map_enable_location" = "请在设置中开启定位权限";
+"map_location_failed" = "无法获取当前位置，请检查定位权限";
+
 // MARK: - 编辑未保存提示
 "edit_unsaved_title" = "未保存的更改";
 "edit_unsaved_message" = "当前编辑尚未保存，您要如何处理？";

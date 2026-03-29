@@ -88,13 +88,13 @@ struct EnhancedMapLocationPicker: View {
                     searchResultsList
                 }
             }
-            .navigationTitle(editMode == .ownQTH ? "设置己方位置" : "选择位置")
+            .navigationTitle(editMode == .ownQTH ? "map_set_own_location".localized : LocalizedStrings.selectLocation.localized)
             .navigationBarItems(
-                leading: Button("取消") {
+                leading: Button(LocalizedStrings.cancel.localized) {
                     presentationMode.wrappedValue.dismiss()
                 },
                 trailing: HStack {
-                    Button("确定") {
+                    Button(LocalizedStrings.confirm.localized) {
                         if let location = selectedLocation {
                             // 使用临时变量避免直接修改绑定
                             DispatchQueue.main.async {
@@ -111,9 +111,9 @@ struct EnhancedMapLocationPicker: View {
         .navigationViewStyle(StackNavigationViewStyle())
         .alert(isPresented: $showingLocationAlert) {
             Alert(
-                title: Text("定位提示"),
+                title: Text("map_location_notice".localized),
                 message: Text(locationAlertMessage),
-                dismissButton: .default(Text("确定"))
+                dismissButton: .default(Text(LocalizedStrings.confirm.localized))
             )
         }
         .onAppear {
@@ -132,7 +132,7 @@ struct EnhancedMapLocationPicker: View {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.gray)
                     
-                    TextField("搜索地点...", text: $searchText)
+                    TextField("map_search_placeholder".localized, text: $searchText)
                         .onSubmit {
                             performSearch()
                         }
@@ -156,7 +156,7 @@ struct EnhancedMapLocationPicker: View {
                     ProgressView()
                         .scaleEffect(0.8)
                 } else {
-                    Button("搜索") {
+                    Button("map_search".localized) {
                         performSearch()
                     }
                     .disabled(searchText.isEmpty)
@@ -172,10 +172,10 @@ struct EnhancedMapLocationPicker: View {
                         if isGettingLocation {
                             ProgressView()
                                 .scaleEffect(0.8)
-                            Text("正在定位...")
+                            Text("map_locating".localized)
                         } else {
                             Image(systemName: "location.fill")
-                            Text(editMode == .ownQTH ? "获取我的位置" : "定位到我的位置")
+                            Text(editMode == .ownQTH ? "map_get_my_location".localized : "map_navigate_to_me".localized)
                         }
                     }
                     .foregroundColor(.blue)
@@ -194,24 +194,24 @@ struct EnhancedMapLocationPicker: View {
     
     private func locationInfoPanel(location: CLLocationCoordinate2D) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("位置信息")
+            Text("map_location_info".localized)
                 .font(.headline)
             
             HStack {
-                Text("坐标:")
+                Text("map_coordinates_label".localized)
                 Text("\(String(format: "%.4f", location.latitude)), \(String(format: "%.4f", location.longitude))")
                     .foregroundColor(.secondary)
             }
             .font(.caption)
             
             HStack {
-                Text("网格:")
+                Text("map_grid_label".localized)
                 Text(formatGridSquare(QTHManager.calculateGridSquare(from: location)))
                     .foregroundColor(.secondary)
             }
             .font(.caption)
             
-            TextField("位置名称", text: $tempLocationName)
+            TextField(LocalizedStrings.locationName.localized, text: $tempLocationName)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
         }
         .padding()
@@ -222,9 +222,9 @@ struct EnhancedMapLocationPicker: View {
     
     private var emptyStatePanel: some View {
         VStack {
-            Text("点击地图选择位置")
+            Text(LocalizedStrings.clickMapToSelect.localized)
                 .foregroundColor(.secondary)
-            Text("或使用搜索功能查找地点")
+            Text("map_search_hint".localized)
                 .font(.caption)
                 .foregroundColor(.secondary)
         }
@@ -246,7 +246,7 @@ struct EnhancedMapLocationPicker: View {
     
     private func searchResultRow(item: MKMapItem) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(item.name ?? "未知地点")
+            Text(item.name ?? "map_unknown_location".localized)
                 .font(.headline)
             
             if let address = item.placemark.title {
@@ -348,7 +348,7 @@ struct EnhancedMapLocationPicker: View {
     
     private func getCurrentLocationManually() {
         guard qthManager.hasLocationPermission || qthManager.locationAuthorizationStatus == .notDetermined else {
-            locationAlertMessage = "请在设置中开启定位权限"
+            locationAlertMessage = "map_enable_location".localized
             showingLocationAlert = true
             return
         }
@@ -395,7 +395,7 @@ struct EnhancedMapLocationPicker: View {
                      }
                 } else {
                     // 只在无法获取定位时显示错误提示
-                    self.locationAlertMessage = "无法获取当前位置，请检查定位权限"
+                    self.locationAlertMessage = "map_location_failed".localized
                     self.showingLocationAlert = true
                 }
             }
