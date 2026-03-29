@@ -270,6 +270,12 @@ struct SettingsView: View {
                                 Text("\(LocalizedStrings.version.localized) 1.0.0")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
+                                if GitVersion.isAvailable {
+                                    Text("Commit: \(GitVersion.displayVersion)")
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                        .monospaced()
+                                }
                             }
                         }
                         
