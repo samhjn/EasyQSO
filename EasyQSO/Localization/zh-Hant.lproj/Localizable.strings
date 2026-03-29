@@ -301,7 +301,7 @@
 "adif_field_owner_callsign" = "電台所有者呼號";
 "adif_field_my_name" = "己方姓名";
 "adif_field_my_city" = "己方城市";
-"adif_field_my_country" = "己方國家";
+"adif_field_my_country" = "己方國家（地區）";
 "adif_field_my_state" = "己方州/省";
 "adif_field_my_cnty" = "己方縣/郡";
 "adif_field_my_gridsquare" = "己方網格";
@@ -337,7 +337,7 @@
 "adif_field_lat" = "緯度";
 "adif_field_lon" = "經度";
 "adif_field_gridsquare_ext" = "網格擴展";
-"adif_field_country" = "國家";
+"adif_field_country" = "國家（地區）";
 "adif_field_state" = "州/省";
 "adif_field_cnty" = "縣/郡";
 "adif_field_cnty_alt" = "縣(替代)";

@@ -301,7 +301,7 @@
 "adif_field_owner_callsign" = "Позывной владельца";
 "adif_field_my_name" = "Моё имя";
 "adif_field_my_city" = "Мой город";
-"adif_field_my_country" = "Моя страна";
+"adif_field_my_country" = "Моя страна (регион)";
 "adif_field_my_state" = "Мой регион";
 "adif_field_my_cnty" = "Мой район";
 "adif_field_my_gridsquare" = "Мой грид-локатор";
@@ -337,7 +337,7 @@
 "adif_field_lat" = "Широта";
 "adif_field_lon" = "Долгота";
 "adif_field_gridsquare_ext" = "Грид-локатор (расш.)";
-"adif_field_country" = "Страна";
+"adif_field_country" = "Страна (регион)";
 "adif_field_state" = "Регион";
 "adif_field_cnty" = "Район";
 "adif_field_cnty_alt" = "Район (альт.)";

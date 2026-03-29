@@ -301,7 +301,7 @@
 "adif_field_owner_callsign" = "Owner Callsign";
 "adif_field_my_name" = "My Name";
 "adif_field_my_city" = "My City";
-"adif_field_my_country" = "My Country";
+"adif_field_my_country" = "My Country (Region)";
 "adif_field_my_state" = "My State/Province";
 "adif_field_my_cnty" = "My County";
 "adif_field_my_gridsquare" = "My Grid Square";
@@ -337,7 +337,7 @@
 "adif_field_lat" = "Latitude";
 "adif_field_lon" = "Longitude";
 "adif_field_gridsquare_ext" = "Grid Square Ext";
-"adif_field_country" = "Country";
+"adif_field_country" = "Country (Region)";
 "adif_field_state" = "State/Province";
 "adif_field_cnty" = "County";
 "adif_field_cnty_alt" = "County (Alt)";

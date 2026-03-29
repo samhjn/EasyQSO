@@ -301,7 +301,7 @@
 "adif_field_owner_callsign" = "所有者コールサイン";
 "adif_field_my_name" = "自局名前";
 "adif_field_my_city" = "自局都市";
-"adif_field_my_country" = "自局国";
+"adif_field_my_country" = "自局の国（地域）";
 "adif_field_my_state" = "自局州/県";
 "adif_field_my_cnty" = "自局郡";
 "adif_field_my_gridsquare" = "自局グリッド";
@@ -337,7 +337,7 @@
 "adif_field_lat" = "緯度";
 "adif_field_lon" = "経度";
 "adif_field_gridsquare_ext" = "グリッド拡張";
-"adif_field_country" = "国";
+"adif_field_country" = "国（地域）";
 "adif_field_state" = "州/県";
 "adif_field_cnty" = "郡";
 "adif_field_cnty_alt" = "郡（代替）";

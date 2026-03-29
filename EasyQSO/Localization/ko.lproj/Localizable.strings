@@ -301,7 +301,7 @@
 "adif_field_owner_callsign" = "소유자 콜사인";
 "adif_field_my_name" = "내 이름";
 "adif_field_my_city" = "내 도시";
-"adif_field_my_country" = "내 국가";
+"adif_field_my_country" = "내 국가(지역)";
 "adif_field_my_state" = "내 시/도";
 "adif_field_my_cnty" = "내 군/구";
 "adif_field_my_gridsquare" = "내 그리드";
@@ -337,7 +337,7 @@
 "adif_field_lat" = "위도";
 "adif_field_lon" = "경도";
 "adif_field_gridsquare_ext" = "그리드 확장";
-"adif_field_country" = "국가";
+"adif_field_country" = "국가(지역)";
 "adif_field_state" = "시/도";
 "adif_field_cnty" = "군/구";
 "adif_field_cnty_alt" = "군(대체)";

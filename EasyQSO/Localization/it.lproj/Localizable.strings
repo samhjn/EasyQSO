@@ -301,7 +301,7 @@
 "adif_field_owner_callsign" = "Nominativo proprietario";
 "adif_field_my_name" = "Il mio nome";
 "adif_field_my_city" = "La mia città";
-"adif_field_my_country" = "Il mio paese";
+"adif_field_my_country" = "Il mio paese (regione)";
 "adif_field_my_state" = "La mia regione";
 "adif_field_my_cnty" = "La mia provincia";
 "adif_field_my_gridsquare" = "Il mio locatore";
@@ -337,7 +337,7 @@
 "adif_field_lat" = "Latitudine";
 "adif_field_lon" = "Longitudine";
 "adif_field_gridsquare_ext" = "Locatore (est.)";
-"adif_field_country" = "Paese";
+"adif_field_country" = "Paese (regione)";
 "adif_field_state" = "Regione";
 "adif_field_cnty" = "Provincia";
 "adif_field_cnty_alt" = "Provincia (alt.)";
