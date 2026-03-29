@@ -271,10 +271,16 @@ struct SettingsView: View {
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                                 if GitVersion.isAvailable {
-                                    Text("Commit: \(GitVersion.displayVersion)")
-                                        .font(.caption2)
-                                        .foregroundColor(.secondary)
-                                        .monospaced()
+                                    if #available(iOS 16.0, *) {
+                                        Text("Commit: \(GitVersion.displayVersion)")
+                                            .font(.caption2)
+                                            .foregroundColor(.secondary)
+                                            .monospaced()
+                                    } else {
+                                        Text("Commit: \(GitVersion.displayVersion)")
+                                            .font(.system(.caption2, design: .monospaced))
+                                            .foregroundColor(.secondary)
+                                    }
                                 }
                             }
                         }
@@ -500,14 +506,14 @@ struct SettingsView: View {
     
     private func presentLegacyDocumentPicker(fileType: String) {
         DispatchQueue.main.async {
-            let documentTypes: [String]
+            let contentTypes: [UTType]
             if fileType == "adi" {
-                documentTypes = ["com.hamradio.adif", "public.text"]
+                contentTypes = [UTType("com.hamradio.adif") ?? .text, .text]
             } else {
-                documentTypes = ["public.comma-separated-values-text", "public.text"]
+                contentTypes = [.commaSeparatedText, .text]
             }
             
-            let documentPicker = UIDocumentPickerViewController(documentTypes: documentTypes, in: .import)
+            let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: contentTypes)
             documentPicker.delegate = documentPickerDelegate
             documentPicker.allowsMultipleSelection = false
             

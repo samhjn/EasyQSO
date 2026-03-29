@@ -303,14 +303,14 @@ struct LogImportExportView: View {
     
     private func presentLegacyDocumentPicker(fileType: String) {
         DispatchQueue.main.async {
-            let documentTypes: [String]
+            let contentTypes: [UTType]
             if fileType == "adi" {
-                documentTypes = ["com.hamradio.adif", "public.text"]
+                contentTypes = [UTType("com.hamradio.adif") ?? .text, .text]
             } else {
-                documentTypes = ["public.comma-separated-values-text", "public.text"]
+                contentTypes = [.commaSeparatedText, .text]
             }
             
-            let documentPicker = UIDocumentPickerViewController(documentTypes: documentTypes, in: .import)
+            let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: contentTypes)
             documentPicker.delegate = documentPickerDelegate
             documentPicker.allowsMultipleSelection = false
             
