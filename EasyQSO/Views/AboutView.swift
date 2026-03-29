@@ -42,7 +42,7 @@ struct AboutView: View {
                             .font(.title2)
                             .foregroundColor(.secondary)
                         
-                        Text("\(LocalizedStrings.version.localized) 1.0.0")
+                        Text("\(LocalizedStrings.version.localized) \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.0")")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }

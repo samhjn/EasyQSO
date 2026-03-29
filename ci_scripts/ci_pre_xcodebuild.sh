@@ -8,15 +8,16 @@ if [[ -z "$CI_BUILD_NUMBER" ]]; then
     exit 0
 fi
 
-PLIST_PATH="$CI_PRIMARY_REPOSITORY_PATH/EasyQSO/Info.plist"
+REPO_ROOT="${CI_PRIMARY_REPOSITORY_PATH:-.}"
+cd "$REPO_ROOT"
 
-echo "Setting CFBundleVersion to $CI_BUILD_NUMBER ..."
-/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $CI_BUILD_NUMBER" "$PLIST_PATH"
+echo "Setting CURRENT_PROJECT_VERSION to $CI_BUILD_NUMBER ..."
+agvtool new-version -all "$CI_BUILD_NUMBER"
 
 if [[ -n "$CI_TAG" ]]; then
     VERSION="${CI_TAG#v}"
-    echo "Tag detected, setting CFBundleShortVersionString to $VERSION ..."
-    /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$PLIST_PATH"
+    echo "Tag detected, setting MARKETING_VERSION to $VERSION ..."
+    agvtool new-marketing-version "$VERSION"
 fi
 
 echo "=== ci_pre_xcodebuild: Done ==="

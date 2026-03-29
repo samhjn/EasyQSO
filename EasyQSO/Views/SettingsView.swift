@@ -267,7 +267,7 @@ struct SettingsView: View {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("EasyQSO")
                                     .font(.headline)
-                                Text("\(LocalizedStrings.version.localized) 1.0.0")
+                                Text("\(LocalizedStrings.version.localized) \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.0")")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                                 if GitVersion.isAvailable {
@@ -528,7 +528,8 @@ struct SettingsView: View {
     private func generateADIF(from records: [QSORecord]) -> Data {
         var adif = "<ADIF_VERS:5>3.1.7"
         adif += "<PROGRAMID:6>EasQSO"
-        adif += "<PROGRAMVERSION:5>1.0.0"
+        let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.0"
+        adif += "<PROGRAMVERSION:\(appVersion.count)>\(appVersion)"
         adif += "<EOH>\n"
         
         let coreTagsHandledSpecially: Set<String> = [
