@@ -4,4 +4,7 @@
 */
 
 "CFBundleDisplayName" = "EasyQSO";
-"NSDocumentsFolderUsageDescription" = "Se necesita acceso a la carpeta de Documentos para importar y exportar archivos de registro"; 
+"NSDocumentsFolderUsageDescription" = "Se necesita acceso a la carpeta de Documentos para importar y exportar archivos de registro";
+"NSLocationWhenInUseUsageDescription" = "Se necesita su ubicación para completar automáticamente la posición QTH y el localizador de cuadrícula";
+"NSLocalNetworkUsageDescription" = "Se necesita acceso a la red local para conectarse a equipos de radio o servidores de registro";
+

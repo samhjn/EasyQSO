@@ -9,4 +9,7 @@
 "CFBundleDisplayName" = "通聯日誌";
 
 // 權限描述
-"NSDocumentsFolderUsageDescription" = "需要存取文件資料夾以匯入和匯出日誌檔案"; 
+"NSDocumentsFolderUsageDescription" = "需要存取文件資料夾以匯入和匯出日誌檔案";
+"NSLocationWhenInUseUsageDescription" = "需要取得您的位置資訊以自動填寫QTH位置和網格座標";
+"NSLocalNetworkUsageDescription" = "需要存取本地網路以連接電台設備或日誌伺服器";
+

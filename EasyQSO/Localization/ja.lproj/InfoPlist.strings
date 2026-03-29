@@ -9,4 +9,7 @@
 "CFBundleDisplayName" = "EasyQSO";
 
 // 権限の説明
-"NSDocumentsFolderUsageDescription" = "ログファイルのインポートとエクスポートにドキュメントフォルダへのアクセスが必要です"; 
+"NSDocumentsFolderUsageDescription" = "ログファイルのインポートとエクスポートにドキュメントフォルダへのアクセスが必要です";
+"NSLocationWhenInUseUsageDescription" = "QTHの位置とグリッドロケーターを自動入力するために位置情報が必要です";
+"NSLocalNetworkUsageDescription" = "無線機やログサーバーに接続するためにローカルネットワークへのアクセスが必要です";
+

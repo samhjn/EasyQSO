@@ -4,4 +4,6 @@
 */
 
 "CFBundleDisplayName" = "EasyQSO";
-"NSDocumentsFolderUsageDescription" = "로그 파일을 가져오고보내려면 문서 폴더에 대한 접근이 필요합니다";
+"NSDocumentsFolderUsageDescription" = "로그 파일을 가져오고 내보내려면 문서 폴더에 대한 접근이 필요합니다";
+"NSLocationWhenInUseUsageDescription" = "QTH 위치와 그리드 좌표를 자동으로 입력하려면 위치 정보가 필요합니다";
+"NSLocalNetworkUsageDescription" = "무선 장비 또는 로그 서버에 연결하려면 로컬 네트워크 접근이 필요합니다";

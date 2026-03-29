@@ -9,4 +9,6 @@
 "CFBundleDisplayName" = "通联日志";
 
 // 权限描述
-"NSDocumentsFolderUsageDescription" = "需要访问文档文件夹以导入和导出日志文件"; 
+"NSDocumentsFolderUsageDescription" = "需要访问文档文件夹以导入和导出日志文件";
+"NSLocationWhenInUseUsageDescription" = "需要获取您的位置信息来自动填写QTH位置和网格坐标";
+"NSLocalNetworkUsageDescription" = "需要访问本地网络以连接电台设备或日志服务器";

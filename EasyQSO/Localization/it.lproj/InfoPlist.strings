@@ -4,4 +4,7 @@
 */
 
 "CFBundleDisplayName" = "EasyQSO";
-"NSDocumentsFolderUsageDescription" = "L'accesso alla cartella Documenti è necessario per importare ed esportare i file di log"; 
+"NSDocumentsFolderUsageDescription" = "L'accesso alla cartella Documenti è necessario per importare ed esportare i file di log";
+"NSLocationWhenInUseUsageDescription" = "La tua posizione è necessaria per compilare automaticamente la posizione QTH e il grid locator";
+"NSLocalNetworkUsageDescription" = "L'accesso alla rete locale è necessario per connettersi alle apparecchiature radio o ai server di log";
+

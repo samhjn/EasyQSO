@@ -9,4 +9,6 @@
 "CFBundleDisplayName" = "EasyQSO";
 
 // Permission descriptions
-"NSDocumentsFolderUsageDescription" = "Access to the Documents folder is needed to import and export log files"; 
+"NSDocumentsFolderUsageDescription" = "Access to the Documents folder is needed to import and export log files";
+"NSLocationWhenInUseUsageDescription" = "Your location is needed to automatically fill in the QTH position and grid square";
+"NSLocalNetworkUsageDescription" = "Local network access is needed to connect to radio equipment or logging servers";

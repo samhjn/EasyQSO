@@ -5,3 +5,5 @@
 
 "CFBundleDisplayName" = "EasyQSO";
 "NSDocumentsFolderUsageDescription" = "Доступ к папке «Документы» необходим для импорта и экспорта файлов журнала";
+"NSLocationWhenInUseUsageDescription" = "Ваше местоположение необходимо для автоматического заполнения позиции QTH и грид-локатора";
+"NSLocalNetworkUsageDescription" = "Доступ к локальной сети необходим для подключения к радиооборудованию или серверам логирования";
