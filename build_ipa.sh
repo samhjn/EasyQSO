@@ -23,6 +23,38 @@ mkdir -p "${EXPORT_DIR}"
 
 echo "🚀 Starting build for ${PROJECT_NAME}..."
 
+# 0. Run Tests
+echo "🧪 Running tests..."
+# Auto-detect an available iPhone simulator
+SIM_DEVICE=$(xcrun simctl list devices available -j \
+  | python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+for runtime, devices in data.get('devices', {}).items():
+    if 'iOS' not in runtime: continue
+    for d in devices:
+        if 'iPhone' in d['name'] and d['isAvailable']:
+            print(d['name']); sys.exit(0)
+" 2>/dev/null)
+
+if [ -z "$SIM_DEVICE" ]; then
+    echo "⚠️  No available iPhone simulator found, skipping tests."
+else
+    echo "   Using simulator: ${SIM_DEVICE}"
+    xcodebuild test \
+      -project "${PROJECT_NAME}.xcodeproj" \
+      -scheme "${SCHEME_NAME}" \
+      -destination "platform=iOS Simulator,name=${SIM_DEVICE}" \
+      -resultBundlePath "${BUILD_DIR}/TestResults.xcresult" \
+      -quiet
+
+    if [ $? -ne 0 ]; then
+        echo "❌ Tests failed. Aborting build."
+        exit 1
+    fi
+    echo "✅ All tests passed."
+fi
+
 # 1. Archive
 echo "📦 Archiving..."
 xcodebuild archive \

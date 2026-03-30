@@ -82,16 +82,35 @@ targets:
         outputFiles:
           - $(SRCROOT)/EasyQSO/GitVersion.swift
     scheme:
-      testTargets: []
-      gatherCoverageData: false
+      testTargets:
+        - EasyQSOTests
+      gatherCoverageData: true
+
+  EasyQSOTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: EasyQSOTests
+    dependencies:
+      - target: EasyQSO
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.shadowmov.EasyQSOTests
+        GENERATE_INFOPLIST_FILE: true
 
 schemes:
   EasyQSO:
     build:
       targets:
         EasyQSO: all
+        EasyQSOTests: [test]
     run:
       config: Debug
+    test:
+      config: Debug
+      gatherCoverageData: true
+      targets:
+        - EasyQSOTests
     profile:
       config: Release
     archive:

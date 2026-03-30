@@ -596,10 +596,7 @@ struct SettingsView: View {
     }
     
     private func formatFreqForADIF(_ mhz: Double) -> String {
-        var s = String(format: "%.6f", mhz)
-        while s.hasSuffix("0") && s.contains(".") { s.removeLast() }
-        if s.hasSuffix(".") { s.removeLast() }
-        return s
+        ADIFHelper.formatFreqForADIF(mhz)
     }
     
     private func generateCSV(from records: [QSORecord]) -> Data {
@@ -991,67 +988,12 @@ struct SettingsView: View {
         showingAlert = true
     }
     
-    /// Extract ALL ADIF fields from a record string for lossless import
     private func extractAllFields(from record: String) -> [String: String] {
-        var result = [String: String]()
-        let pattern = "<([A-Za-z_][A-Za-z0-9_]*):(\\d+)(?::[A-Za-z])?>([^<]*)"
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else {
-            return result
-        }
-        let nsRange = NSRange(record.startIndex..<record.endIndex, in: record)
-        let matches = regex.matches(in: record, options: [], range: nsRange)
-        
-        for match in matches {
-            guard let nameRange = Range(match.range(at: 1), in: record),
-                  let lengthRange = Range(match.range(at: 2), in: record),
-                  let valueRange = Range(match.range(at: 3), in: record),
-                  let length = Int(record[lengthRange]) else { continue }
-            
-            let fieldName = String(record[nameRange]).uppercased()
-            if length == 0 { continue }
-            
-            let rawValue = String(record[valueRange])
-            let value = rawValue.count > length ? String(rawValue.prefix(length)) : rawValue
-            if !value.isEmpty {
-                result[fieldName] = value
-            }
-        }
-        return result
+        ADIFHelper.extractAllFields(from: record)
     }
     
     private func extractField(from record: String, fieldName: String) -> String? {
-        let pattern = "<\(fieldName):(\\d+)>([^<]*)"
-        
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else {
-            return nil
-        }
-        
-        let nsRange = NSRange(record.startIndex..<record.endIndex, in: record)
-        guard let match = regex.firstMatch(in: record, options: [], range: nsRange) else {
-            return nil
-        }
-        
-        // 提取ADIF标注的长度
-        guard let lengthRange = Range(match.range(at: 1), in: record),
-              let length = Int(record[lengthRange]) else {
-            return nil
-        }
-        
-        // 长度为0表示字段值为空，返回nil让调用方使用默认值
-        if length == 0 {
-            return nil
-        }
-        
-        guard let valueRange = Range(match.range(at: 2), in: record) else {
-            return nil
-        }
-        
-        let rawValue = String(record[valueRange])
-        // 按照ADIF标注的长度截取，避免多取数据
-        if rawValue.count > length {
-            return String(rawValue.prefix(length))
-        }
-        return rawValue.isEmpty ? nil : rawValue
+        ADIFHelper.extractField(from: record, fieldName: fieldName)
     }
     
     private func formattedDate() -> String {

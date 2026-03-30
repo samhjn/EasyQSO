@@ -592,38 +592,7 @@ struct LogImportExportView: View {
     }
     
     private func extractField(from record: String, fieldName: String) -> String? {
-        let pattern = "<\(fieldName):(\\d+)>([^<]*)"
-        
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else {
-            return nil
-        }
-        
-        let nsRange = NSRange(record.startIndex..<record.endIndex, in: record)
-        guard let match = regex.firstMatch(in: record, options: [], range: nsRange) else {
-            return nil
-        }
-        
-        // 提取ADIF标注的长度
-        guard let lengthRange = Range(match.range(at: 1), in: record),
-              let length = Int(record[lengthRange]) else {
-            return nil
-        }
-        
-        // 长度为0表示字段值为空，返回nil让调用方使用默认值
-        if length == 0 {
-            return nil
-        }
-        
-        guard let valueRange = Range(match.range(at: 2), in: record) else {
-            return nil
-        }
-        
-        let rawValue = String(record[valueRange])
-        // 按照ADIF标注的长度截取，避免多取数据
-        if rawValue.count > length {
-            return String(rawValue.prefix(length))
-        }
-        return rawValue.isEmpty ? nil : rawValue
+        ADIFHelper.extractField(from: record, fieldName: fieldName)
     }
     
     private func formattedDate() -> String {
