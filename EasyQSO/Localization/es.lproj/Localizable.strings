@@ -472,3 +472,10 @@
 "adif_field_comment" = "Comentario";
 "adif_field_notes" = "Notas";
 "adif_field_public_key" = "Clave pública";
+
+// MARK: - Nuevo QSO — deslizar para restablecer
+"new_qso_reset_title" = "Vaciar formulario";
+"new_qso_reset_message" = "Ha rellenado algunos campos. ¿Seguro que desea vaciar todos los campos y empezar de nuevo?";
+"new_qso_reset_confirm" = "Vaciar";
+"new_qso_pull_reset_hint" = "Desliza un poco más para vaciar el formulario";
+"new_qso_pull_refresh_time_hint" = "Desliza un poco más para actualizar la hora";

@@ -472,3 +472,10 @@
 "adif_field_comment" = "코멘트";
 "adif_field_notes" = "노트";
 "adif_field_public_key" = "공개 키";
+
+// MARK: - 새 QSO 당겨서 초기화
+"new_qso_reset_title" = "양식 비우기";
+"new_qso_reset_message" = "일부 필드를 입력했습니다. 모든 필드를 비우고 처음부터 다시 하시겠습니까?";
+"new_qso_reset_confirm" = "비우기";
+"new_qso_pull_reset_hint" = "양식을 비우려면 더 당겨주세요";
+"new_qso_pull_refresh_time_hint" = "시간을 새로고침하려면 더 당겨주세요";

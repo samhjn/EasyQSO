@@ -472,3 +472,10 @@
 "adif_field_comment" = "Комментарий";
 "adif_field_notes" = "Заметки";
 "adif_field_public_key" = "Открытый ключ";
+
+// MARK: - Новый QSO — потянуть для сброса
+"new_qso_reset_title" = "Очистить форму";
+"new_qso_reset_message" = "Некоторые поля заполнены. Очистить все поля и начать заново?";
+"new_qso_reset_confirm" = "Очистить";
+"new_qso_pull_reset_hint" = "Потяните сильнее, чтобы очистить форму";
+"new_qso_pull_refresh_time_hint" = "Потяните сильнее, чтобы обновить время";

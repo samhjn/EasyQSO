@@ -472,3 +472,10 @@
 "adif_field_comment" = "Commento";
 "adif_field_notes" = "Note";
 "adif_field_public_key" = "Chiave pubblica";
+
+// MARK: - Nuovo QSO — trascina per reimpostare
+"new_qso_reset_title" = "Svuota modulo";
+"new_qso_reset_message" = "Hai compilato alcuni campi. Vuoi svuotare tutti i campi e ricominciare?";
+"new_qso_reset_confirm" = "Svuota";
+"new_qso_pull_reset_hint" = "Trascina ancora per svuotare il modulo";
+"new_qso_pull_refresh_time_hint" = "Trascina ancora per aggiornare l'ora";

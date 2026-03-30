@@ -472,3 +472,10 @@
 "adif_field_comment" = "Comment";
 "adif_field_notes" = "Notes";
 "adif_field_public_key" = "Public Key";
+
+// MARK: - New QSO Pull-to-Reset
+"new_qso_reset_title" = "Clear Form";
+"new_qso_reset_message" = "You have filled in some fields. Are you sure you want to clear all fields and start over?";
+"new_qso_reset_confirm" = "Clear";
+"new_qso_pull_reset_hint" = "Keep pulling to clear the form";
+"new_qso_pull_refresh_time_hint" = "Keep pulling to refresh time";

@@ -472,3 +472,10 @@
 "adif_field_comment" = "备注";
 "adif_field_notes" = "笔记";
 "adif_field_public_key" = "公钥";
+
+// MARK: - 新建QSO下拉重置
+"new_qso_reset_title" = "清空表单";
+"new_qso_reset_message" = "你已填写了部分字段，确定要清空所有字段重新开始吗？";
+"new_qso_reset_confirm" = "清空";
+"new_qso_pull_reset_hint" = "继续下拉以清空表单";
+"new_qso_pull_refresh_time_hint" = "继续下拉以刷新时间";

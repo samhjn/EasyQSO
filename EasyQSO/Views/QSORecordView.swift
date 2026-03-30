@@ -40,6 +40,10 @@ struct QSORecordView: View {
     @State private var alertTitle = "QSO已保存"
     @State private var alertMessage = ""
     @State private var isValidationError = false
+    @State private var showingResetAlert = false
+    @State private var pullDistance: CGFloat = 0
+    @State private var showingPullHint = false
+    @State private var formResetToken = UUID()
     
     // ADIF extended fields
     @State private var extendedFields: [String: String] = [:]
@@ -106,6 +110,23 @@ struct QSORecordView: View {
     private var hasCollapsedGroupContent: Bool {
         dateTimeVis == .collapsed || endDateTimeVis == .collapsed ||
         contactedQTHVis == .collapsed || ownQTHVis == .collapsed
+    }
+    
+    // MARK: - User input detection
+    
+    private var hasUserInput: Bool {
+        !callsign.isEmpty || !rstSent.isEmpty || !rstReceived.isEmpty ||
+        !name.isEmpty || !qth.isEmpty || !gridSquare.isEmpty ||
+        !cqZone.isEmpty || !ituZone.isEmpty || !remarks.isEmpty ||
+        !extendedFields.isEmpty
+    }
+    
+    private var shouldShowPullHint: Bool {
+        pullDistance > 42
+    }
+    
+    private var pullHintText: String {
+        hasUserInput ? "new_qso_pull_reset_hint".localized : "new_qso_pull_refresh_time_hint".localized
     }
     
     // MARK: - Keyboard ordered fields
@@ -275,9 +296,58 @@ struct QSORecordView: View {
                 // ═══════════ Collapsed (unified at bottom) ═══════════
                 collapsedSection
             }
+            .id(formResetToken)
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 12)
+                    .onChanged { value in
+                        if value.translation.height <= 0 {
+                            pullDistance = 0
+                            showingPullHint = false
+                            return
+                        }
+                        pullDistance = value.translation.height
+                        withAnimation(.easeOut(duration: 0.12)) {
+                            showingPullHint = shouldShowPullHint
+                        }
+                    }
+                    .onEnded { _ in
+                        pullDistance = 0
+                        withAnimation(.easeOut(duration: 0.12)) {
+                            showingPullHint = false
+                        }
+                    }
+            )
+            .refreshable {
+                pullDistance = 0
+                showingPullHint = false
+                if hasUserInput {
+                    showingResetAlert = true
+                } else {
+                    date = Date()
+                    endDate = Date()
+                }
+            }
             .safeAreaInset(edge: .bottom) {
                 Color.clear.frame(height: 80)
             }
+            
+            VStack {
+                if showingPullHint {
+                    Text(pullHintText)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color(UIColor.secondarySystemBackground))
+                        .clipShape(Capsule())
+                        // Keep clear of the native pull-to-refresh spinner.
+                        .padding(.top, 56)
+                        .transition(.opacity)
+                }
+                
+                Spacer()
+            }
+            .allowsHitTesting(false)
             
             VStack {
                 Spacer()
@@ -341,6 +411,18 @@ struct QSORecordView: View {
                 editMode: .ownQTH
             )
             .id(UUID())
+        }
+        .alert("new_qso_reset_title".localized, isPresented: $showingResetAlert) {
+            Button("new_qso_reset_confirm".localized, role: .destructive) {
+                resetForm()
+            }
+            Button(LocalizedStrings.cancel.localized, role: .cancel) {
+                pullDistance = 0
+                showingPullHint = false
+                formResetToken = UUID()
+            }
+        } message: {
+            Text("new_qso_reset_message".localized)
         }
         .onChange(of: showingAlert) { isShowing in
             if isShowing {
@@ -826,6 +908,31 @@ struct QSORecordView: View {
             alertMessage = String(format: LocalizedStrings.saveFailedMessage.localized, error.localizedDescription)
             showingAlert = true
         }
+    }
+    
+    private func resetForm() {
+        callsign = ""
+        date = Date()
+        endDate = Date()
+        band = "20m"
+        mode = "SSB"
+        frequency = ""
+        rxFrequency = ""
+        rxBand = ""
+        txPower = ""
+        rstSent = ""
+        rstReceived = ""
+        name = ""
+        qth = ""
+        gridSquare = ""
+        cqZone = ""
+        ituZone = ""
+        satellite = ""
+        remarks = ""
+        selectedLocation = nil
+        extendedFields = [:]
+        loadOwnQTHInfo()
+        loadLatestQSOSettings()
     }
     
     private func clearFields() {
