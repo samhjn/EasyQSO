@@ -267,17 +267,20 @@ struct SettingsView: View {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("EasyQSO")
                                     .font(.headline)
-                                Text("\(LocalizedStrings.version.localized) \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? GitVersion.marketingVersion)")
+                                Text("\(LocalizedStrings.version.localized) \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "")")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
-                                if GitVersion.isAvailable {
+                                if let commitHash = Bundle.main.object(forInfoDictionaryKey: "GitCommitHash") as? String,
+                                   !commitHash.isEmpty, commitHash != "unknown" {
+                                    let dirty = Bundle.main.object(forInfoDictionaryKey: "GitIsDirty") as? Bool ?? false
+                                    let display = dirty ? "\(commitHash)-dirty" : commitHash
                                     if #available(iOS 16.0, *) {
-                                        Text("Commit: \(GitVersion.displayVersion)")
+                                        Text("Commit: \(display)")
                                             .font(.caption2)
                                             .foregroundColor(.secondary)
                                             .monospaced()
                                     } else {
-                                        Text("Commit: \(GitVersion.displayVersion)")
+                                        Text("Commit: \(display)")
                                             .font(.system(.caption2, design: .monospaced))
                                             .foregroundColor(.secondary)
                                     }
@@ -533,7 +536,7 @@ struct SettingsView: View {
     private func generateADIF(from records: [QSORecord]) -> Data {
         var adif = "<ADIF_VERS:5>3.1.7"
         adif += "<PROGRAMID:6>EasQSO"
-        let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? GitVersion.marketingVersion
+        let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
         adif += "<PROGRAMVERSION:\(appVersion.count)>\(appVersion)"
         adif += "<EOH>\n"
         
