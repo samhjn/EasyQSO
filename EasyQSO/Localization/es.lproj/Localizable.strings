@@ -226,7 +226,7 @@
 "preset_modes" = "Modos preestablecidos";
 
 // MARK: - RX Band
-"rx_band" = "RX Band";
+"rx_band" = "Banda RX";
 
 // MARK: - Configuración de campos ADIF
 "adif_field_config" = "Configuración de campos QSO";

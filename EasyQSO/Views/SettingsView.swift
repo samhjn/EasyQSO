@@ -327,9 +327,14 @@ struct SettingsView: View {
                         Text("Copyright © 2025 ShadowMov")
                             .font(.caption)
                             .foregroundColor(.secondary)
+                        if !"icp_info".localized.isEmpty {
+                            Text("icp_info".localized)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
                     }
                     .padding(.vertical, 4)
-                    
+
                     // 操作按钮
                     Button(LocalizedStrings.viewFullLicense.localized) {
                         if let url = URL(string: "https://www.gnu.org/licenses/gpl-3.0.html") {

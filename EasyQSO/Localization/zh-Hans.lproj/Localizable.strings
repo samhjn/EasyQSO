@@ -479,3 +479,6 @@
 "new_qso_reset_confirm" = "清空";
 "new_qso_pull_reset_hint" = "继续下拉以清空表单";
 "new_qso_pull_refresh_time_hint" = "继续下拉以刷新时间";
+
+// MARK: - ICP备案
+"icp_info" = "浙ICP备2021031153号-6A";

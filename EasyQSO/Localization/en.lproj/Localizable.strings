@@ -479,3 +479,6 @@
 "new_qso_reset_confirm" = "Clear";
 "new_qso_pull_reset_hint" = "Keep pulling to clear the form";
 "new_qso_pull_refresh_time_hint" = "Keep pulling to refresh time";
+
+// MARK: - ICP Filing
+"icp_info" = "";
