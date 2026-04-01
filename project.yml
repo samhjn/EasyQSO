@@ -53,6 +53,7 @@ targets:
           enum GitVersion {
               static let commitHash = "${COMMIT_HASH}"
               static let isDirty = ${IS_DIRTY}
+              static let marketingVersion = "${MARKETING_VERSION}"
               static var isAvailable: Bool {
                   commitHash != "unknown" && !commitHash.isEmpty
               }
@@ -72,6 +73,7 @@ targets:
           enum GitVersion {
               static let commitHash = "unknown"
               static let isDirty = false
+              static let marketingVersion = ""
               static var isAvailable: Bool { false }
               static var displayVersion: String { "unknown" }
           }

@@ -116,7 +116,7 @@
 
 // MARK: - App-Informationen
 "app_display_name" = "Amateurfunk-Logger";
-"documents_folder_usage" = "Zugriff auf den Ordner „Dokumente" wird benötigt, um Logdateien zu importieren und exportieren";
+"documents_folder_usage" = "Zugriff auf den Ordner „Dokumente\" wird benötigt, um Logdateien zu importieren und exportieren";
 
 // MARK: - Erweiterte Funktionen
 "import_success_with_duplicates" = "%d Einträge erfolgreich importiert (doppelte Einträge wurden automatisch übersprungen)";
@@ -210,7 +210,7 @@
 "software_description" = "EasyQSO ist eine QSO-Logbuchanwendung für Amateurfunker. Sie bietet umfassende Funktionen zur QSO-Verwaltung, einschließlich Erfassung, Abfrage, Import/Export und mehr.";
 "open_source_license" = "Open-Source-Lizenz";
 "version" = "Version";
-"welcome_gpl_notice" = "Willkommen bei EasyQSO! Diese Software ist unter der GNU General Public License v3.0 veröffentlicht. Klicken Sie auf „GPL-Lizenz erfahren", um detaillierte Informationen anzuzeigen.";
+"welcome_gpl_notice" = "Willkommen bei EasyQSO! Diese Software ist unter der GNU General Public License v3.0 veröffentlicht. Klicken Sie auf „GPL-Lizenz erfahren\", um detaillierte Informationen anzuzeigen.";
 "welcome_title" = "Willkommen bei EasyQSO";
 "learn_gpl_license" = "GPL-Lizenz erfahren";
 "view_later" = "Später anzeigen";

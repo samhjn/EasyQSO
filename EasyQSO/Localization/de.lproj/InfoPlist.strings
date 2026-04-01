@@ -4,6 +4,6 @@
 */
 
 "CFBundleDisplayName" = "EasyQSO";
-"NSDocumentsFolderUsageDescription" = "Zugriff auf den Ordner „Dokumente" wird benötigt, um Logdateien zu importieren und exportieren";
+"NSDocumentsFolderUsageDescription" = "Zugriff auf den Ordner „Dokumente\" wird benötigt, um Logdateien zu importieren und exportieren";
 "NSLocationWhenInUseUsageDescription" = "Ihr Standort wird benötigt, um die QTH-Position und den Gitterfeld-Locator automatisch auszufüllen";
 "NSLocalNetworkUsageDescription" = "Zugriff auf das lokale Netzwerk wird benötigt, um eine Verbindung zu Funkgeräten oder Log-Servern herzustellen";
