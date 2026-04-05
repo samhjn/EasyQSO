@@ -220,6 +220,10 @@
 "custom_modes_desc" = "Add custom communication modes beyond the ADIF standard for use in QSO records";
 "new_mode_placeholder" = "Enter new mode name";
 "mode_already_exists" = "Este modo ya existe";
+"new_submode_placeholder" = "Nombre del submodo";
+"submode_already_exists" = "Este submodo ya existe en este modo";
+"submode_exists_under_other" = "Este submodo ya está asignado a otro modo";
+"custom_tag" = "Personalizado";
 "list_management" = "Gestión de listas";
 "mode_settings_title" = "Configuración de modos";
 "mode_settings_desc" = "Gestione los modos de comunicación disponibles en los registros QSO. Puede mostrar u ocultar los modos preestablecidos y agregar modos personalizados. La lista preestablecida solo contiene los modos más comunes.";

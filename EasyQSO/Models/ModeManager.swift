@@ -37,7 +37,9 @@ class ModeManager: ObservableObject {
     @Published private(set) var revision = 0
 
     private static let customKey = "CustomModes"
+    private static let customSubmodesKey = "CustomSubmodes"
     private static let hiddenKey = "HiddenModes"
+    private static let hiddenSubmodesKey = "HiddenSubmodes"
     private static let submodesMigratedKey = "SubmodeMigrationDone_v2"
 
     private init() {}
@@ -111,8 +113,8 @@ class ModeManager: ObservableObject {
     /// All ADIF mode names (no submodes)
     static let allAdifModes: [String] = modeSubmodes.map(\.mode)
 
-    /// Reverse lookup: submode → parent mode
-    static let submodeToMode: [String: String] = {
+    /// Reverse lookup (preset only): submode → parent mode
+    static let presetSubmodeToMode: [String: String] = {
         var map = [String: String]()
         for entry in modeSubmodes {
             for sub in entry.submodes {
@@ -122,8 +124,8 @@ class ModeManager: ObservableObject {
         return map
     }()
 
-    /// Lookup: mode → submodes
-    static let modeToSubmodes: [String: [String]] = {
+    /// Lookup (preset only): mode → submodes
+    static let presetModeToSubmodes: [String: [String]] = {
         var map = [String: [String]]()
         for entry in modeSubmodes {
             map[entry.mode] = entry.submodes
@@ -131,10 +133,38 @@ class ModeManager: ObservableObject {
         return map
     }()
 
+    /// Combined submode→mode map including custom submodes
+    static var submodeToMode: [String: String] {
+        var map = presetSubmodeToMode
+        for (mode, subs) in shared.customSubmodes {
+            for sub in subs {
+                map[sub.uppercased()] = mode.uppercased()
+            }
+        }
+        return map
+    }
+
+    /// Combined mode→submodes map including custom submodes
+    static var modeToSubmodes: [String: [String]] {
+        var map = presetModeToSubmodes
+        for (mode, subs) in shared.customSubmodes {
+            let key = mode.uppercased()
+            var existing = map[key] ?? []
+            for sub in subs where !existing.contains(where: { $0.uppercased() == sub.uppercased() }) {
+                existing.append(sub)
+            }
+            map[key] = existing
+        }
+        return map
+    }
+
     /// Modes enabled by default (user sees these without configuration)
     static let defaultEnabledModes: Set<String> = [
         "SSB", "CW", "FM", "AM", "RTTY", "PSK", "FT8", "MFSK", "JT65"
     ]
+
+    /// Submodes enabled by default (only these are visible on first launch)
+    static let defaultEnabledSubmodes: Set<String> = ["LSB", "USB"]
 
     /// Legacy presetModes list (for backward compat of settings display)
     static let presetModes: [String] = Array(defaultEnabledModes).sorted()
@@ -144,16 +174,14 @@ class ModeManager: ObservableObject {
     /// Given a string (could be a mode or submode name), resolve to (mode, submode?)
     static func resolveMode(_ value: String) -> (mode: String, submode: String?) {
         let upper = value.uppercased()
-        if let parent = submodeToMode[upper] {
-            return (parent, value.uppercased())
+        let allSubmodeMap = submodeToMode
+        if let parent = allSubmodeMap[upper] {
+            return (parent, upper)
         }
-        if allAdifModes.contains(where: { $0.uppercased() == upper }) {
-            return (value.uppercased(), nil)
-        }
-        return (value.uppercased(), nil)
+        return (upper, nil)
     }
 
-    /// Check if a string is a known submode
+    /// Check if a string is a known submode (preset or custom)
     static func isKnownSubmode(_ value: String) -> Bool {
         submodeToMode[value.uppercased()] != nil
     }
@@ -183,8 +211,82 @@ class ModeManager: ObservableObject {
         UserDefaults.standard.stringArray(forKey: Self.customKey) ?? []
     }
 
+    /// Custom submodes stored as JSON dictionary: { "MODE": ["SUB1", "SUB2"] }
+    var customSubmodes: [String: [String]] {
+        guard let data = UserDefaults.standard.data(forKey: Self.customSubmodesKey),
+              let dict = try? JSONDecoder().decode([String: [String]].self, from: data) else {
+            return [:]
+        }
+        return dict
+    }
+
+    /// Get all submodes (preset + custom) for a given mode
+    func allSubmodes(for mode: String) -> [String] {
+        let modeUpper = mode.uppercased()
+        var subs = Self.presetModeToSubmodes[modeUpper] ?? []
+        if let custom = customSubmodes[modeUpper] {
+            for c in custom where !subs.contains(where: { $0.uppercased() == c.uppercased() }) {
+                subs.append(c)
+            }
+        }
+        return subs
+    }
+
+    func customSubmodesForMode(_ mode: String) -> [String] {
+        customSubmodes[mode.uppercased()] ?? []
+    }
+
+    func isCustomSubmode(_ submode: String, under mode: String) -> Bool {
+        customSubmodesForMode(mode).contains(where: { $0.uppercased() == submode.uppercased() })
+    }
+
+    func addCustomSubmode(_ submode: String, to mode: String) {
+        let sub = submode.uppercased().trimmingCharacters(in: .whitespaces)
+        let modeKey = mode.uppercased()
+        guard !sub.isEmpty else { return }
+        let presetSubs = Self.presetModeToSubmodes[modeKey] ?? []
+        if presetSubs.contains(where: { $0.uppercased() == sub }) { return }
+        var dict = customSubmodes
+        var subs = dict[modeKey] ?? []
+        if subs.contains(where: { $0.uppercased() == sub }) { return }
+        if Self.presetSubmodeToMode[sub] != nil { return }
+        subs.append(sub)
+        dict[modeKey] = subs
+        saveCustomSubmodes(dict)
+        objectWillChange.send()
+        revision += 1
+    }
+
+    func removeCustomSubmode(_ submode: String, from mode: String) {
+        let modeKey = mode.uppercased()
+        var dict = customSubmodes
+        guard var subs = dict[modeKey] else { return }
+        subs.removeAll { $0.uppercased() == submode.uppercased() }
+        if subs.isEmpty {
+            dict.removeValue(forKey: modeKey)
+        } else {
+            dict[modeKey] = subs
+        }
+        saveCustomSubmodes(dict)
+        var hiddenSubs = hiddenSubmodes
+        hiddenSubs.remove(submode.uppercased())
+        UserDefaults.standard.set(Array(hiddenSubs), forKey: Self.hiddenSubmodesKey)
+        objectWillChange.send()
+        revision += 1
+    }
+
+    private func saveCustomSubmodes(_ dict: [String: [String]]) {
+        if let data = try? JSONEncoder().encode(dict) {
+            UserDefaults.standard.set(data, forKey: Self.customSubmodesKey)
+        }
+    }
+
     var hiddenModes: Set<String> {
         Set(UserDefaults.standard.stringArray(forKey: Self.hiddenKey) ?? [])
+    }
+
+    var hiddenSubmodes: Set<String> {
+        Set(UserDefaults.standard.stringArray(forKey: Self.hiddenSubmodesKey) ?? [])
     }
 
     var allKnownModes: [String] {
@@ -204,10 +306,24 @@ class ModeManager: ObservableObject {
 
     var availableModes: [String] { enabledModes }
 
+    /// Total count of enabled modes + enabled submodes (for settings display)
+    var enabledItemCount: Int {
+        let hidden = hiddenModes
+        let hiddenSubs = hiddenSubmodes
+        let enabled = allKnownModes.filter { !hidden.contains($0) }
+        var count = enabled.count
+        for mode in enabled {
+            let subs = allSubmodes(for: mode)
+            count += subs.filter { !hiddenSubs.contains($0.uppercased()) }.count
+        }
+        return count
+    }
+
     /// Build the flat picker item list with modes and indented submodes
     func pickerItems(currentMode: String, currentSubmode: String) -> [ModePickerItem] {
         var items: [ModePickerItem] = []
         let hidden = hiddenModes
+        let hiddenSubs = hiddenSubmodes
         let enabled = allKnownModes.filter { !hidden.contains($0) }
 
         for mode in enabled {
@@ -218,15 +334,14 @@ class ModeManager: ObservableObject {
                 adifSubmode: nil,
                 isSubmode: false
             ))
-            if let subs = Self.modeToSubmodes[modeUpper] {
-                for sub in subs {
-                    items.append(ModePickerItem(
-                        id: "s_\(sub.uppercased())",
-                        adifMode: mode,
-                        adifSubmode: sub,
-                        isSubmode: true
-                    ))
-                }
+            let subs = allSubmodes(for: modeUpper)
+            for sub in subs where !hiddenSubs.contains(sub.uppercased()) {
+                items.append(ModePickerItem(
+                    id: "s_\(sub.uppercased())",
+                    adifMode: mode,
+                    adifSubmode: sub,
+                    isSubmode: true
+                ))
             }
         }
 
@@ -306,6 +421,18 @@ class ModeManager: ObservableObject {
         hiddenModes.contains(mode)
     }
 
+    func setSubmodeHidden(_ hidden: Bool, for submode: String) {
+        var set = hiddenSubmodes
+        if hidden { set.insert(submode.uppercased()) } else { set.remove(submode.uppercased()) }
+        UserDefaults.standard.set(Array(set), forKey: Self.hiddenSubmodesKey)
+        objectWillChange.send()
+        revision += 1
+    }
+
+    func isSubmodeHidden(_ submode: String) -> Bool {
+        hiddenSubmodes.contains(submode.uppercased())
+    }
+
     func isCustom(_ mode: String) -> Bool {
         customModes.contains(mode)
     }
@@ -314,21 +441,42 @@ class ModeManager: ObservableObject {
         Self.allAdifModes.contains(where: { $0.uppercased() == mode.uppercased() })
     }
 
-    // MARK: - Initial setup: hide non-default modes on first launch
+    // MARK: - Initial setup: hide non-default modes/submodes on first launch
 
     func ensureDefaultVisibility() {
-        let key = "ModeDefaultVisibilitySet_v2"
-        guard !UserDefaults.standard.bool(forKey: key) else { return }
+        let modeKey = "ModeDefaultVisibilitySet_v2"
+        let submodeKey = "SubmodeDefaultVisibilitySet_v1"
+        var changed = false
 
-        var hidden = hiddenModes
-        for entry in Self.modeSubmodes {
-            if !Self.defaultEnabledModes.contains(entry.mode) {
-                hidden.insert(entry.mode)
+        if !UserDefaults.standard.bool(forKey: modeKey) {
+            var hidden = hiddenModes
+            for entry in Self.modeSubmodes {
+                if !Self.defaultEnabledModes.contains(entry.mode) {
+                    hidden.insert(entry.mode)
+                }
             }
+            UserDefaults.standard.set(Array(hidden), forKey: Self.hiddenKey)
+            UserDefaults.standard.set(true, forKey: modeKey)
+            changed = true
         }
-        UserDefaults.standard.set(Array(hidden), forKey: Self.hiddenKey)
-        UserDefaults.standard.set(true, forKey: key)
-        objectWillChange.send()
-        revision += 1
+
+        if !UserDefaults.standard.bool(forKey: submodeKey) {
+            var hiddenSubs = hiddenSubmodes
+            for entry in Self.modeSubmodes {
+                for sub in entry.submodes {
+                    if !Self.defaultEnabledSubmodes.contains(sub.uppercased()) {
+                        hiddenSubs.insert(sub.uppercased())
+                    }
+                }
+            }
+            UserDefaults.standard.set(Array(hiddenSubs), forKey: Self.hiddenSubmodesKey)
+            UserDefaults.standard.set(true, forKey: submodeKey)
+            changed = true
+        }
+
+        if changed {
+            objectWillChange.send()
+            revision += 1
+        }
     }
 }

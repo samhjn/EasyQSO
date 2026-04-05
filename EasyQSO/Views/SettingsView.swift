@@ -117,7 +117,7 @@ struct SettingsView: View {
                             Image(systemName: "antenna.radiowaves.left.and.right")
                             Text("mode_settings_title".localized)
                             Spacer()
-                            Text("\(modeManager.availableModes.count)")
+                            Text("\(modeManager.enabledItemCount)")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }

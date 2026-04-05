@@ -220,6 +220,10 @@
 "custom_modes_desc" = "新增ADIF標準以外的自訂通訊模式，新增後可在QSO記錄中使用";
 "new_mode_placeholder" = "輸入新模式名稱";
 "mode_already_exists" = "該模式已存在";
+"new_submode_placeholder" = "輸入子模式名稱";
+"submode_already_exists" = "該子模式已存在於此模式下";
+"submode_exists_under_other" = "該子模式已屬於其他預置模式";
+"custom_tag" = "自訂";
 "list_management" = "列表管理";
 "mode_settings_title" = "模式管理";
 "mode_settings_desc" = "管理QSO記錄中可用的通訊模式。可以顯示或隱藏預設模式，也可以新增自訂模式。預設列表僅包含常用模式，並非ADIF標準的全部模式。";

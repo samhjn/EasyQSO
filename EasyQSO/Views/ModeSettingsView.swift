@@ -15,59 +15,19 @@ struct ModeSettingsView: View {
     @State private var newModeName = ""
     @State private var showingAlert = false
     @State private var alertMessage = ""
+    @State private var newSubmodeName: [String: String] = [:]
     
     var body: some View {
         List {
             Section(header: Text("preset_modes".localized)) {
                 ForEach(ModeManager.modeSubmodes, id: \.mode) { entry in
-                    VStack(alignment: .leading, spacing: 0) {
-                        HStack {
-                            Text(entry.mode)
-                                .fontWeight(modeManager.isHidden(entry.mode) ? .regular : .medium)
-                                .foregroundColor(modeManager.isHidden(entry.mode) ? .secondary : .primary)
-                            if !entry.submodes.isEmpty {
-                                Text("(\(entry.submodes.count))")
-                                    .font(.caption2)
-                                    .foregroundColor(.secondary)
-                            }
-                            Spacer()
-                            Toggle("", isOn: Binding(
-                                get: { !modeManager.isHidden(entry.mode) },
-                                set: { modeManager.setHidden(!$0, for: entry.mode) }
-                            ))
-                            .labelsHidden()
-                        }
-                        if !entry.submodes.isEmpty && !modeManager.isHidden(entry.mode) {
-                            Text(entry.submodes.joined(separator: ", "))
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                                .padding(.top, 2)
-                        }
-                    }
-                    .padding(.vertical, 2)
+                    modeRow(mode: entry.mode, presetSubmodes: entry.submodes, isCustomMode: false)
                 }
             }
             
             Section(header: Text("custom_modes".localized)) {
                 ForEach(modeManager.customModes, id: \.self) { mode in
-                    HStack {
-                        Text(mode)
-                            .fontWeight(modeManager.isHidden(mode) ? .regular : .medium)
-                            .foregroundColor(modeManager.isHidden(mode) ? .secondary : .primary)
-                        Spacer()
-                        Toggle("", isOn: Binding(
-                            get: { !modeManager.isHidden(mode) },
-                            set: { modeManager.setHidden(!$0, for: mode) }
-                        ))
-                        .labelsHidden()
-                        Button {
-                            withAnimation { modeManager.removeCustomMode(mode) }
-                        } label: {
-                            Image(systemName: "minus.circle.fill")
-                                .foregroundColor(.red)
-                        }
-                        .buttonStyle(.plain)
-                    }
+                    modeRow(mode: mode, presetSubmodes: [], isCustomMode: true)
                 }
                 
                 HStack {
@@ -112,6 +72,146 @@ struct ModeSettingsView: View {
                 title: Text(LocalizedStrings.validationError.localized),
                 message: Text(alertMessage)
             )
+        }
+    }
+    
+    // MARK: - Mode Row with expandable submodes
+    
+    @ViewBuilder
+    private func modeRow(mode: String, presetSubmodes: [String], isCustomMode: Bool) -> some View {
+        let isHidden = modeManager.isHidden(mode)
+        let allSubs = modeManager.allSubmodes(for: mode)
+        let customSubs = modeManager.customSubmodesForMode(mode)
+        let hasSubmodes = !allSubs.isEmpty
+        
+        if !hasSubmodes && !isCustomMode {
+            HStack {
+                Text(mode)
+                    .fontWeight(isHidden ? .regular : .medium)
+                    .foregroundColor(isHidden ? .secondary : .primary)
+                Spacer()
+                Toggle("", isOn: Binding(
+                    get: { !isHidden },
+                    set: { modeManager.setHidden(!$0, for: mode) }
+                ))
+                .labelsHidden()
+            }
+        } else {
+            DisclosureGroup {
+                ForEach(presetSubmodes, id: \.self) { sub in
+                    submodeRow(sub, parentMode: mode, isCustom: false, isParentHidden: isHidden)
+                }
+                
+                if !customSubs.isEmpty {
+                    ForEach(customSubs, id: \.self) { sub in
+                        submodeRow(sub, parentMode: mode, isCustom: true, isParentHidden: isHidden)
+                    }
+                }
+                
+                addSubmodeRow(parentMode: mode)
+            } label: {
+                HStack {
+                    Text(mode)
+                        .fontWeight(isHidden ? .regular : .medium)
+                        .foregroundColor(isHidden ? .secondary : .primary)
+                    if hasSubmodes {
+                        let visibleCount = allSubs.filter { !modeManager.isSubmodeHidden($0) }.count
+                        Text("\(visibleCount)/\(allSubs.count)")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    if isCustomMode {
+                        Button {
+                            withAnimation { modeManager.removeCustomMode(mode) }
+                        } label: {
+                            Image(systemName: "minus.circle.fill")
+                                .foregroundColor(.red)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    Toggle("", isOn: Binding(
+                        get: { !isHidden },
+                        set: { modeManager.setHidden(!$0, for: mode) }
+                    ))
+                    .labelsHidden()
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func submodeRow(_ sub: String, parentMode: String, isCustom: Bool, isParentHidden: Bool) -> some View {
+        HStack {
+            Text(sub)
+                .font(.subheadline)
+                .foregroundColor(
+                    isParentHidden || modeManager.isSubmodeHidden(sub) ? .secondary : .primary
+                )
+            if isCustom {
+                Text("custom_tag".localized)
+                    .font(.caption2)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 1)
+                    .background(Color.blue.opacity(0.15))
+                    .foregroundColor(.blue)
+                    .cornerRadius(3)
+            }
+            Spacer()
+            if isCustom {
+                Button {
+                    withAnimation { modeManager.removeCustomSubmode(sub, from: parentMode) }
+                } label: {
+                    Image(systemName: "minus.circle.fill")
+                        .foregroundColor(.red)
+                        .font(.subheadline)
+                }
+                .buttonStyle(.plain)
+            }
+            Toggle("", isOn: Binding(
+                get: { !modeManager.isSubmodeHidden(sub) },
+                set: { modeManager.setSubmodeHidden(!$0, for: sub) }
+            ))
+            .labelsHidden()
+            .disabled(isParentHidden)
+        }
+    }
+    
+    @ViewBuilder
+    private func addSubmodeRow(parentMode: String) -> some View {
+        let binding = Binding<String>(
+            get: { newSubmodeName[parentMode] ?? "" },
+            set: { newSubmodeName[parentMode] = $0.uppercased() }
+        )
+        HStack {
+            TextField("new_submode_placeholder".localized, text: binding)
+                .font(.subheadline)
+                .autocapitalization(.allCharacters)
+            
+            Button {
+                let trimmed = (newSubmodeName[parentMode] ?? "").trimmingCharacters(in: .whitespaces)
+                let allSubs = modeManager.allSubmodes(for: parentMode)
+                if allSubs.contains(where: { $0.uppercased() == trimmed.uppercased() }) {
+                    alertMessage = "submode_already_exists".localized
+                    showingAlert = true
+                    return
+                }
+                if ModeManager.presetSubmodeToMode[trimmed.uppercased()] != nil {
+                    alertMessage = "submode_exists_under_other".localized
+                    showingAlert = true
+                    return
+                }
+                withAnimation {
+                    modeManager.addCustomSubmode(trimmed, to: parentMode)
+                    newSubmodeName[parentMode] = ""
+                }
+            } label: {
+                Image(systemName: "plus.circle.fill")
+                    .foregroundColor(.green)
+                    .font(.subheadline)
+            }
+            .buttonStyle(.plain)
+            .disabled((newSubmodeName[parentMode] ?? "").trimmingCharacters(in: .whitespaces).isEmpty)
         }
     }
 }

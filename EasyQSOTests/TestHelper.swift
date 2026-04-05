@@ -5,8 +5,7 @@ import CoreData
 enum TestHelper {
     
     static func createInMemoryContext() -> NSManagedObjectContext {
-        let model = EasyQSOModel.createModel()
-        let container = NSPersistentContainer(name: "EasyQSOTest", managedObjectModel: model)
+        let container = NSPersistentContainer(name: "EasyQSOTest", managedObjectModel: EasyQSOModel.shared)
         let description = NSPersistentStoreDescription()
         description.type = NSInMemoryStoreType
         container.persistentStoreDescriptions = [description]

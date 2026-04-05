@@ -220,6 +220,10 @@
 "custom_modes_desc" = "Fügen Sie benutzerdefinierte Betriebsarten hinzu, die über den ADIF-Standard hinausgehen, zur Verwendung in QSO-Einträgen";
 "new_mode_placeholder" = "Neuen Betriebsartnamen eingeben";
 "mode_already_exists" = "Diese Betriebsart existiert bereits";
+"new_submode_placeholder" = "Submode-Name eingeben";
+"submode_already_exists" = "Dieser Submode existiert bereits unter diesem Modus";
+"submode_exists_under_other" = "Dieser Submode ist bereits einem anderen Modus zugewiesen";
+"custom_tag" = "Benutzerdefiniert";
 "list_management" = "Listenverwaltung";
 "mode_settings_title" = "Betriebsart-Einstellungen";
 "mode_settings_desc" = "Verwalten Sie die in QSO-Einträgen verfügbaren Betriebsarten. Sie können voreingestellte Betriebsarten ein-/ausblenden und benutzerdefinierte hinzufügen. Die Voreinstellungsliste enthält nur häufig verwendete Betriebsarten.";

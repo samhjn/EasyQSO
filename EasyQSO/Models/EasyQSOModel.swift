@@ -21,6 +21,10 @@ import CoreData
 
 // 这个类负责设置Core Data模型
 class EasyQSOModel {
+    /// Cached model instance to avoid entity-class mapping conflicts
+    /// when multiple NSPersistentContainers are created (e.g. during tests).
+    static let shared: NSManagedObjectModel = createModel()
+
     static func createModel() -> NSManagedObjectModel {
         let model = NSManagedObjectModel()
         
@@ -200,8 +204,7 @@ class EasyQSOModel {
 // 扩展PersistenceController以使用我们的模型
 extension PersistenceController {
     static func createContainer() -> NSPersistentContainer {
-        let model = EasyQSOModel.createModel()
-        let container = NSPersistentContainer(name: "EasyQSO", managedObjectModel: model)
+        let container = NSPersistentContainer(name: "EasyQSO", managedObjectModel: EasyQSOModel.shared)
         return container
     }
 }

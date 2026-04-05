@@ -464,6 +464,180 @@ final class ModeSubmodeTests: XCTestCase {
         }
     }
 
+    func testDefaultEnabledSubmodesAreAllValid() {
+        for sub in ModeManager.defaultEnabledSubmodes {
+            XCTAssertNotNil(ModeManager.presetSubmodeToMode[sub],
+                            "\(sub) in defaultEnabledSubmodes but not a known preset submode")
+        }
+    }
+
+    func testEnabledItemCountIncludesModesPlusSubmodes() {
+        let manager = ModeManager.shared
+
+        manager.setHidden(false, for: "SSB")
+        manager.setSubmodeHidden(false, for: "LSB")
+        manager.setSubmodeHidden(false, for: "USB")
+
+        let count = manager.enabledItemCount
+        let modeCount = manager.enabledModes.count
+        XCTAssertTrue(count > modeCount,
+                      "enabledItemCount (\(count)) should be greater than just mode count (\(modeCount))")
+    }
+
+    // MARK: - Submode visibility
+
+    func testSetSubmodeHidden() {
+        let manager = ModeManager.shared
+        let key = "LSB"
+
+        manager.setSubmodeHidden(false, for: key)
+        XCTAssertFalse(manager.isSubmodeHidden(key))
+
+        manager.setSubmodeHidden(true, for: key)
+        XCTAssertTrue(manager.isSubmodeHidden(key))
+
+        manager.setSubmodeHidden(false, for: key)
+        XCTAssertFalse(manager.isSubmodeHidden(key))
+    }
+
+    func testHiddenSubmodeExcludedFromPickerItems() {
+        let manager = ModeManager.shared
+
+        manager.setHidden(false, for: "SSB")
+        manager.setSubmodeHidden(true, for: "LSB")
+
+        let items = manager.pickerItems(currentMode: "SSB", currentSubmode: "")
+        let lsbItem = items.first { $0.tagValue == "LSB" }
+        XCTAssertNil(lsbItem, "Hidden submode LSB should not appear in picker")
+
+        let usbItem = items.first { $0.tagValue == "USB" }
+        XCTAssertNotNil(usbItem, "Non-hidden submode USB should still appear")
+
+        manager.setSubmodeHidden(false, for: "LSB")
+    }
+
+    func testHiddenSubmodeStillIncludedAsCurrentValue() {
+        let manager = ModeManager.shared
+
+        manager.setHidden(false, for: "SSB")
+        manager.setSubmodeHidden(true, for: "USB")
+
+        let items = manager.pickerItems(currentMode: "SSB", currentSubmode: "USB")
+        let usbItem = items.first { $0.tagValue == "USB" }
+        XCTAssertNotNil(usbItem, "Hidden submode should appear when it's the current value")
+
+        manager.setSubmodeHidden(false, for: "USB")
+    }
+
+    // MARK: - Custom submodes
+
+    func testAddCustomSubmode() {
+        let manager = ModeManager.shared
+        manager.addCustomSubmode("MYDIGITAL", to: "SSB")
+        XCTAssertTrue(manager.customSubmodesForMode("SSB").contains("MYDIGITAL"))
+        XCTAssertTrue(manager.allSubmodes(for: "SSB").contains("MYDIGITAL"))
+        manager.removeCustomSubmode("MYDIGITAL", from: "SSB")
+    }
+
+    func testRemoveCustomSubmode() {
+        let manager = ModeManager.shared
+        manager.addCustomSubmode("TESTSUB", to: "CW")
+        XCTAssertTrue(manager.customSubmodesForMode("CW").contains("TESTSUB"))
+        manager.removeCustomSubmode("TESTSUB", from: "CW")
+        XCTAssertFalse(manager.customSubmodesForMode("CW").contains("TESTSUB"))
+    }
+
+    func testCustomSubmodeAppearsInPickerItems() {
+        let manager = ModeManager.shared
+        manager.setHidden(false, for: "FM")
+        manager.addCustomSubmode("NBFM", to: "FM")
+
+        let items = manager.pickerItems(currentMode: "FM", currentSubmode: "")
+        let nbfmItem = items.first { $0.tagValue == "NBFM" }
+        XCTAssertNotNil(nbfmItem, "Custom submode should appear in picker")
+        XCTAssertTrue(nbfmItem?.isSubmode == true)
+
+        manager.removeCustomSubmode("NBFM", from: "FM")
+    }
+
+    func testCustomSubmodeIncludedInSubmodeToMode() {
+        let manager = ModeManager.shared
+        manager.addCustomSubmode("WBFM", to: "FM")
+
+        XCTAssertEqual(ModeManager.submodeToMode["WBFM"], "FM")
+        XCTAssertEqual(ModeManager.parentMode(for: "WBFM"), "FM")
+        XCTAssertTrue(ModeManager.isKnownSubmode("WBFM"))
+
+        manager.removeCustomSubmode("WBFM", from: "FM")
+    }
+
+    func testCustomSubmodeResolveMode() {
+        let manager = ModeManager.shared
+        manager.addCustomSubmode("CUSTSUB", to: "AM")
+
+        let result = ModeManager.resolveMode("CUSTSUB")
+        XCTAssertEqual(result.mode, "AM")
+        XCTAssertEqual(result.submode, "CUSTSUB")
+
+        manager.removeCustomSubmode("CUSTSUB", from: "AM")
+    }
+
+    func testCannotAddDuplicateCustomSubmode() {
+        let manager = ModeManager.shared
+        manager.addCustomSubmode("DUPSUB", to: "SSB")
+        manager.addCustomSubmode("DUPSUB", to: "SSB")
+        XCTAssertEqual(manager.customSubmodesForMode("SSB").filter { $0 == "DUPSUB" }.count, 1)
+        manager.removeCustomSubmode("DUPSUB", from: "SSB")
+    }
+
+    func testCannotAddPresetSubmodeAsCustom() {
+        let manager = ModeManager.shared
+        manager.addCustomSubmode("LSB", to: "SSB")
+        XCTAssertFalse(manager.customSubmodesForMode("SSB").contains("LSB"),
+                       "Should not allow adding preset submode as custom")
+    }
+
+    func testCannotAddSubmodeFromOtherModeAsCustom() {
+        let manager = ModeManager.shared
+        manager.addCustomSubmode("USB", to: "CW")
+        XCTAssertFalse(manager.customSubmodesForMode("CW").contains("USB"),
+                       "Should not allow adding submode that belongs to another preset mode")
+    }
+
+    func testCustomSubmodeOnCustomMode() {
+        let manager = ModeManager.shared
+        manager.addCustomMode("MYMODE")
+        manager.setHidden(false, for: "MYMODE")
+        manager.addCustomSubmode("MYSUB", to: "MYMODE")
+
+        XCTAssertTrue(manager.allSubmodes(for: "MYMODE").contains("MYSUB"))
+        let items = manager.pickerItems(currentMode: "MYMODE", currentSubmode: "")
+        let subItem = items.first { $0.tagValue == "MYSUB" }
+        XCTAssertNotNil(subItem)
+
+        manager.removeCustomSubmode("MYSUB", from: "MYMODE")
+        manager.removeCustomMode("MYMODE")
+    }
+
+    func testRemoveCustomSubmodeAlsoRemovesHidden() {
+        let manager = ModeManager.shared
+        manager.addCustomSubmode("HIDESUB", to: "FM")
+        manager.setSubmodeHidden(true, for: "HIDESUB")
+        XCTAssertTrue(manager.isSubmodeHidden("HIDESUB"))
+
+        manager.removeCustomSubmode("HIDESUB", from: "FM")
+        XCTAssertFalse(manager.isSubmodeHidden("HIDESUB"),
+                       "Removing custom submode should also remove its hidden state")
+    }
+
+    func testIsCustomSubmode() {
+        let manager = ModeManager.shared
+        manager.addCustomSubmode("XSUB", to: "AM")
+        XCTAssertTrue(manager.isCustomSubmode("XSUB", under: "AM"))
+        XCTAssertFalse(manager.isCustomSubmode("LSB", under: "SSB"))
+        manager.removeCustomSubmode("XSUB", from: "AM")
+    }
+
     // MARK: - Full round-trip with submode
 
     func testExportThenParseRoundTripWithSubmode() throws {

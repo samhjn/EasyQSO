@@ -220,6 +220,10 @@
 "custom_modes_desc" = "Add custom communication modes beyond the ADIF standard for use in QSO records";
 "new_mode_placeholder" = "Enter new mode name";
 "mode_already_exists" = "This mode already exists";
+"new_submode_placeholder" = "Enter submode name";
+"submode_already_exists" = "This submode already exists under this mode";
+"submode_exists_under_other" = "This submode is already assigned to another mode";
+"custom_tag" = "Custom";
 "list_management" = "List Management";
 "mode_settings_title" = "Mode Settings";
 "mode_settings_desc" = "Manage communication modes available in QSO records. You can show or hide preset modes, and add custom modes. The preset list contains commonly used modes only, not all modes defined in the ADIF standard.";

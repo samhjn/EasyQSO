@@ -220,6 +220,10 @@
 "custom_modes_desc" = "ADIF 표준 외의 사용자 정의 통신 모드를 추가하여 QSO 기록에 사용할 수 있습니다";
 "new_mode_placeholder" = "새 모드 이름 입력";
 "mode_already_exists" = "이 모드는 이미 존재합니다";
+"new_submode_placeholder" = "서브모드 이름 입력";
+"submode_already_exists" = "이 서브모드는 이미 이 모드에 존재합니다";
+"submode_exists_under_other" = "이 서브모드는 이미 다른 모드에 할당되어 있습니다";
+"custom_tag" = "사용자 정의";
 "list_management" = "목록 관리";
 "mode_settings_title" = "모드 설정";
 "mode_settings_desc" = "QSO 기록에서 사용할 수 있는 통신 모드를 관리합니다. 프리셋 모드를 표시하거나 숨기고, 사용자 정의 모드를 추가할 수 있습니다. 프리셋 목록은 자주 사용하는 모드만 포함하며 ADIF 표준의 모든 모드가 아닙니다.";
