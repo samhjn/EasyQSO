@@ -262,6 +262,7 @@
 // MARK: - ADIFフィールドグループ
 "adif_group_datetime" = "日時";
 "adif_group_end_datetime" = "終了日時";
+"adif_group_mode" = "モード";
 "adif_group_contacted_qth" = "相手QTH（地図付き）";
 "adif_group_own_qth" = "自局QTH（地図付き）";
 

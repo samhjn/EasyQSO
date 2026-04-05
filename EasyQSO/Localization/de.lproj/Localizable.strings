@@ -262,6 +262,7 @@
 // MARK: - ADIF-Feldgruppen
 "adif_group_datetime" = "Datum und Uhrzeit";
 "adif_group_end_datetime" = "Enddatum und -uhrzeit";
+"adif_group_mode" = "Modus";
 "adif_group_contacted_qth" = "QTH der Gegenstation (mit Karte)";
 "adif_group_own_qth" = "Eigenes QTH (mit Karte)";
 

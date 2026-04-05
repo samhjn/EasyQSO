@@ -262,6 +262,7 @@
 // MARK: - ADIF Field Groups
 "adif_group_datetime" = "Дата и время";
 "adif_group_end_datetime" = "Дата и время окончания";
+"adif_group_mode" = "Режим";
 "adif_group_contacted_qth" = "QTH корреспондента (с картой)";
 "adif_group_own_qth" = "Своё QTH (с картой)";
 

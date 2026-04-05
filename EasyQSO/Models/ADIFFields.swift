@@ -366,6 +366,11 @@ struct ADIFFields {
             category: .basic, supportsCollapsed: true
         ),
         ADIFFieldGroup(
+            id: "group_mode",
+            memberFieldIds: ["MODE", "SUBMODE"],
+            category: .basic, supportsCollapsed: false
+        ),
+        ADIFFieldGroup(
             id: "group_contacted_qth",
             memberFieldIds: ["QTH", "GRIDSQUARE", "CQZ", "ITUZ", "LAT", "LON"],
             category: .contactedStation, supportsCollapsed: true
@@ -423,12 +428,11 @@ struct ADIFFields {
         
         if category == .basic {
             var items: [SettingsItem] = []
-            let explicitIds: Set<String> = ["CALL", "FREQ", "BAND", "MODE"]
+            let explicitIds: Set<String> = ["CALL", "FREQ", "BAND", "MODE", "SUBMODE"]
             if let f = byId["CALL"] { items.append(.field(f)) }
             for g in groups { items.append(.group(g)) }
             if let f = byId["FREQ"] { items.append(.field(f)) }
             if let f = byId["BAND"] { items.append(.field(f)) }
-            if let f = byId["MODE"] { items.append(.field(f)) }
             for f in fields where !explicitIds.contains(f.id) {
                 items.append(.field(f))
             }

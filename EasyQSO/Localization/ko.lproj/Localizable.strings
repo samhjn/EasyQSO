@@ -262,6 +262,7 @@
 // MARK: - ADIF 필드 그룹
 "adif_group_datetime" = "날짜 및 시간";
 "adif_group_end_datetime" = "종료 날짜 및 시간";
+"adif_group_mode" = "모드";
 "adif_group_contacted_qth" = "상대국 QTH (지도 포함)";
 "adif_group_own_qth" = "자국 QTH (지도 포함)";
 

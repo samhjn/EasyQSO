@@ -17,10 +17,10 @@
  */
 
 import SwiftUI
+import CoreData
 
 @main
 struct EasyQSOApp: App {
-    // 使用共享的持久化控制器
     let persistenceController = PersistenceController.shared
     
     var body: some Scene {
@@ -28,12 +28,59 @@ struct EasyQSOApp: App {
             ContentView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .onAppear {
-                    // 设置外观
                     setupAppearance()
+                    ModeManager.shared.ensureDefaultVisibility()
+                    migrateSubmodeRecordsInBackground()
                 }
         }
     }
     
+    private func migrateSubmodeRecordsInBackground() {
+        let key = "SubmodeMigrationDone_v2"
+        guard !UserDefaults.standard.bool(forKey: key) else { return }
+
+        let container = persistenceController.container
+        container.performBackgroundTask { bgContext in
+            bgContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+
+            let request = NSFetchRequest<QSORecord>(entityName: "QSORecord")
+            request.fetchBatchSize = 100
+            guard let records = try? bgContext.fetch(request) else {
+                DispatchQueue.main.async {
+                    UserDefaults.standard.set(true, forKey: key)
+                }
+                return
+            }
+
+            var migrated = 0
+            for record in records {
+                let modeVal = record.mode
+                if let parentMode = ModeManager.parentMode(for: modeVal) {
+                    var fields = record.adifFields
+                    if (fields["SUBMODE"] ?? "").isEmpty {
+                        fields["SUBMODE"] = modeVal
+                        record.adifFields = fields
+                        record.mode = parentMode
+                        migrated += 1
+                    }
+                }
+            }
+
+            if migrated > 0 {
+                do {
+                    try bgContext.save()
+                    print("✓ Submode migration: \(migrated) records fixed")
+                } catch {
+                    print("✗ Submode migration failed: \(error)")
+                }
+            }
+
+            DispatchQueue.main.async {
+                UserDefaults.standard.set(true, forKey: key)
+            }
+        }
+    }
+
     private func setupAppearance() {
         // 设置导航栏样式
         let appearance = UINavigationBarAppearance()

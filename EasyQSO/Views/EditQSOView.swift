@@ -27,6 +27,7 @@ struct EditQSOView: View {
     @State private var endDate: Date
     @State private var band: String
     @State private var mode: String
+    @State private var submode: String
     @State private var frequency: String
     @State private var rxFrequency: String
     @State private var txPower: String
@@ -77,6 +78,7 @@ struct EditQSOView: View {
         var endDate: Date
         var band: String
         var mode: String
+        var submode: String
         var frequency: String
         var rxFrequency: String
         var txPower: String
@@ -100,7 +102,7 @@ struct EditQSOView: View {
     private var currentSnapshot: FormSnapshot {
         FormSnapshot(
             callsign: callsign, date: date, endDate: endDate,
-            band: band, mode: mode, frequency: frequency,
+            band: band, mode: mode, submode: submode, frequency: frequency,
             rxFrequency: rxFrequency, txPower: txPower,
             rstSent: rstSent, rstReceived: rstReceived,
             name: name, qth: qth, gridSquare: gridSquare,
@@ -118,10 +120,27 @@ struct EditQSOView: View {
     
     let bands = ["160m", "80m", "40m", "30m", "20m", "17m", "15m", "12m", "10m", "6m", "2m", "70cm"]
     
-    private var modes: [String] { modeManager.pickerModes(current: mode) }
-    
-    private var isVoiceMode: Bool { ["SSB", "FM", "AM"].contains(mode) }
-    private var isCWMode: Bool { mode == "CW" }
+    private var modePickerItems: [ModePickerItem] {
+        modeManager.pickerItems(currentMode: mode, currentSubmode: submode)
+    }
+
+    private var modePickerTag: Binding<String> {
+        Binding(
+            get: { submode.isEmpty ? mode : submode },
+            set: { newValue in
+                if let parent = ModeManager.parentMode(for: newValue) {
+                    mode = parent
+                    submode = newValue
+                } else {
+                    mode = newValue
+                    submode = ""
+                }
+            }
+        )
+    }
+
+    private var isVoiceMode: Bool { ModeManager.isVoiceMode(mode: mode, submode: submode.isEmpty ? nil : submode) }
+    private var isCWMode: Bool { ModeManager.isCWMode(mode: mode, submode: submode.isEmpty ? nil : submode) }
     
     private var showRxBandPicker: Bool {
         fieldVisibility.isCoreFieldVisible(for: "FREQ_RX") &&
@@ -264,6 +283,7 @@ struct EditQSOView: View {
         _date = State(initialValue: record.date)
         _band = State(initialValue: record.band)
         _mode = State(initialValue: record.mode)
+        _submode = State(initialValue: record.adifFields["SUBMODE"] ?? "")
         _frequency = State(initialValue: record.frequencyMHz > 0 ? String(record.frequencyMHz) : "")
         _rxFrequency = State(initialValue: record.rxFrequencyMHz > 0 ? String(record.rxFrequencyMHz) : "")
         _txPower = State(initialValue: record.txPower ?? "")
@@ -290,7 +310,7 @@ struct EditQSOView: View {
         
         _savedSnapshot = State(initialValue: FormSnapshot(
             callsign: record.callsign, date: record.date, endDate: endDateVal,
-            band: record.band, mode: record.mode,
+            band: record.band, mode: record.mode, submode: adif["SUBMODE"] ?? "",
             frequency: record.frequencyMHz > 0 ? String(record.frequencyMHz) : "",
             rxFrequency: record.rxFrequencyMHz > 0 ? String(record.rxFrequencyMHz) : "",
             txPower: record.txPower ?? "",
@@ -365,8 +385,10 @@ struct EditQSOView: View {
                     }
                 }
                 
-                Picker(LocalizedStrings.mode.localized, selection: $mode) {
-                    ForEach(modes, id: \.self) { Text($0) }
+                Picker(LocalizedStrings.mode.localized, selection: modePickerTag) {
+                    ForEach(modePickerItems) { item in
+                        Text(item.displayLabel).tag(item.tagValue)
+                    }
                 }
                 
                 ADIFDynamicFieldRows(extendedFields: $extendedFields, category: .basic, visibilityManager: fieldVisibility, focusedField: $focusedField)
@@ -651,9 +673,9 @@ struct EditQSOView: View {
                     }
                 }
                 if hasTxPwr {
-                    TextField(LocalizedStrings.txPower.localized, text: $txPower)
+                    TextField("adif_field_tx_pwr".localized, text: $txPower)
                         .focused($focusedField, equals: "TX_PWR")
-                        .floatingLabel(LocalizedStrings.txPower.localized, text: txPower)
+                        .floatingLabel("adif_field_tx_pwr".localized, text: txPower)
                 }
                 if hasSatName {
                     TextField(LocalizedStrings.satellite.localized, text: $satellite)
@@ -1023,6 +1045,12 @@ struct EditQSOView: View {
         record.date = date
         record.band = band
         record.mode = mode
+
+        if !submode.isEmpty {
+            extendedFields["SUBMODE"] = submode
+        } else {
+            extendedFields.removeValue(forKey: "SUBMODE")
+        }
         record.frequencyMHz = Double(frequency) ?? 0.0
         record.rxFrequencyMHz = Double(rxFrequency) ?? 0.0
         record.txPower = txPower.isEmpty ? nil : txPower

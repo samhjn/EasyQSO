@@ -9,6 +9,7 @@
  */
 
 import SwiftUI
+import CoreData
 import CoreLocation
 
 struct QSORecordView: View {
@@ -24,6 +25,7 @@ struct QSORecordView: View {
     @State private var endDate = Date()
     @State private var band = "20m"
     @State private var mode = "SSB"
+    @State private var submode = ""
     @State private var frequency = ""
     @State private var rxFrequency = ""
     @State private var txPower = ""
@@ -67,10 +69,27 @@ struct QSORecordView: View {
     
     let bands = ["160m", "80m", "40m", "30m", "20m", "17m", "15m", "12m", "10m", "6m", "2m", "70cm"]
     
-    private var modes: [String] { modeManager.pickerModes(current: mode) }
-    
-    private var isVoiceMode: Bool { ["SSB", "FM", "AM"].contains(mode) }
-    private var isCWMode: Bool { mode == "CW" }
+    private var modePickerItems: [ModePickerItem] {
+        modeManager.pickerItems(currentMode: mode, currentSubmode: submode)
+    }
+
+    private var modePickerTag: Binding<String> {
+        Binding(
+            get: { submode.isEmpty ? mode : submode },
+            set: { newValue in
+                if let parent = ModeManager.parentMode(for: newValue) {
+                    mode = parent
+                    submode = newValue
+                } else {
+                    mode = newValue
+                    submode = ""
+                }
+            }
+        )
+    }
+
+    private var isVoiceMode: Bool { ModeManager.isVoiceMode(mode: mode, submode: submode.isEmpty ? nil : submode) }
+    private var isCWMode: Bool { ModeManager.isCWMode(mode: mode, submode: submode.isEmpty ? nil : submode) }
     
     private var showRxBandPicker: Bool {
         fieldVisibility.isCoreFieldVisible(for: "FREQ_RX") &&
@@ -244,11 +263,14 @@ struct QSORecordView: View {
                             if let lastFreq = QSORecord.lastFrequencyForBand(newBand, context: viewContext) {
                                 frequency = String(lastFreq)
                             }
+                            loadSameBandStationInfo(for: newBand)
                         }
                     }
                     
-                    Picker(LocalizedStrings.mode.localized, selection: $mode) {
-                        ForEach(modes, id: \.self) { Text($0) }
+                    Picker(LocalizedStrings.mode.localized, selection: modePickerTag) {
+                        ForEach(modePickerItems) { item in
+                            Text(item.displayLabel).tag(item.tagValue)
+                        }
                     }
                     
                     ADIFDynamicFieldRows(extendedFields: $extendedFields, category: .basic, visibilityManager: fieldVisibility, focusedField: $focusedField)
@@ -582,9 +604,9 @@ struct QSORecordView: View {
                     }
                 }
                 if hasTxPwr {
-                    TextField(LocalizedStrings.txPower.localized, text: $txPower)
+                    TextField("adif_field_tx_pwr".localized, text: $txPower)
                         .focused($focusedField, equals: "TX_PWR")
-                        .floatingLabel(LocalizedStrings.txPower.localized, text: txPower)
+                        .floatingLabel("adif_field_tx_pwr".localized, text: txPower)
                 }
                 if hasSatName {
                     TextField(LocalizedStrings.satellite.localized, text: $satellite)
@@ -759,8 +781,46 @@ struct QSORecordView: View {
         if let latestQSO = QSORecord.getLatestQSO(context: viewContext) {
             band = latestQSO.band
             mode = latestQSO.mode
+            submode = latestQSO.adifFields["SUBMODE"] ?? ""
             if latestQSO.frequencyMHz > 0 {
                 frequency = String(latestQSO.frequencyMHz)
+            }
+
+            let latestFields = latestQSO.adifFields
+            if let tp = latestQSO.txPower, !tp.isEmpty { txPower = tp }
+
+            let ownStationKeys = [
+                "STATION_CALLSIGN", "OPERATOR", "MY_RIG", "MY_ANTENNA",
+                "MY_POTA_REF", "MY_SOTA_REF", "MY_WWFF_REF",
+                "MY_SIG", "MY_SIG_INFO"
+            ]
+            for key in ownStationKeys {
+                if let val = latestFields[key], !val.isEmpty {
+                    extendedFields[key] = val
+                }
+            }
+        }
+    }
+
+    private func loadSameBandStationInfo(for targetBand: String) {
+        let request = QSORecord.fetchRequest() as NSFetchRequest<QSORecord>
+        request.predicate = NSPredicate(format: "band == %@", targetBand)
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \QSORecord.date, ascending: false)]
+        request.fetchLimit = 1
+
+        guard let record = try? viewContext.fetch(request).first else { return }
+
+        if let tp = record.txPower, !tp.isEmpty, txPower.isEmpty { txPower = tp }
+
+        let fields = record.adifFields
+        let keys = [
+            "STATION_CALLSIGN", "OPERATOR", "MY_RIG", "MY_ANTENNA",
+            "MY_POTA_REF", "MY_SOTA_REF", "MY_WWFF_REF",
+            "MY_SIG", "MY_SIG_INFO"
+        ]
+        for key in keys {
+            if let val = fields[key], !val.isEmpty, (extendedFields[key] ?? "").isEmpty {
+                extendedFields[key] = val
             }
         }
     }
@@ -867,6 +927,12 @@ struct QSORecordView: View {
             extendedFields["BAND_RX"] = rxBand
         }
         
+        if !submode.isEmpty {
+            extendedFields["SUBMODE"] = submode
+        } else {
+            extendedFields.removeValue(forKey: "SUBMODE")
+        }
+
         newQSO.adifFields = extendedFields
         
         var fields = newQSO.adifFields
@@ -916,6 +982,7 @@ struct QSORecordView: View {
         endDate = Date()
         band = "20m"
         mode = "SSB"
+        submode = ""
         frequency = ""
         rxFrequency = ""
         rxBand = ""
@@ -939,15 +1006,25 @@ struct QSORecordView: View {
         let currentFrequency = frequency
         let currentBand = band
         let currentMode = mode
+        let currentSubmode = submode
         let currentRxFrequency = rxFrequency
         let currentTxPower = txPower
         let currentSatellite = satellite
-        
+
+        let ownStationKeys: Set<String> = [
+            "STATION_CALLSIGN", "OPERATOR", "MY_RIG", "MY_ANTENNA",
+            "MY_POTA_REF", "MY_SOTA_REF", "MY_WWFF_REF",
+            "MY_SIG", "MY_SIG_INFO", "MY_CITY", "MY_GRIDSQUARE",
+            "MY_CQ_ZONE", "MY_ITU_ZONE", "MY_LAT", "MY_LON"
+        ]
+        let preservedExtended = extendedFields.filter { ownStationKeys.contains($0.key) }
+
         callsign = ""
         date = Date()
         endDate = Date()
         band = currentBand
         mode = currentMode
+        submode = currentSubmode
         frequency = currentFrequency
         rxFrequency = currentRxFrequency
         txPower = currentTxPower
@@ -961,7 +1038,7 @@ struct QSORecordView: View {
         ituZone = ""
         selectedLocation = nil
         remarks = ""
-        extendedFields = [:]
+        extendedFields = preservedExtended
     }
     
     private func formatGridSquare(_ input: String) -> String {

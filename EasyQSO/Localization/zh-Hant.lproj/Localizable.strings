@@ -262,6 +262,7 @@
 // MARK: - ADIF欄位組
 "adif_group_datetime" = "時間";
 "adif_group_end_datetime" = "結束時間";
+"adif_group_mode" = "模式";
 "adif_group_contacted_qth" = "對方QTH (含地圖)";
 "adif_group_own_qth" = "己方QTH (含地圖)";
 

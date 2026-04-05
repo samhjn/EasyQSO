@@ -262,6 +262,7 @@
 // MARK: - Groupes de champs ADIF
 "adif_group_datetime" = "Date et heure";
 "adif_group_end_datetime" = "Date et heure de fin";
+"adif_group_mode" = "Mode";
 "adif_group_contacted_qth" = "QTH contacté (avec carte)";
 "adif_group_own_qth" = "Mon QTH (avec carte)";
 

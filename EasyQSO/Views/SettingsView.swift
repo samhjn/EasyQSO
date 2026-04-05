@@ -541,7 +541,7 @@ struct SettingsView: View {
         adif += "<EOH>\n"
         
         let coreTagsHandledSpecially: Set<String> = [
-            "CALL", "QSO_DATE", "TIME_ON", "BAND", "MODE",
+            "CALL", "QSO_DATE", "TIME_ON", "BAND", "MODE", "SUBMODE",
             "FREQ", "FREQ_RX", "TX_PWR", "RST_SENT", "RST_RCVD",
             "NAME", "QTH", "GRIDSQUARE", "CQZ", "ITUZ",
             "SAT_NAME", "COMMENT", "LAT", "LON"
@@ -554,6 +554,9 @@ struct SettingsView: View {
             adif += "<TIME_ON:\(timeString.count)>\(timeString)"
             adif += "<BAND:\(record.band.count)>\(record.band)"
             adif += "<MODE:\(record.mode.count)>\(record.mode)"
+            if let sub = record.adifFields["SUBMODE"], !sub.isEmpty {
+                adif += "<SUBMODE:\(sub.utf8.count)>\(sub)"
+            }
             
             if record.frequencyMHz > 0 {
                 let freqString = formatFreqForADIF(record.frequencyMHz)
@@ -727,7 +730,15 @@ struct SettingsView: View {
             let dateString = extractField(from: trimmedRecord, fieldName: "QSO_DATE") ?? ""
             let timeString = extractField(from: trimmedRecord, fieldName: "TIME_ON") ?? ""
             let band = extractField(from: trimmedRecord, fieldName: "BAND") ?? "20m"
-            let mode = extractField(from: trimmedRecord, fieldName: "MODE") ?? "SSB"
+            var mode = extractField(from: trimmedRecord, fieldName: "MODE") ?? "SSB"
+            var importedSubmode = extractField(from: trimmedRecord, fieldName: "SUBMODE") ?? ""
+
+            // ADIF fault tolerance: if MODE is actually a known submode and SUBMODE is absent
+            if importedSubmode.isEmpty, let parentMode = ModeManager.parentMode(for: mode) {
+                importedSubmode = mode
+                mode = parentMode
+            }
+
             let freqString = extractField(from: trimmedRecord, fieldName: "FREQ")
             let frequency = freqString != nil ? (Double(freqString!) ?? 0.0) : 0.0
             
@@ -782,9 +793,9 @@ struct SettingsView: View {
             
             // Import ALL additional ADIF fields losslessly
             let coreImportTags: Set<String> = [
-                "CALL", "QSO_DATE", "TIME_ON", "BAND", "MODE", "FREQ", "FREQ_RX",
-                "TX_PWR", "RST_SENT", "RST_RCVD", "NAME", "QTH", "GRIDSQUARE",
-                "CQZ", "ITUZ", "SAT_NAME", "COMMENT"
+                "CALL", "QSO_DATE", "TIME_ON", "BAND", "MODE", "SUBMODE",
+                "FREQ", "FREQ_RX", "TX_PWR", "RST_SENT", "RST_RCVD",
+                "NAME", "QTH", "GRIDSQUARE", "CQZ", "ITUZ", "SAT_NAME", "COMMENT"
             ]
             var extFields = [String: String]()
             let allExtracted = extractAllFields(from: trimmedRecord)
@@ -792,6 +803,9 @@ struct SettingsView: View {
                 if !coreImportTags.contains(tag.uppercased()) && !value.isEmpty {
                     extFields[tag.uppercased()] = value
                 }
+            }
+            if !importedSubmode.isEmpty {
+                extFields["SUBMODE"] = importedSubmode
             }
             if !extFields.isEmpty {
                 newQSO.adifFields = extFields

@@ -19,18 +19,32 @@ struct ModeSettingsView: View {
     var body: some View {
         List {
             Section(header: Text("preset_modes".localized)) {
-                ForEach(ModeManager.presetModes, id: \.self) { mode in
-                    HStack {
-                        Text(mode)
-                            .fontWeight(modeManager.isHidden(mode) ? .regular : .medium)
-                            .foregroundColor(modeManager.isHidden(mode) ? .secondary : .primary)
-                        Spacer()
-                        Toggle("", isOn: Binding(
-                            get: { !modeManager.isHidden(mode) },
-                            set: { modeManager.setHidden(!$0, for: mode) }
-                        ))
-                        .labelsHidden()
+                ForEach(ModeManager.modeSubmodes, id: \.mode) { entry in
+                    VStack(alignment: .leading, spacing: 0) {
+                        HStack {
+                            Text(entry.mode)
+                                .fontWeight(modeManager.isHidden(entry.mode) ? .regular : .medium)
+                                .foregroundColor(modeManager.isHidden(entry.mode) ? .secondary : .primary)
+                            if !entry.submodes.isEmpty {
+                                Text("(\(entry.submodes.count))")
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            Toggle("", isOn: Binding(
+                                get: { !modeManager.isHidden(entry.mode) },
+                                set: { modeManager.setHidden(!$0, for: entry.mode) }
+                            ))
+                            .labelsHidden()
+                        }
+                        if !entry.submodes.isEmpty && !modeManager.isHidden(entry.mode) {
+                            Text(entry.submodes.joined(separator: ", "))
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                                .padding(.top, 2)
+                        }
                     }
+                    .padding(.vertical, 2)
                 }
             }
             
@@ -65,7 +79,7 @@ struct ModeSettingsView: View {
                     
                     Button {
                         let trimmed = newModeName.trimmingCharacters(in: .whitespaces)
-                        if ModeManager.presetModes.contains(trimmed) ||
+                        if ModeManager.allAdifModes.contains(where: { $0.uppercased() == trimmed.uppercased() }) ||
                            modeManager.customModes.contains(trimmed) {
                             alertMessage = "mode_already_exists".localized
                             showingAlert = true

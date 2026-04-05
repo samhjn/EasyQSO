@@ -89,7 +89,7 @@ enum ADIFHelper {
         adif += "<EOH>\n"
         
         let coreTagsHandledSpecially: Set<String> = [
-            "CALL", "QSO_DATE", "TIME_ON", "BAND", "MODE",
+            "CALL", "QSO_DATE", "TIME_ON", "BAND", "MODE", "SUBMODE",
             "FREQ", "FREQ_RX", "TX_PWR", "RST_SENT", "RST_RCVD",
             "NAME", "QTH", "GRIDSQUARE", "CQZ", "ITUZ",
             "SAT_NAME", "COMMENT", "LAT", "LON"
@@ -104,7 +104,7 @@ enum ADIFHelper {
     static func generateADIFRecord(_ record: QSORecord, coreTagsHandledSpecially: Set<String>? = nil) -> String {
         var adif = ""
         let coreTags = coreTagsHandledSpecially ?? [
-            "CALL", "QSO_DATE", "TIME_ON", "BAND", "MODE",
+            "CALL", "QSO_DATE", "TIME_ON", "BAND", "MODE", "SUBMODE",
             "FREQ", "FREQ_RX", "TX_PWR", "RST_SENT", "RST_RCVD",
             "NAME", "QTH", "GRIDSQUARE", "CQZ", "ITUZ",
             "SAT_NAME", "COMMENT", "LAT", "LON"
@@ -116,6 +116,9 @@ enum ADIFHelper {
         adif += "<TIME_ON:\(timeString.count)>\(timeString)"
         adif += "<BAND:\(record.band.count)>\(record.band)"
         adif += "<MODE:\(record.mode.count)>\(record.mode)"
+        if let sub = record.adifFields["SUBMODE"], !sub.isEmpty {
+            adif += "<SUBMODE:\(sub.utf8.count)>\(sub)"
+        }
         
         if record.frequencyMHz > 0 {
             let freqString = formatFreqForADIF(record.frequencyMHz)
