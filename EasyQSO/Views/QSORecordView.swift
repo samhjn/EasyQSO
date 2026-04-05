@@ -17,6 +17,7 @@ struct QSORecordView: View {
     @StateObject private var qthManager = QTHManager()
     @ObservedObject private var fieldVisibility = FieldVisibilityManager.shared
     @ObservedObject private var modeManager = ModeManager.shared
+    @ObservedObject private var autoFillManager = AutoFillManager.shared
     @FocusState private var focusedField: String?
     
     // Core fields
@@ -260,16 +261,26 @@ struct QSORecordView: View {
                         if isBandChangedByFrequency {
                             isBandChangedByFrequency = false
                         } else {
-                            if let lastFreq = QSORecord.lastFrequencyForBand(newBand, context: viewContext) {
-                                frequency = String(lastFreq)
+                            if autoFillManager.autoFillFrequencyAndMode {
+                                if let lastFreq = QSORecord.lastFrequencyForBand(newBand, context: viewContext) {
+                                    frequency = String(lastFreq)
+                                }
                             }
                             loadSameBandStationInfo(for: newBand)
+                        }
+                        if autoFillManager.autoFillOwnQTH {
+                            loadOwnQTHFromHistory()
                         }
                     }
                     
                     Picker(LocalizedStrings.mode.localized, selection: modePickerTag) {
                         ForEach(modePickerItems) { item in
                             Text(item.displayLabel).tag(item.tagValue)
+                        }
+                    }
+                    .onChange(of: mode) { _ in
+                        if autoFillManager.autoFillOwnQTH {
+                            loadOwnQTHFromHistory()
                         }
                     }
                     
@@ -458,8 +469,10 @@ struct QSORecordView: View {
         }
         .onAppear {
             DispatchQueue.main.async {
-                loadOwnQTHInfo()
-                loadLatestQSOSettings()
+                if autoFillManager.autoFillFrequencyAndMode {
+                    loadLatestQSOSettings()
+                }
+                loadOwnQTHDefaults()
             }
         }
     }
@@ -756,7 +769,35 @@ struct QSORecordView: View {
     
     // MARK: - Data Loading
     
-    private func loadOwnQTHInfo() {
+    private func loadOwnQTHDefaults() {
+        if autoFillManager.autoFillOwnQTH {
+            loadOwnQTHFromHistory()
+        } else {
+            loadOwnQTHFromManager()
+        }
+    }
+    
+    private func loadOwnQTHFromHistory() {
+        if let qthInfo = QSORecord.lastOwnQTHInfo(band: band, mode: mode, context: viewContext) {
+            ownQTH = qthInfo.myCity
+            ownGridSquare = qthInfo.myGridSquare
+            ownCQZone = qthInfo.myCQZone
+            ownITUZone = qthInfo.myITUZone
+            if let grid = qthInfo.myGridSquare.isEmpty ? nil : qthInfo.myGridSquare {
+                selectedOwnLocation = QTHManager.coordinateFromGridSquare(grid)
+            } else {
+                selectedOwnLocation = nil
+            }
+        } else {
+            ownQTH = ""
+            ownGridSquare = ""
+            ownCQZone = ""
+            ownITUZone = ""
+            selectedOwnLocation = nil
+        }
+    }
+    
+    private func loadOwnQTHFromManager() {
         if ownQTH != qthManager.ownQTH.location {
             ownQTH = qthManager.ownQTH.location
         }
@@ -998,8 +1039,10 @@ struct QSORecordView: View {
         remarks = ""
         selectedLocation = nil
         extendedFields = [:]
-        loadOwnQTHInfo()
-        loadLatestQSOSettings()
+        if autoFillManager.autoFillFrequencyAndMode {
+            loadLatestQSOSettings()
+        }
+        loadOwnQTHDefaults()
     }
     
     private func clearFields() {

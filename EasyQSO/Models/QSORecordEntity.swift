@@ -395,6 +395,69 @@ public class QSORecord: NSManagedObject {
         return nil
     }
     
+    // MARK: - Own QTH history lookup
+    
+    struct OwnQTHRecord {
+        var myCity: String
+        var myGridSquare: String
+        var myCQZone: String
+        var myITUZone: String
+        var myLat: String?
+        var myLon: String?
+    }
+    
+    /// Priority-based lookup for own QTH from history:
+    /// 1. Band + Mode match
+    /// 2. Band-only match
+    /// 3. Any record with MY_CITY
+    /// 4. nil (leave empty)
+    static func lastOwnQTHInfo(band: String, mode: String, context: NSManagedObjectContext) -> OwnQTHRecord? {
+        if let result = fetchOwnQTH(band: band, mode: mode, context: context) {
+            return result
+        }
+        if let result = fetchOwnQTH(band: band, mode: nil, context: context) {
+            return result
+        }
+        if let result = fetchOwnQTH(band: nil, mode: nil, context: context) {
+            return result
+        }
+        return nil
+    }
+    
+    private static func fetchOwnQTH(band: String?, mode: String?, context: NSManagedObjectContext) -> OwnQTHRecord? {
+        let request = NSFetchRequest<QSORecord>(entityName: "QSORecord")
+        var predicates: [NSPredicate] = []
+        if let band = band {
+            predicates.append(NSPredicate(format: "band == %@", band))
+        }
+        if let mode = mode {
+            predicates.append(NSPredicate(format: "mode == %@", mode))
+        }
+        if !predicates.isEmpty {
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
+        }
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \QSORecord.date, ascending: false)]
+        request.fetchLimit = 50
+        
+        do {
+            let results = try context.fetch(request)
+            for record in results {
+                let fields = record.adifFields
+                if let myCity = fields["MY_CITY"], !myCity.isEmpty {
+                    return OwnQTHRecord(
+                        myCity: myCity,
+                        myGridSquare: fields["MY_GRIDSQUARE"] ?? "",
+                        myCQZone: fields["MY_CQ_ZONE"] ?? "",
+                        myITUZone: fields["MY_ITU_ZONE"] ?? "",
+                        myLat: fields["MY_LAT"],
+                        myLon: fields["MY_LON"]
+                    )
+                }
+            }
+        } catch {}
+        return nil
+    }
+    
     // 获取指定波段的最后使用频率
     static func lastFrequencyForBand(_ band: String, context: NSManagedObjectContext) -> Double? {
         let request = NSFetchRequest<QSORecord>(entityName: "QSORecord")

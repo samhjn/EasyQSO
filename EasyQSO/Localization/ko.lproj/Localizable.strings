@@ -484,3 +484,10 @@
 "new_qso_reset_confirm" = "비우기";
 "new_qso_pull_reset_hint" = "양식을 비우려면 더 당겨주세요";
 "new_qso_pull_refresh_time_hint" = "시간을 새로고침하려면 더 당겨주세요";
+
+// MARK: - 자동 채우기 설정
+"autofill_section" = "자동 채우기";
+"autofill_freq_mode" = "주파수 & 모드";
+"autofill_freq_mode_desc" = "최근 QSO 기록에서 밴드, 모드, 주파수를 자동으로 채웁니다";
+"autofill_own_qth" = "자국 QTH";
+"autofill_own_qth_desc" = "기록에서 자국 QTH를 자동으로 채우고, 밴드 및 모드 변경에 연동합니다";

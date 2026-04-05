@@ -484,3 +484,10 @@
 "new_qso_reset_confirm" = "清空";
 "new_qso_pull_reset_hint" = "繼續下拉以清空表單";
 "new_qso_pull_refresh_time_hint" = "繼續下拉以刷新時間";
+
+// MARK: - 自動填充設定
+"autofill_section" = "自動填充";
+"autofill_freq_mode" = "頻率 & 模式";
+"autofill_freq_mode_desc" = "根據最近的 QSO 記錄自動填充波段、模式和頻率";
+"autofill_own_qth" = "己方 QTH";
+"autofill_own_qth_desc" = "根據歷史記錄自動填充己方 QTH，連動波段和模式變更";

@@ -484,3 +484,10 @@
 "new_qso_reset_confirm" = "クリア";
 "new_qso_pull_reset_hint" = "フォームをクリアするには、さらに引き下げてください";
 "new_qso_pull_refresh_time_hint" = "さらに引き下げて時刻を更新";
+
+// MARK: - 自動入力設定
+"autofill_section" = "自動入力";
+"autofill_freq_mode" = "周波数 & モード";
+"autofill_freq_mode_desc" = "最新のQSO記録からバンド、モード、周波数を自動入力";
+"autofill_own_qth" = "自局QTH";
+"autofill_own_qth_desc" = "履歴から自局QTHを自動入力し、バンドとモードの変更に連動";

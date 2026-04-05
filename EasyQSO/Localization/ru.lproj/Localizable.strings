@@ -484,3 +484,10 @@
 "new_qso_reset_confirm" = "Очистить";
 "new_qso_pull_reset_hint" = "Потяните сильнее, чтобы очистить форму";
 "new_qso_pull_refresh_time_hint" = "Потяните сильнее, чтобы обновить время";
+
+// MARK: - Auto-fill Settings
+"autofill_section" = "Auto-fill";
+"autofill_freq_mode" = "Frequency & Mode";
+"autofill_freq_mode_desc" = "Auto-fill band, mode and frequency from latest QSO record";
+"autofill_own_qth" = "Own QTH";
+"autofill_own_qth_desc" = "Auto-fill own QTH from history, linked to band & mode changes";

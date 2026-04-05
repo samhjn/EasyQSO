@@ -300,6 +300,11 @@ struct EditQSOView: View {
         _rxBand = State(initialValue: record.adifFields["BAND_RX"] ?? "")
         
         let adif = record.adifFields
+        
+        _ownQTH = State(initialValue: adif["MY_CITY"] ?? "")
+        _ownGridSquare = State(initialValue: adif["MY_GRIDSQUARE"] ?? "")
+        _ownCQZone = State(initialValue: adif["MY_CQ_ZONE"] ?? "")
+        _ownITUZone = State(initialValue: adif["MY_ITU_ZONE"] ?? "")
         let endDateVal: Date
         if let parsed = ADIFDateTimeHelper.adifToDate(dateStr: adif["QSO_DATE_OFF"], timeStr: adif["TIME_OFF"]) {
             endDateVal = parsed
@@ -320,7 +325,10 @@ struct EditQSOView: View {
             cqZone: record.cqZone ?? "", ituZone: record.ituZone ?? "",
             satellite: record.satellite ?? "", remarks: record.remarks ?? "",
             extendedFields: adif, rxBand: adif["BAND_RX"] ?? "",
-            ownQTH: "", ownGridSquare: "", ownCQZone: "", ownITUZone: ""
+            ownQTH: adif["MY_CITY"] ?? "",
+            ownGridSquare: adif["MY_GRIDSQUARE"] ?? "",
+            ownCQZone: adif["MY_CQ_ZONE"] ?? "",
+            ownITUZone: adif["MY_ITU_ZONE"] ?? ""
         ))
         
         if let existingCoordinate = record.coordinate {
@@ -329,6 +337,12 @@ struct EditQSOView: View {
             _selectedLocation = State(initialValue: QTHManager.coordinateFromGridSquare(gridSquare))
         } else {
             _selectedLocation = State(initialValue: nil)
+        }
+        
+        if let myGrid = adif["MY_GRIDSQUARE"], !myGrid.isEmpty {
+            _selectedOwnLocation = State(initialValue: QTHManager.coordinateFromGridSquare(myGrid))
+        } else {
+            _selectedOwnLocation = State(initialValue: nil)
         }
     }
     
@@ -523,7 +537,6 @@ struct EditQSOView: View {
         }
         .onAppear {
             DispatchQueue.main.async {
-                loadOwnQTHInfo()
                 savedSnapshot = currentSnapshot
             }
         }
@@ -927,25 +940,20 @@ struct EditQSOView: View {
     
     // MARK: - Data Loading
     
-    private func loadOwnQTHInfo() {
-        if ownQTH != qthManager.ownQTH.location {
-            ownQTH = qthManager.ownQTH.location
-        }
-        if ownGridSquare != qthManager.ownQTH.gridSquare {
-            ownGridSquare = qthManager.ownQTH.gridSquare
-        }
-        if ownCQZone != qthManager.ownQTH.cqZone {
-            ownCQZone = qthManager.ownQTH.cqZone
-        }
-        if ownITUZone != qthManager.ownQTH.ituZone {
-            ownITUZone = qthManager.ownQTH.ituZone
-        }
-        let currentCoordinate = selectedOwnLocation
-        let savedCoordinate = qthManager.ownQTH.coordinate
-        if currentCoordinate?.latitude != savedCoordinate?.latitude ||
-           currentCoordinate?.longitude != savedCoordinate?.longitude {
-            selectedOwnLocation = qthManager.ownQTH.coordinate
-        }
+    private func formatADIFLocation(latitude: Double) -> String {
+        let dir = latitude >= 0 ? "N" : "S"
+        let abs = abs(latitude)
+        let deg = Int(abs)
+        let min = (abs - Double(deg)) * 60.0
+        return String(format: "%@%03d %05.3f", dir, deg, min)
+    }
+    
+    private func formatADIFLocation(longitude: Double) -> String {
+        let dir = longitude >= 0 ? "E" : "W"
+        let abs = abs(longitude)
+        let deg = Int(abs)
+        let min = (abs - Double(deg)) * 60.0
+        return String(format: "%@%03d %05.3f", dir, deg, min)
     }
     
     private func formatGridSquare(_ input: String) -> String {
@@ -1078,6 +1086,18 @@ struct EditQSOView: View {
         if endDateTimeVis != .hidden || endDateHasData {
             fields["QSO_DATE_OFF"] = ADIFDateTimeHelper.dateToADIFDate(endDate)
             fields["TIME_OFF"] = ADIFDateTimeHelper.dateToADIFTime(endDate)
+        }
+        
+        fields["MY_CITY"] = ownQTH
+        fields["MY_GRIDSQUARE"] = ownGridSquare
+        fields["MY_CQ_ZONE"] = ownCQZone
+        fields["MY_ITU_ZONE"] = ownITUZone
+        if let ownCoord = selectedOwnLocation {
+            fields["MY_LAT"] = formatADIFLocation(latitude: ownCoord.latitude)
+            fields["MY_LON"] = formatADIFLocation(longitude: ownCoord.longitude)
+        } else {
+            fields.removeValue(forKey: "MY_LAT")
+            fields.removeValue(forKey: "MY_LON")
         }
         
         record.adifFields = fields

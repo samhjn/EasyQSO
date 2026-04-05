@@ -45,6 +45,7 @@ struct SettingsView: View {
     // 字段设置
     @State private var showingFieldSettings = false
     @ObservedObject private var modeManager = ModeManager.shared
+    @ObservedObject private var autoFillManager = AutoFillManager.shared
     
     
     // 导入报告相关
@@ -86,6 +87,27 @@ struct SettingsView: View {
     
     var body: some View {
         Form {
+                // ===== 自动填充 =====
+                Section(header: Text("autofill_section".localized)) {
+                    Toggle(isOn: $autoFillManager.autoFillFrequencyAndMode) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("autofill_freq_mode".localized)
+                            Text("autofill_freq_mode_desc".localized)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    
+                    Toggle(isOn: $autoFillManager.autoFillOwnQTH) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("autofill_own_qth".localized)
+                            Text("autofill_own_qth_desc".localized)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+                
                 // ===== ADIF字段设置 =====
                 Section(header: Text("adif_field_config".localized)) {
                     Button(action: {
