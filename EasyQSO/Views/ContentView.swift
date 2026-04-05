@@ -22,6 +22,7 @@ import CoreData
 struct ContentView: View {
     @State private var selectedTab = 0
     @State private var showingGPLAlert = false
+    @State private var shouldScrollToGPL = false
     @Environment(\.managedObjectContext) private var viewContext
     
     var body: some View {
@@ -39,7 +40,7 @@ struct ContentView: View {
                     }
                     .tag(1)
                 
-                SettingsView()
+                SettingsView(scrollToGPL: $shouldScrollToGPL)
                     .tabItem {
                         Label(LocalizedStrings.settings.localized, systemImage: "gearshape")
                     }
@@ -58,7 +59,8 @@ struct ContentView: View {
         }
         .alert(LocalizedStrings.welcomeTitle.localized, isPresented: $showingGPLAlert) {
             Button(LocalizedStrings.learnGplLicense.localized) {
-                selectedTab = 2 // 切换到设置标签页
+                selectedTab = 2
+                shouldScrollToGPL = true
                 UserDefaults.standard.set(true, forKey: "hasShownGPLAlert")
             }
             Button(LocalizedStrings.viewLater.localized) {

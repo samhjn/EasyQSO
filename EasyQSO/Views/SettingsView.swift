@@ -23,6 +23,8 @@ import MobileCoreServices
 import UIKit
 
 struct SettingsView: View {
+    @Binding var scrollToGPL: Bool
+    
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \QSORecord.date, ascending: false)],
@@ -58,6 +60,10 @@ struct SettingsView: View {
     @State private var exportFilterCriteria = FilterCriteria()
     @State private var useFilterForExport = false
     
+    init(scrollToGPL: Binding<Bool> = .constant(false)) {
+        self._scrollToGPL = scrollToGPL
+    }
+    
     let exportFormats = ["ADIF", "CSV"]
     
     var fieldSettingsSummary: String {
@@ -86,6 +92,7 @@ struct SettingsView: View {
     }
     
     var body: some View {
+        ScrollViewReader { proxy in
         Form {
                 // ===== 自动填充 =====
                 Section(header: Text("autofill_section".localized)) {
@@ -343,6 +350,7 @@ struct SettingsView: View {
                         .foregroundColor(.secondary)
                     }
                     .padding(.vertical, 8)
+                    .id("gplLicense")
                     
                     // 版权信息
                     VStack(alignment: .leading, spacing: 4) {
@@ -476,7 +484,26 @@ struct SettingsView: View {
                         }
                     }
                 }
+                if scrollToGPL {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        withAnimation {
+                            proxy.scrollTo("gplLicense", anchor: .top)
+                        }
+                        scrollToGPL = false
+                    }
+                }
             }
+            .onChange(of: scrollToGPL) { newValue in
+                if newValue {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        withAnimation {
+                            proxy.scrollTo("gplLicense", anchor: .top)
+                        }
+                        scrollToGPL = false
+                    }
+                }
+            }
+        }
     }
     
     private func exportLogs() {
