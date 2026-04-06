@@ -14,7 +14,6 @@ import CoreLocation
 
 struct QSORecordView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @StateObject private var qthManager = QTHManager()
     @ObservedObject private var fieldVisibility = FieldVisibilityManager.shared
     @ObservedObject private var modeManager = ModeManager.shared
     @ObservedObject private var autoFillManager = AutoFillManager.shared
@@ -772,8 +771,6 @@ struct QSORecordView: View {
     private func loadOwnQTHDefaults() {
         if autoFillManager.autoFillOwnQTH {
             loadOwnQTHFromHistory()
-        } else {
-            loadOwnQTHFromManager()
         }
     }
     
@@ -794,27 +791,6 @@ struct QSORecordView: View {
             ownCQZone = ""
             ownITUZone = ""
             selectedOwnLocation = nil
-        }
-    }
-    
-    private func loadOwnQTHFromManager() {
-        if ownQTH != qthManager.ownQTH.location {
-            ownQTH = qthManager.ownQTH.location
-        }
-        if ownGridSquare != qthManager.ownQTH.gridSquare {
-            ownGridSquare = qthManager.ownQTH.gridSquare
-        }
-        if ownCQZone != qthManager.ownQTH.cqZone {
-            ownCQZone = qthManager.ownQTH.cqZone
-        }
-        if ownITUZone != qthManager.ownQTH.ituZone {
-            ownITUZone = qthManager.ownQTH.ituZone
-        }
-        let currentCoordinate = selectedOwnLocation
-        let savedCoordinate = qthManager.ownQTH.coordinate
-        if currentCoordinate?.latitude != savedCoordinate?.latitude ||
-           currentCoordinate?.longitude != savedCoordinate?.longitude {
-            selectedOwnLocation = qthManager.ownQTH.coordinate
         }
     }
     
@@ -937,14 +913,6 @@ struct QSORecordView: View {
     // MARK: - Save
     
     private func saveQSO() {
-        qthManager.updateOwnQTH(
-            location: ownQTH,
-            gridSquare: ownGridSquare,
-            cqZone: ownCQZone,
-            ituZone: ownITUZone,
-            coordinate: selectedOwnLocation
-        )
-        
         let newQSO = QSORecord(context: viewContext)
         newQSO.callsign = callsign
         newQSO.date = date

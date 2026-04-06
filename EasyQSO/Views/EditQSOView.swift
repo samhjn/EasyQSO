@@ -14,7 +14,6 @@ import CoreLocation
 struct EditQSOView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.presentationMode) var presentationMode
-    @StateObject private var qthManager = QTHManager()
     @ObservedObject private var fieldVisibility = FieldVisibilityManager.shared
     @ObservedObject private var modeManager = ModeManager.shared
     @FocusState private var focusedField: String?
@@ -1041,14 +1040,6 @@ struct EditQSOView: View {
     
     @discardableResult
     private func performSave() -> Bool {
-        qthManager.updateOwnQTH(
-            location: ownQTH,
-            gridSquare: ownGridSquare,
-            cqZone: ownCQZone,
-            ituZone: ownITUZone,
-            coordinate: selectedOwnLocation
-        )
-        
         record.callsign = callsign
         record.date = date
         record.band = band

@@ -52,6 +52,7 @@ targets:
           /usr/libexec/PlistBuddy -c "Delete :GitIsDirty" "$PLIST" 2>/dev/null || true
           /usr/libexec/PlistBuddy -c "Add :GitIsDirty bool $IS_DIRTY" "$PLIST"
         name: Inject Git Info into Info.plist
+        basedOnDependencyAnalysis: false
     scheme:
       testTargets:
         - EasyQSOTests

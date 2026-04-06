@@ -19,35 +19,9 @@
 import Foundation
 import CoreLocation
 
-// 己方QTH信息结构
-struct OwnQTHInfo {
-    var location: String
-    var gridSquare: String
-    var cqZone: String
-    var ituZone: String
-    var coordinate: CLLocationCoordinate2D?
-    
-    init() {
-        self.location = ""
-        self.gridSquare = ""
-        self.cqZone = ""
-        self.ituZone = ""
-        self.coordinate = nil
-    }
-}
-
 class QTHManager: NSObject, ObservableObject, CLLocationManagerDelegate {
-    @Published var ownQTH = OwnQTHInfo()
     @Published var currentLocation: CLLocationCoordinate2D?
     @Published var locationAuthorizationStatus: CLAuthorizationStatus = .notDetermined
-    
-    private let defaults = UserDefaults.standard
-    private let ownQTHLocationKey = "ownQTHLocation"
-    private let ownQTHGridSquareKey = "ownQTHGridSquare"
-    private let ownQTHCQZoneKey = "ownQTHCQZone"
-    private let ownQTHITUZoneKey = "ownQTHITUZone"
-    private let ownQTHLatitudeKey = "ownQTHLatitude"
-    private let ownQTHLongitudeKey = "ownQTHLongitude"
     
     private var locationManager: CLLocationManager?
     private var locationCompletion: ((CLLocationCoordinate2D?) -> Void)?
@@ -55,7 +29,6 @@ class QTHManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     override init() {
         super.init()
         setupLocationManager()
-        loadOwnQTH()
     }
     
     // MARK: - 定位管理
@@ -147,46 +120,7 @@ class QTHManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         }
     }
     
-    // MARK: - 己方QTH信息管理
-    
-    // 加载己方QTH信息
-    func loadOwnQTH() {
-        ownQTH.location = defaults.string(forKey: ownQTHLocationKey) ?? ""
-        ownQTH.gridSquare = defaults.string(forKey: ownQTHGridSquareKey) ?? ""
-        ownQTH.cqZone = defaults.string(forKey: ownQTHCQZoneKey) ?? ""
-        ownQTH.ituZone = defaults.string(forKey: ownQTHITUZoneKey) ?? ""
-        
-        let latitude = defaults.double(forKey: ownQTHLatitudeKey)
-        let longitude = defaults.double(forKey: ownQTHLongitudeKey)
-        if latitude != 0 || longitude != 0 {
-            ownQTH.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-        }
-    }
-    
-    // 保存己方QTH信息
-    func saveOwnQTH() {
-        defaults.set(ownQTH.location, forKey: ownQTHLocationKey)
-        defaults.set(ownQTH.gridSquare, forKey: ownQTHGridSquareKey)
-        defaults.set(ownQTH.cqZone, forKey: ownQTHCQZoneKey)
-        defaults.set(ownQTH.ituZone, forKey: ownQTHITUZoneKey)
-        
-        if let coordinate = ownQTH.coordinate {
-            defaults.set(coordinate.latitude, forKey: ownQTHLatitudeKey)
-            defaults.set(coordinate.longitude, forKey: ownQTHLongitudeKey)
-        }
-        
-        defaults.synchronize()
-    }
-    
-    // 更新己方QTH信息
-    func updateOwnQTH(location: String, gridSquare: String, cqZone: String, ituZone: String, coordinate: CLLocationCoordinate2D? = nil) {
-        ownQTH.location = location
-        ownQTH.gridSquare = gridSquare
-        ownQTH.cqZone = cqZone
-        ownQTH.ituZone = ituZone
-        ownQTH.coordinate = coordinate
-        saveOwnQTH()
-    }
+    // MARK: - 网格坐标计算
     
     // 从坐标计算网格坐标
     static func calculateGridSquare(from coordinate: CLLocationCoordinate2D) -> String {
