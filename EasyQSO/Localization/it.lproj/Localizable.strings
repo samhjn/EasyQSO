@@ -217,7 +217,7 @@
 
 // MARK: - Custom Modes
 "custom_modes" = "Custom Modes";
-"custom_modes_desc" = "Add custom communication modes beyond the ADIF standard for use in QSO records";
+"custom_modes_desc" = "Aggiungi modalità di comunicazione personalizzate da utilizzare nei record QSO";
 "new_mode_placeholder" = "Enter new mode name";
 "mode_already_exists" = "Questa modalità esiste già";
 "new_submode_placeholder" = "Nome del sottomodo";
@@ -235,7 +235,7 @@
 // MARK: - Impostazioni campi ADIF
 "adif_field_config" = "Configurazione campi QSO";
 "adif_field_settings" = "Gestisci campi QSO";
-"adif_field_config_desc" = "Configura la visibilità dei campi ADIF 3.1.7 durante la registrazione e modifica dei QSO: visibile, compresso o nascosto.";
+"adif_field_config_desc" = "Configura la visibilità dei campi del registro durante la registrazione e modifica dei QSO: visibile, compresso o nascosto.";
 "adif_search_fields" = "Cerca campi...";
 "adif_reset_defaults" = "Ripristina";
 "adif_required" = "Obbligatorio";

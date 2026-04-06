@@ -353,6 +353,7 @@ struct QSORecordView: View {
                 pullDistance = 0
                 showingPullHint = false
                 if hasUserInput {
+                    try? await Task.sleep(nanoseconds: 400_000_000)
                     showingResetAlert = true
                 } else {
                     date = Date()
@@ -447,6 +448,7 @@ struct QSORecordView: View {
         .alert("new_qso_reset_title".localized, isPresented: $showingResetAlert) {
             Button("new_qso_reset_confirm".localized, role: .destructive) {
                 resetForm()
+                formResetToken = UUID()
             }
             Button(LocalizedStrings.cancel.localized, role: .cancel) {
                 pullDistance = 0

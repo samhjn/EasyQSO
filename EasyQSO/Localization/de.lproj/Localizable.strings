@@ -217,7 +217,7 @@
 
 // MARK: - Benutzerdefinierte Betriebsarten
 "custom_modes" = "Benutzerdefinierte Betriebsarten";
-"custom_modes_desc" = "Fügen Sie benutzerdefinierte Betriebsarten hinzu, die über den ADIF-Standard hinausgehen, zur Verwendung in QSO-Einträgen";
+"custom_modes_desc" = "Fügen Sie benutzerdefinierte Betriebsarten zur Verwendung in QSO-Einträgen hinzu";
 "new_mode_placeholder" = "Neuen Betriebsartnamen eingeben";
 "mode_already_exists" = "Diese Betriebsart existiert bereits";
 "new_submode_placeholder" = "Submode-Name eingeben";
@@ -235,7 +235,7 @@
 // MARK: - ADIF-Feldeinstellungen
 "adif_field_config" = "QSO-Feldkonfiguration";
 "adif_field_settings" = "QSO-Felder verwalten";
-"adif_field_config_desc" = "Konfigurieren Sie die Sichtbarkeit der ADIF 3.1.7-Felder bei der QSO-Erfassung und -Bearbeitung: sichtbar, eingeklappt oder ausgeblendet.";
+"adif_field_config_desc" = "Konfigurieren Sie die Sichtbarkeit der Protokollfelder bei der QSO-Erfassung und -Bearbeitung: sichtbar, eingeklappt oder ausgeblendet.";
 "adif_search_fields" = "Felder suchen...";
 "adif_reset_defaults" = "Zurücksetzen";
 "adif_required" = "Erforderlich";

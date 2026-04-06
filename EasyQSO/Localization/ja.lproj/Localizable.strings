@@ -217,7 +217,7 @@
 
 // MARK: - カスタムモード
 "custom_modes" = "カスタムモード";
-"custom_modes_desc" = "ADIF標準以外のカスタム通信モードを追加し、QSO記録で使用できます";
+"custom_modes_desc" = "カスタム通信モードを追加し、QSO記録で使用できます";
 "new_mode_placeholder" = "新しいモード名を入力";
 "mode_already_exists" = "このモードは既に存在します";
 "new_submode_placeholder" = "サブモード名を入力";
@@ -235,7 +235,7 @@
 // MARK: - ADIFフィールド設定
 "adif_field_config" = "QSOフィールド設定";
 "adif_field_settings" = "QSOフィールド管理";
-"adif_field_config_desc" = "ADIF 3.1.7標準のフィールドについて、QSO記録・編集時の表示状態（表示・折りたたみ・非表示）を設定します。";
+"adif_field_config_desc" = "ログフィールドのQSO記録・編集時の表示状態（表示・折りたたみ・非表示）を設定します。";
 "adif_search_fields" = "フィールドを検索...";
 "adif_reset_defaults" = "リセット";
 "adif_required" = "必須";

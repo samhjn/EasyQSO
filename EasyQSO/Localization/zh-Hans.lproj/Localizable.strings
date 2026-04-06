@@ -217,7 +217,7 @@
 
 // MARK: - 自定义模式
 "custom_modes" = "自定义模式";
-"custom_modes_desc" = "添加ADIF标准以外的自定义通信模式，添加后可在QSO记录中使用";
+"custom_modes_desc" = "添加自定义通信模式，添加后可在QSO记录中使用";
 "new_mode_placeholder" = "输入新模式名称";
 "mode_already_exists" = "该模式已存在";
 "new_submode_placeholder" = "输入子模式名称";
@@ -235,7 +235,7 @@
 // MARK: - ADIF字段设置
 "adif_field_config" = "QSO字段配置";
 "adif_field_settings" = "管理QSO字段";
-"adif_field_config_desc" = "配置ADIF 3.1.7标准中的字段在QSO记录和编辑时的显示状态：显示、折叠或隐藏。";
+"adif_field_config_desc" = "配置日志字段在QSO记录和编辑时的显示状态：显示、折叠或隐藏。";
 "adif_search_fields" = "搜索字段...";
 "adif_reset_defaults" = "重置";
 "adif_required" = "必填";

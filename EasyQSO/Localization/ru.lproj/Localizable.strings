@@ -217,7 +217,7 @@
 
 // MARK: - Custom Modes
 "custom_modes" = "Custom Modes";
-"custom_modes_desc" = "Add custom communication modes beyond the ADIF standard for use in QSO records";
+"custom_modes_desc" = "Добавляйте пользовательские режимы связи для использования в записях QSO";
 "new_mode_placeholder" = "Enter new mode name";
 "mode_already_exists" = "Этот режим уже существует";
 "new_submode_placeholder" = "Введите название подрежима";
@@ -235,7 +235,7 @@
 // MARK: - ADIF Field Settings
 "adif_field_config" = "Настройка полей QSO";
 "adif_field_settings" = "Управление полями QSO";
-"adif_field_config_desc" = "Настройте видимость полей ADIF 3.1.7 при записи и редактировании QSO: видимые, свёрнутые или скрытые.";
+"adif_field_config_desc" = "Настройте видимость полей журнала при записи и редактировании QSO: видимые, свёрнутые или скрытые.";
 "adif_search_fields" = "Поиск полей...";
 "adif_reset_defaults" = "Сброс";
 "adif_required" = "Обязательное";

@@ -217,7 +217,7 @@
 
 // MARK: - 사용자 정의 모드
 "custom_modes" = "사용자 정의 모드";
-"custom_modes_desc" = "ADIF 표준 외의 사용자 정의 통신 모드를 추가하여 QSO 기록에 사용할 수 있습니다";
+"custom_modes_desc" = "사용자 정의 통신 모드를 추가하여 QSO 기록에 사용할 수 있습니다";
 "new_mode_placeholder" = "새 모드 이름 입력";
 "mode_already_exists" = "이 모드는 이미 존재합니다";
 "new_submode_placeholder" = "서브모드 이름 입력";
@@ -235,7 +235,7 @@
 // MARK: - ADIF 필드 설정
 "adif_field_config" = "QSO 필드 설정";
 "adif_field_settings" = "QSO 필드 관리";
-"adif_field_config_desc" = "QSO 기록 및 편집 시 ADIF 3.1.7 필드의 표시 상태를 설정합니다: 표시, 접힘 또는 숨김.";
+"adif_field_config_desc" = "QSO 기록 및 편집 시 로그 필드의 표시 상태를 설정합니다: 표시, 접힘 또는 숨김.";
 "adif_search_fields" = "필드 검색...";
 "adif_reset_defaults" = "초기화";
 "adif_required" = "필수";
