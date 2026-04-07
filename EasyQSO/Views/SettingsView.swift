@@ -46,6 +46,7 @@ struct SettingsView: View {
     
     // 字段设置
     @State private var showingFieldSettings = false
+    @ObservedObject private var visibilityManager = FieldVisibilityManager.shared
     @ObservedObject private var modeManager = ModeManager.shared
     @ObservedObject private var autoFillManager = AutoFillManager.shared
     
@@ -67,10 +68,12 @@ struct SettingsView: View {
     let exportFormats = ["ADIF", "CSV"]
     
     var fieldSettingsSummary: String {
-        let vm = FieldVisibilityManager.shared
+        // Access visibilityManager (an @ObservedObject) so SwiftUI
+        // re-renders this view when field visibility changes.
+        let _ = visibilityManager.revision
         var visible = 0
         for field in ADIFFields.all {
-            if vm.visibility(for: field.id) == .visible { visible += 1 }
+            if visibilityManager.visibility(for: field.id) == .visible { visible += 1 }
         }
         return "\(visible)/\(ADIFFields.all.count)"
     }
