@@ -205,6 +205,30 @@ class ModeManager: ObservableObject {
         mode.uppercased() == "CW"
     }
 
+    /// Known digital modes that use dB-based signal reports (e.g. -10)
+    private static let digitalModes: Set<String> = [
+        "ARDOP", "CHIP", "CONTESTI", "DIGITALVOICE", "DOMINO", "DYNAMIC",
+        "FSK441", "FSK", "FT8", "HELL", "ISCAT",
+        "JT4", "JT6M", "JT9", "JT44", "JT65",
+        "MFSK", "MSK144", "MT63", "MTONE", "OFDM", "OLIVIA", "OPERA",
+        "PAC", "PAX", "PKT", "PSK", "PSK2K", "Q15", "QRA64",
+        "ROS", "RTTY", "RTTYM",
+        "T10", "THOR", "THRB", "TOR", "V4", "WINMOR", "WSPR",
+    ]
+
+    /// Check if a mode is a known digital mode (uses dB signal reports)
+    static func isDigitalMode(mode: String, submode: String?) -> Bool {
+        let m = mode.uppercased()
+        if digitalModes.contains(m) { return true }
+        // Check if submode belongs to a known digital parent
+        if let s = submode, !s.isEmpty,
+           let parent = submodeToMode[s.uppercased()],
+           digitalModes.contains(parent) {
+            return true
+        }
+        return false
+    }
+
     // MARK: - User preferences
 
     var customModes: [String] {
