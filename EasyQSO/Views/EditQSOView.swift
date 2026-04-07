@@ -935,16 +935,8 @@ struct EditQSOView: View {
                 .padding(.vertical, 4)
                 .background(Color.accentColor.opacity(0.1))
                 .cornerRadius(8)
-        } else {
-            // Unknown mode: default to voice-style RST
-            Button("59") { binding.wrappedValue = "59" }
-                .buttonStyle(.borderless)
-                .font(.caption)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(Color.accentColor.opacity(0.1))
-                .cornerRadius(8)
         }
+        // Unknown mode: no quick button, user enters RST manually
     }
     
     // MARK: - Data Loading
