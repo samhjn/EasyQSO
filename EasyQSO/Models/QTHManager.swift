@@ -213,11 +213,15 @@ class QTHManager: NSObject, ObservableObject, CLLocationManagerDelegate {
             let subsquare2 = Int(ascii6 - 97)
             longitude += Double(subsquare1) * (2.0/24.0)
             latitude += Double(subsquare2) * (1.0/24.0)
+
+            // 移动到子网格中心
+            longitude += (2.0/24.0) / 2.0
+            latitude += (1.0/24.0) / 2.0
+        } else {
+            // 移动到网格中心（4字符精度）
+            longitude += 1.0
+            latitude += 0.5
         }
-        
-        // 移动到网格中心
-        longitude += 1.0
-        latitude += 0.5
         
         return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
