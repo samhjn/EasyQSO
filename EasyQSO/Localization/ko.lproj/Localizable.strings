@@ -228,6 +228,7 @@
 "mode_settings_title" = "모드 설정";
 "mode_settings_desc" = "QSO 기록에서 사용할 수 있는 통신 모드를 관리합니다. 프리셋 모드를 표시하거나 숨기고, 사용자 정의 모드를 추가할 수 있습니다. 프리셋 목록은 자주 사용하는 모드만 포함하며 ADIF 표준의 모든 모드가 아닙니다.";
 "preset_modes" = "프리셋 모드";
+"mode_search_placeholder" = "모드 검색...";
 
 // MARK: - 수신 밴드
 "rx_band" = "수신 밴드";

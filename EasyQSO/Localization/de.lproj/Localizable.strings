@@ -228,6 +228,7 @@
 "mode_settings_title" = "Betriebsart-Einstellungen";
 "mode_settings_desc" = "Verwalten Sie die in QSO-Einträgen verfügbaren Betriebsarten. Sie können voreingestellte Betriebsarten ein-/ausblenden und benutzerdefinierte hinzufügen. Die Voreinstellungsliste enthält nur häufig verwendete Betriebsarten.";
 "preset_modes" = "Voreingestellte Betriebsarten";
+"mode_search_placeholder" = "Betriebsarten suchen...";
 
 // MARK: - RX-Band
 "rx_band" = "RX-Band";

@@ -228,6 +228,7 @@
 "mode_settings_title" = "モード設定";
 "mode_settings_desc" = "QSO記録で使用可能な通信モードを管理します。プリセットモードの表示/非表示を切り替えたり、カスタムモードを追加できます。プリセットリストはよく使われるモードのみで、ADIF標準の全モードではありません。";
 "preset_modes" = "プリセットモード";
+"mode_search_placeholder" = "モードを検索...";
 
 // MARK: - 受信バンド
 "rx_band" = "受信バンド";
