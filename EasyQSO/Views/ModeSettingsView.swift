@@ -16,52 +16,107 @@ struct ModeSettingsView: View {
     @State private var showingAlert = false
     @State private var alertMessage = ""
     @State private var newSubmodeName: [String: String] = [:]
-    
+    @State private var searchText = ""
+
+    /// Check if a mode or any of its submodes match the search text
+    private func modeMatchesSearch(_ mode: String, submodes: [String]) -> Bool {
+        if searchText.isEmpty { return true }
+        let query = searchText.uppercased()
+        if mode.uppercased().localizedCaseInsensitiveContains(query) { return true }
+        let customSubs = modeManager.customSubmodesForMode(mode)
+        let allSubs = submodes + customSubs.filter { sub in !submodes.contains(where: { $0.uppercased() == sub.uppercased() }) }
+        return allSubs.contains { $0.localizedCaseInsensitiveContains(query) }
+    }
+
+    /// Filter preset submodes that match the search text (returns all if search is empty or mode itself matches)
+    private func filteredSubmodes(_ submodes: [String], for mode: String) -> [String] {
+        if searchText.isEmpty { return submodes }
+        if mode.localizedCaseInsensitiveContains(searchText) { return submodes }
+        return submodes.filter { $0.localizedCaseInsensitiveContains(searchText) }
+    }
+
+    private var filteredPresetModes: [(mode: String, submodes: [String])] {
+        if searchText.isEmpty { return ModeManager.modeSubmodes }
+        return ModeManager.modeSubmodes.filter { modeMatchesSearch($0.mode, submodes: $0.submodes) }
+    }
+
+    private var filteredCustomModes: [String] {
+        if searchText.isEmpty { return modeManager.customModes }
+        return modeManager.customModes.filter { modeMatchesSearch($0, submodes: []) }
+    }
+
     var body: some View {
         List {
-            Section(header: Text("preset_modes".localized)) {
-                ForEach(ModeManager.modeSubmodes, id: \.mode) { entry in
-                    modeRow(mode: entry.mode, presetSubmodes: entry.submodes, isCustomMode: false)
-                }
-            }
-            
-            Section(header: Text("custom_modes".localized)) {
-                ForEach(modeManager.customModes, id: \.self) { mode in
-                    modeRow(mode: mode, presetSubmodes: [], isCustomMode: true)
-                }
-                
-                HStack {
-                    TextField("new_mode_placeholder".localized, text: $newModeName)
-                        .autocapitalization(.allCharacters)
-                        .onChange(of: newModeName) { newValue in
-                            newModeName = newValue.uppercased()
-                        }
-                    
-                    Button {
-                        let trimmed = newModeName.trimmingCharacters(in: .whitespaces)
-                        if ModeManager.allAdifModes.contains(where: { $0.uppercased() == trimmed.uppercased() }) ||
-                           modeManager.customModes.contains(trimmed) {
-                            alertMessage = "mode_already_exists".localized
-                            showingAlert = true
-                            return
-                        }
-                        withAnimation {
-                            modeManager.addCustomMode(trimmed)
-                            newModeName = ""
-                        }
-                    } label: {
-                        Image(systemName: "plus.circle.fill")
-                            .foregroundColor(.green)
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(newModeName.trimmingCharacters(in: .whitespaces).isEmpty)
-                }
-            }
-            
             Section {
-                Text("mode_settings_desc".localized)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.secondary)
+                    TextField("mode_search_placeholder".localized, text: $searchText)
+                        .autocapitalization(.allCharacters)
+                        .disableAutocorrection(true)
+                    if !searchText.isEmpty {
+                        Button {
+                            searchText = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.secondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+
+            if !filteredPresetModes.isEmpty {
+                Section(header: Text("preset_modes".localized)) {
+                    ForEach(filteredPresetModes, id: \.mode) { entry in
+                        modeRow(mode: entry.mode, presetSubmodes: filteredSubmodes(entry.submodes, for: entry.mode), isCustomMode: false)
+                    }
+                }
+            }
+
+            if searchText.isEmpty || !filteredCustomModes.isEmpty {
+                Section(header: Text("custom_modes".localized)) {
+                    ForEach(filteredCustomModes, id: \.self) { mode in
+                        modeRow(mode: mode, presetSubmodes: [], isCustomMode: true)
+                    }
+
+                    if searchText.isEmpty {
+                        HStack {
+                            TextField("new_mode_placeholder".localized, text: $newModeName)
+                                .autocapitalization(.allCharacters)
+                                .onChange(of: newModeName) { newValue in
+                                    newModeName = newValue.uppercased()
+                                }
+
+                            Button {
+                                let trimmed = newModeName.trimmingCharacters(in: .whitespaces)
+                                if ModeManager.allAdifModes.contains(where: { $0.uppercased() == trimmed.uppercased() }) ||
+                                   modeManager.customModes.contains(trimmed) {
+                                    alertMessage = "mode_already_exists".localized
+                                    showingAlert = true
+                                    return
+                                }
+                                withAnimation {
+                                    modeManager.addCustomMode(trimmed)
+                                    newModeName = ""
+                                }
+                            } label: {
+                                Image(systemName: "plus.circle.fill")
+                                    .foregroundColor(.green)
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(newModeName.trimmingCharacters(in: .whitespaces).isEmpty)
+                        }
+                    }
+                }
+            }
+
+            if searchText.isEmpty {
+                Section {
+                    Text("mode_settings_desc".localized)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
         }
         .listStyle(InsetGroupedListStyle())

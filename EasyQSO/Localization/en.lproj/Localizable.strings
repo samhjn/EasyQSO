@@ -228,6 +228,7 @@
 "mode_settings_title" = "Mode Settings";
 "mode_settings_desc" = "Manage communication modes available in QSO records. You can show or hide preset modes, and add custom modes. The preset list contains commonly used modes only, not all modes defined in the ADIF standard.";
 "preset_modes" = "Preset Modes";
+"mode_search_placeholder" = "Search modes...";
 
 // MARK: - RX Band
 "rx_band" = "RX Band";

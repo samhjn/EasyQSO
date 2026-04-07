@@ -228,6 +228,7 @@
 "mode_settings_title" = "模式管理";
 "mode_settings_desc" = "管理QSO記錄中可用的通訊模式。可以顯示或隱藏預設模式，也可以新增自訂模式。預設列表僅包含常用模式，並非ADIF標準的全部模式。";
 "preset_modes" = "預設模式";
+"mode_search_placeholder" = "搜尋模式...";
 
 // MARK: - 接收波段
 "rx_band" = "接收波段";

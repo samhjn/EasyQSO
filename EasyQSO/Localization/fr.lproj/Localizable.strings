@@ -228,6 +228,7 @@
 "mode_settings_title" = "Paramètres des modes";
 "mode_settings_desc" = "Gérez les modes de communication disponibles dans les enregistrements QSO. Vous pouvez afficher ou masquer les modes prédéfinis et ajouter des modes personnalisés. La liste prédéfinie ne contient que les modes couramment utilisés.";
 "preset_modes" = "Modes prédéfinis";
+"mode_search_placeholder" = "Rechercher des modes...";
 
 // MARK: - RX Band
 "rx_band" = "Bande RX";
