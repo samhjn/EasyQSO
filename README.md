@@ -1,5 +1,7 @@
 # EasyQSO - Amateur Radio QSO Logger
 
+[![iOS CI](https://github.com/samhjn/EasyQSO/actions/workflows/ios-ci.yml/badge.svg)](https://github.com/samhjn/EasyQSO/actions/workflows/ios-ci.yml)
+
 EasyQSO is an iOS application designed for amateur radio enthusiasts to record, query, and manage their QSO (contact) logs. It provides comprehensive features for logging amateur radio contacts with support for import/export functionality.
 
 ## Features
