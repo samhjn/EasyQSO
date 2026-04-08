@@ -133,6 +133,58 @@ final class ModeSubmodeTests: XCTestCase {
         XCTAssertFalse(ModeManager.isCWMode(mode: "SSB", submode: nil))
     }
 
+    // MARK: - ModeManager.isDigitalMode
+
+    func testIsDigitalModeForKnownDigitalModes() {
+        XCTAssertTrue(ModeManager.isDigitalMode(mode: "FT8", submode: nil))
+        XCTAssertTrue(ModeManager.isDigitalMode(mode: "PSK", submode: nil))
+        XCTAssertTrue(ModeManager.isDigitalMode(mode: "MFSK", submode: nil))
+        XCTAssertTrue(ModeManager.isDigitalMode(mode: "RTTY", submode: nil))
+        XCTAssertTrue(ModeManager.isDigitalMode(mode: "JT65", submode: nil))
+        XCTAssertTrue(ModeManager.isDigitalMode(mode: "JT9", submode: nil))
+        XCTAssertTrue(ModeManager.isDigitalMode(mode: "WSPR", submode: nil))
+        XCTAssertTrue(ModeManager.isDigitalMode(mode: "OLIVIA", submode: nil))
+        XCTAssertTrue(ModeManager.isDigitalMode(mode: "MSK144", submode: nil))
+        XCTAssertTrue(ModeManager.isDigitalMode(mode: "DIGITALVOICE", submode: nil))
+    }
+
+    func testIsDigitalModeWithSubmode() {
+        XCTAssertTrue(ModeManager.isDigitalMode(mode: "MFSK", submode: "FT4"))
+        XCTAssertTrue(ModeManager.isDigitalMode(mode: "MFSK", submode: "JS8"))
+        XCTAssertTrue(ModeManager.isDigitalMode(mode: "PSK", submode: "PSK31"))
+        XCTAssertTrue(ModeManager.isDigitalMode(mode: "JT9", submode: "JT9-1"))
+    }
+
+    func testIsDigitalModeResolvesSubmodeParent() {
+        // When mode field is empty/generic but submode belongs to a digital parent
+        XCTAssertTrue(ModeManager.isDigitalMode(mode: "MFSK", submode: "Q65"))
+        XCTAssertTrue(ModeManager.isDigitalMode(mode: "DIGITALVOICE", submode: "C4FM"))
+    }
+
+    func testIsDigitalModeForVoiceIsFalse() {
+        XCTAssertFalse(ModeManager.isDigitalMode(mode: "SSB", submode: nil))
+        XCTAssertFalse(ModeManager.isDigitalMode(mode: "SSB", submode: "LSB"))
+        XCTAssertFalse(ModeManager.isDigitalMode(mode: "FM", submode: nil))
+        XCTAssertFalse(ModeManager.isDigitalMode(mode: "AM", submode: nil))
+    }
+
+    func testIsDigitalModeForCWIsFalse() {
+        XCTAssertFalse(ModeManager.isDigitalMode(mode: "CW", submode: nil))
+        XCTAssertFalse(ModeManager.isDigitalMode(mode: "CW", submode: "PCW"))
+    }
+
+    func testIsDigitalModeForUnknownModeIsFalse() {
+        XCTAssertFalse(ModeManager.isDigitalMode(mode: "MYMODE", submode: nil))
+        XCTAssertFalse(ModeManager.isDigitalMode(mode: "UNKNOWN", submode: nil))
+        XCTAssertFalse(ModeManager.isDigitalMode(mode: "CUSTOM123", submode: "CUSTOMSUB"))
+    }
+
+    func testIsDigitalModeCaseInsensitive() {
+        XCTAssertTrue(ModeManager.isDigitalMode(mode: "ft8", submode: nil))
+        XCTAssertTrue(ModeManager.isDigitalMode(mode: "Psk", submode: nil))
+        XCTAssertTrue(ModeManager.isDigitalMode(mode: "mfsk", submode: "ft4"))
+    }
+
     // MARK: - ModeManager.pickerItems
 
     func testPickerItemsContainsModeAndSubmodes() {
