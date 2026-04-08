@@ -141,6 +141,7 @@ struct EditQSOView: View {
 
     private var isVoiceMode: Bool { ModeManager.isVoiceMode(mode: mode, submode: submode.isEmpty ? nil : submode) }
     private var isCWMode: Bool { ModeManager.isCWMode(mode: mode, submode: submode.isEmpty ? nil : submode) }
+    private var isDigitalMode: Bool { ModeManager.isDigitalMode(mode: mode, submode: submode.isEmpty ? nil : submode) }
     
     private var showRxBandPicker: Bool {
         fieldVisibility.isCoreFieldVisible(for: "FREQ_RX") &&
@@ -942,7 +943,7 @@ struct EditQSOView: View {
                     .background(Color.accentColor.opacity(0.1))
                     .cornerRadius(8)
             }
-        } else {
+        } else if isDigitalMode {
             Button("-10") { binding.wrappedValue = "-10" }
                 .buttonStyle(.borderless)
                 .font(.caption)
@@ -951,6 +952,7 @@ struct EditQSOView: View {
                 .background(Color.accentColor.opacity(0.1))
                 .cornerRadius(8)
         }
+        // Unknown mode: no quick button, user enters RST manually
     }
     
     // MARK: - Data Loading
