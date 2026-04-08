@@ -493,3 +493,28 @@
 "autofill_own_qth" = "自局QTH";
 "autofill_own_qth_desc" = "履歴から自局QTHを自動入力し、バンドとモードの変更に連動";
 "autofill_badge" = "自動";
+"autofill_dxcc" = "DXCCエンティティ";
+"autofill_dxcc_desc" = "コールサインのプレフィックスからDXCCエンティティを自動入力";
+"autofill_dxcc_no_data" = "DXCCデータがまだインポートされていません。タップしてインポート。";
+"autofill_dxcc_hidden_hint" = "フィールド設定でDXCCフィールドを有効にして設定してください。タップしてDXCCデータを管理。";
+
+// MARK: - DXCCデータ
+"dxcc_section" = "DXCCデータ";
+"dxcc_data_title" = "DXCCデータ";
+"dxcc_section_desc" = "コールサイン自動検索のためにDXCCプレフィックスデータベースをインターネットからダウンロードします。";
+"dxcc_import_button" = "DXCCプレフィックスデータをインポート";
+"dxcc_downloading" = "ダウンロード中...";
+"dxcc_entities_count" = "エンティティ";
+"dxcc_last_update" = "最終更新";
+"dxcc_import_success_title" = "インポート成功";
+"dxcc_import_success_message" = "%d件のDXCCエンティティを正常にインポートしました。";
+"dxcc_import_failed_title" = "インポート失敗";
+"dxcc_invalid_url" = "無効なダウンロードURLです。";
+"dxcc_download_failed" = "ダウンロードに失敗しました (HTTP %d)。";
+"dxcc_parse_error" = "DXCCデータの解析に失敗しました。";
+"dxcc_no_data" = "DXCCデータなし";
+"dxcc_no_data_hint" = "設定 → DXCCデータからプレフィックスデータを先にインポートしてください。";
+"dxcc_clear_selection" = "選択を解除";
+"dxcc_search_prompt" = "名前、プレフィックス、コードで検索";
+"dxcc_picker_title" = "DXCCエンティティを選択";
+"dxcc_not_set" = "未設定";

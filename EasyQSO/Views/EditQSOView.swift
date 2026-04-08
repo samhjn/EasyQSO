@@ -16,6 +16,7 @@ struct EditQSOView: View {
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject private var fieldVisibility = FieldVisibilityManager.shared
     @ObservedObject private var modeManager = ModeManager.shared
+    @ObservedObject private var autoFillManager = AutoFillManager.shared
     @FocusState private var focusedField: String?
     
     let record: QSORecord
@@ -356,6 +357,7 @@ struct EditQSOView: View {
                     .focused($focusedField, equals: "CALL")
                     .onChange(of: callsign) { newValue in
                         callsign = newValue.uppercased()
+                        autoFillDXCCFromCallsign(newValue.uppercased())
                     }
                     .floatingLabel(LocalizedStrings.callsign.localized, text: callsign)
                 
@@ -765,11 +767,15 @@ struct EditQSOView: View {
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                                 .listRowSeparator(.hidden)
-                            
+
                             ForEach(fields) { field in
-                                TextField(field.displayName, text: bindingForExtended(field.id))
-                                    .focused($focusedField, equals: field.id)
-                                    .floatingLabel(field.displayName, text: extendedFields[field.id] ?? "")
+                                if field.id == "DXCC" || field.id == "MY_DXCC" {
+                                    DXCCFieldRow(dxccCode: bindingForExtended(field.id), label: field.displayName)
+                                } else {
+                                    TextField(field.displayName, text: bindingForExtended(field.id))
+                                        .focused($focusedField, equals: field.id)
+                                        .floatingLabel(field.displayName, text: extendedFields[field.id] ?? "")
+                                }
                             }
                         }
                     }
@@ -777,7 +783,7 @@ struct EditQSOView: View {
             }
         }
     }
-    
+
     // MARK: - Hidden Fields With Values Section
     
     @ViewBuilder
@@ -852,6 +858,16 @@ struct EditQSOView: View {
         }
     }
     
+    private func autoFillDXCCFromCallsign(_ call: String) {
+        guard autoFillManager.autoFillDXCC,
+              fieldVisibility.visibility(for: "DXCC") != .hidden,
+              DXCCManager.shared.isDataAvailable,
+              call.count >= 2 else { return }
+        if let entity = DXCCManager.shared.lookupCallsign(call) {
+            extendedFields["DXCC"] = String(entity.code)
+        }
+    }
+
     private func hiddenGroupHeader(_ name: String) -> some View {
         HStack(spacing: 4) {
             Image(systemName: "eye.slash")

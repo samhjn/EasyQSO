@@ -101,19 +101,26 @@ struct ADIFDynamicFieldRows: View {
     @ObservedObject var visibilityManager: FieldVisibilityManager
     @FocusState.Binding var focusedField: String?
     var excludeFieldIds: Set<String> = []
-    
+    var isFieldAutoFilled: ((String) -> Bool)? = nil
+
+    private static let dxccFieldIds: Set<String> = ["DXCC", "MY_DXCC"]
+
     var body: some View {
         let visible = visibilityManager.visibleFields(for: category).filter {
             !excludeFieldIds.contains($0.id)
         }
-        
+
         ForEach(visible) { field in
-            TextField(field.displayName, text: bindingFor(field.id))
-                .focused($focusedField, equals: field.id)
-                .floatingLabel(field.displayName, text: extendedFields[field.id] ?? "")
+            if Self.dxccFieldIds.contains(field.id) {
+                DXCCFieldRow(dxccCode: bindingFor(field.id), label: field.displayName, isAutoFilled: isFieldAutoFilled?(field.id) ?? false)
+            } else {
+                TextField(field.displayName, text: bindingFor(field.id))
+                    .focused($focusedField, equals: field.id)
+                    .floatingLabel(field.displayName, text: extendedFields[field.id] ?? "")
+            }
         }
     }
-    
+
     private func bindingFor(_ fieldId: String) -> Binding<String> {
         Binding(
             get: { extendedFields[fieldId] ?? "" },
@@ -157,7 +164,9 @@ struct ADIFCollapsedFieldsSection: View {
     @Binding var extendedFields: [String: String]
     @ObservedObject var visibilityManager: FieldVisibilityManager
     @FocusState.Binding var focusedField: String?
-    
+
+    private let dxccFieldIds: Set<String> = ["DXCC", "MY_DXCC"]
+
     var body: some View {
         let allCollapsed = visibilityManager.allCollapsedFields()
         
@@ -175,9 +184,13 @@ struct ADIFCollapsedFieldsSection: View {
                                 .listRowSeparator(.hidden)
                             
                             ForEach(fields) { field in
-                                TextField(field.displayName, text: bindingFor(field.id))
-                                    .focused($focusedField, equals: field.id)
-                                    .floatingLabel(field.displayName, text: extendedFields[field.id] ?? "")
+                                if dxccFieldIds.contains(field.id) {
+                                    DXCCFieldRow(dxccCode: bindingFor(field.id), label: field.displayName)
+                                } else {
+                                    TextField(field.displayName, text: bindingFor(field.id))
+                                        .focused($focusedField, equals: field.id)
+                                        .floatingLabel(field.displayName, text: extendedFields[field.id] ?? "")
+                                }
                             }
                         }
                     }

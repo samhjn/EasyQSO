@@ -493,3 +493,28 @@
 "autofill_own_qth" = "己方 QTH";
 "autofill_own_qth_desc" = "根據歷史記錄自動填充己方 QTH，連動波段和模式變更";
 "autofill_badge" = "自動";
+"autofill_dxcc" = "DXCC 實體";
+"autofill_dxcc_desc" = "根據呼號前綴自動填充 DXCC 實體";
+"autofill_dxcc_no_data" = "尚未匯入 DXCC 資料，點擊前往匯入。";
+"autofill_dxcc_hidden_hint" = "請在欄位設定中啟用 DXCC 欄位以配置。點擊前往管理 DXCC 資料。";
+
+// MARK: - DXCC 資料
+"dxcc_section" = "DXCC 資料";
+"dxcc_data_title" = "DXCC 資料";
+"dxcc_section_desc" = "從網路下載 DXCC 前綴資料庫，用於呼號自動查詢。";
+"dxcc_import_button" = "匯入 DXCC 前綴資料";
+"dxcc_downloading" = "下載中...";
+"dxcc_entities_count" = "實體數量";
+"dxcc_last_update" = "最後更新";
+"dxcc_import_success_title" = "匯入成功";
+"dxcc_import_success_message" = "成功匯入 %d 個 DXCC 實體。";
+"dxcc_import_failed_title" = "匯入失敗";
+"dxcc_invalid_url" = "無效的下載地址。";
+"dxcc_download_failed" = "下載失敗（HTTP %d）。";
+"dxcc_parse_error" = "解析 DXCC 資料失敗。";
+"dxcc_no_data" = "無 DXCC 資料";
+"dxcc_no_data_hint" = "請前往 設定 → DXCC 資料 先匯入前綴資料。";
+"dxcc_clear_selection" = "清除選擇";
+"dxcc_search_prompt" = "按名稱、前綴或代碼搜尋";
+"dxcc_picker_title" = "選擇 DXCC 實體";
+"dxcc_not_set" = "未設定";

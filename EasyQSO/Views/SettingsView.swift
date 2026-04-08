@@ -46,9 +46,12 @@ struct SettingsView: View {
     
     // 字段设置
     @State private var showingFieldSettings = false
+    @State private var navigateToDXCCData = false
     @ObservedObject private var visibilityManager = FieldVisibilityManager.shared
     @ObservedObject private var modeManager = ModeManager.shared
     @ObservedObject private var autoFillManager = AutoFillManager.shared
+    @ObservedObject private var dxccManager = DXCCManager.shared
+    @ObservedObject private var fieldVisibility = FieldVisibilityManager.shared
     
     
     // 导入报告相关
@@ -67,6 +70,10 @@ struct SettingsView: View {
     
     let exportFormats = ["ADIF", "CSV"]
     
+    private var isDXCCFieldVisible: Bool {
+        fieldVisibility.visibility(for: "DXCC") != .hidden
+    }
+
     var fieldSettingsSummary: String {
         // Access visibilityManager (an @ObservedObject) so SwiftUI
         // re-renders this view when field visibility changes.
@@ -116,6 +123,42 @@ struct SettingsView: View {
                                 .foregroundColor(.secondary)
                         }
                     }
+
+                    if isDXCCFieldVisible {
+                        Toggle(isOn: $autoFillManager.autoFillDXCC) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("autofill_dxcc".localized)
+                                Text("autofill_dxcc_desc".localized)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                if !dxccManager.isDataAvailable {
+                                    Button(action: { navigateToDXCCData = true }) {
+                                        Text("autofill_dxcc_no_data".localized)
+                                            .font(.caption)
+                                            .foregroundColor(.orange)
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                            }
+                        }
+                        .disabled(!dxccManager.isDataAvailable)
+                    } else {
+                        Button(action: { navigateToDXCCData = true }) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                HStack {
+                                    Text("autofill_dxcc".localized)
+                                        .foregroundColor(.secondary)
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                Text("autofill_dxcc_hidden_hint".localized)
+                                    .font(.caption)
+                                    .foregroundColor(.orange)
+                            }
+                        }
+                    }
                 }
                 
                 // ===== ADIF字段设置 =====
@@ -150,6 +193,17 @@ struct SettingsView: View {
                             Text("mode_settings_title".localized)
                             Spacer()
                             Text("\(modeManager.enabledItemCount)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+
+                    NavigationLink(destination: DXCCDataView(), isActive: $navigateToDXCCData) {
+                        HStack {
+                            Image(systemName: "globe")
+                            Text("dxcc_data_title".localized)
+                            Spacer()
+                            Text(dxccManager.isDataAvailable ? "\(dxccManager.entities.count)" : "-")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }

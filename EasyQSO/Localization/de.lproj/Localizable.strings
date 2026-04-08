@@ -491,5 +491,30 @@
 "autofill_freq_mode" = "Frequency & Mode";
 "autofill_freq_mode_desc" = "Auto-fill band, mode and frequency from latest QSO record";
 "autofill_own_qth" = "Own QTH";
-"autofill_own_qth_desc" = "Auto-fill own QTH from history, linked to band & mode changes";
+"autofill_own_qth_desc" = "Eigenes QTH automatisch aus der Historie ausfüllen, verknüpft mit Band- und Modusänderungen";
 "autofill_badge" = "auto";
+"autofill_dxcc" = "DXCC-Entität";
+"autofill_dxcc_desc" = "DXCC-Entität automatisch anhand des Rufzeichenpräfixes ausfüllen";
+"autofill_dxcc_no_data" = "DXCC-Daten noch nicht importiert. Zum Importieren tippen.";
+"autofill_dxcc_hidden_hint" = "Aktivieren Sie das DXCC-Feld in den Feldeinstellungen, um es zu konfigurieren. Tippen, um DXCC-Daten zu verwalten.";
+
+// MARK: - DXCC-Daten
+"dxcc_section" = "DXCC-Daten";
+"dxcc_data_title" = "DXCC-Daten";
+"dxcc_section_desc" = "DXCC-Präfixdatenbank aus dem Internet herunterladen für automatische Rufzeichensuche.";
+"dxcc_import_button" = "DXCC-Präfixdaten importieren";
+"dxcc_downloading" = "Wird heruntergeladen...";
+"dxcc_entities_count" = "Entitäten";
+"dxcc_last_update" = "Letzte Aktualisierung";
+"dxcc_import_success_title" = "Import erfolgreich";
+"dxcc_import_success_message" = "%d DXCC-Entitäten erfolgreich importiert.";
+"dxcc_import_failed_title" = "Import fehlgeschlagen";
+"dxcc_invalid_url" = "Ungültige Download-URL.";
+"dxcc_download_failed" = "Download fehlgeschlagen (HTTP %d).";
+"dxcc_parse_error" = "DXCC-Daten konnten nicht verarbeitet werden.";
+"dxcc_no_data" = "Keine DXCC-Daten";
+"dxcc_no_data_hint" = "Gehen Sie zu Einstellungen → DXCC-Daten, um zuerst die Präfixdaten zu importieren.";
+"dxcc_clear_selection" = "Auswahl löschen";
+"dxcc_search_prompt" = "Nach Name, Präfix oder Code suchen";
+"dxcc_picker_title" = "DXCC-Entität auswählen";
+"dxcc_not_set" = "Nicht festgelegt";

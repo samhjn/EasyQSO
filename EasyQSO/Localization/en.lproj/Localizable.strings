@@ -493,6 +493,31 @@
 "autofill_own_qth" = "Own QTH";
 "autofill_own_qth_desc" = "Auto-fill own QTH from history, linked to band & mode changes";
 "autofill_badge" = "auto";
+"autofill_dxcc" = "DXCC Entity";
+"autofill_dxcc_desc" = "Auto-fill DXCC entity from callsign prefix";
+"autofill_dxcc_no_data" = "DXCC data not imported yet. Tap to import.";
+"autofill_dxcc_hidden_hint" = "Enable the DXCC field in Field Settings to configure. Tap to manage DXCC data.";
+
+// MARK: - DXCC Data
+"dxcc_section" = "DXCC Data";
+"dxcc_data_title" = "DXCC Data";
+"dxcc_section_desc" = "Download DXCC prefix database from the internet for callsign auto-lookup.";
+"dxcc_import_button" = "Import DXCC Prefix Data";
+"dxcc_downloading" = "Downloading...";
+"dxcc_entities_count" = "Entities";
+"dxcc_last_update" = "Last Update";
+"dxcc_import_success_title" = "Import Successful";
+"dxcc_import_success_message" = "Successfully imported %d DXCC entities.";
+"dxcc_import_failed_title" = "Import Failed";
+"dxcc_invalid_url" = "Invalid download URL.";
+"dxcc_download_failed" = "Download failed (HTTP %d).";
+"dxcc_parse_error" = "Failed to parse DXCC data.";
+"dxcc_no_data" = "No DXCC Data";
+"dxcc_no_data_hint" = "Go to Settings → DXCC Data to import prefix data first.";
+"dxcc_clear_selection" = "Clear Selection";
+"dxcc_search_prompt" = "Search by name, prefix or code";
+"dxcc_picker_title" = "Select DXCC Entity";
+"dxcc_not_set" = "Not Set";
 
 // MARK: - ICP Filing
 "icp_info" = "";
