@@ -17,6 +17,7 @@ struct QSORecordView: View {
     @ObservedObject private var fieldVisibility = FieldVisibilityManager.shared
     @ObservedObject private var modeManager = ModeManager.shared
     @ObservedObject private var autoFillManager = AutoFillManager.shared
+    @StateObject private var autoFillEngine = AutoFillEngine.standardEngine()
     @FocusState private var focusedField: String?
     
     // Core fields
@@ -243,6 +244,7 @@ struct QSORecordView: View {
                             .keyboardType(.decimalPad)
                             .focused($focusedField, equals: "FREQ")
                             .onChange(of: frequency) { newValue in
+                                autoFillEngine.trackFieldChange("FREQ", newValue: frequency)
                                 if let freq = Double(newValue), let autoBand = QSORecord.bandForFrequency(freq) {
                                     if band != autoBand {
                                         isBandChangedByFrequency = true
@@ -250,7 +252,7 @@ struct QSORecordView: View {
                                     }
                                 }
                             }
-                            .floatingLabel(LocalizedStrings.frequency.localized, text: frequency)
+                            .autoFillLabel(LocalizedStrings.frequency.localized, text: frequency, isAutoFilled: autoFillEngine.isAutoFilled("FREQ"))
                     }
                     
                     Picker(LocalizedStrings.band.localized, selection: $band) {
@@ -260,15 +262,7 @@ struct QSORecordView: View {
                         if isBandChangedByFrequency {
                             isBandChangedByFrequency = false
                         } else {
-                            if autoFillManager.autoFillFrequencyAndMode {
-                                if let lastFreq = QSORecord.lastFrequencyForBand(newBand, context: viewContext) {
-                                    frequency = String(lastFreq)
-                                }
-                            }
-                            loadSameBandStationInfo(for: newBand)
-                        }
-                        if autoFillManager.autoFillOwnQTH {
-                            loadOwnQTHFromHistory()
+                            applyAutoFillForTrigger("BAND")
                         }
                     }
                     
@@ -278,9 +272,7 @@ struct QSORecordView: View {
                         }
                     }
                     .onChange(of: mode) { _ in
-                        if autoFillManager.autoFillOwnQTH {
-                            loadOwnQTHFromHistory()
-                        }
+                        applyAutoFillForTrigger("MODE")
                     }
                     
                     ADIFDynamicFieldRows(extendedFields: $extendedFields, category: .basic, visibilityManager: fieldVisibility, focusedField: $focusedField)
@@ -473,7 +465,8 @@ struct QSORecordView: View {
                 if autoFillManager.autoFillFrequencyAndMode {
                     loadLatestQSOSettings()
                 }
-                loadOwnQTHDefaults()
+                // Trigger own QTH autofill based on current band/mode
+                applyAutoFillForTrigger("BAND")
             }
         }
     }
@@ -546,8 +539,9 @@ struct QSORecordView: View {
         HStack {
             TextField(LocalizedStrings.ownQth.localized, text: $ownQTH)
                 .focused($focusedField, equals: "MY_CITY")
-                .floatingLabel(LocalizedStrings.ownQth.localized, text: ownQTH)
-            
+                .onChange(of: ownQTH) { _ in autoFillEngine.trackFieldChange("MY_CITY", newValue: ownQTH) }
+                .autoFillLabel(LocalizedStrings.ownQth.localized, text: ownQTH, isAutoFilled: autoFillEngine.isAutoFilled("MY_CITY"))
+
             Button(LocalizedStrings.selectOnMap.localized) {
                 focusedField = nil
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -557,23 +551,26 @@ struct QSORecordView: View {
             .font(.caption)
             .foregroundColor(.blue)
         }
-        
+
         TextField(LocalizedStrings.gridSquare.localized, text: $ownGridSquare)
             .focused($focusedField, equals: "MY_GRIDSQUARE")
             .onChange(of: ownGridSquare) { newValue in
                 ownGridSquare = formatGridSquare(newValue)
+                autoFillEngine.trackFieldChange("MY_GRIDSQUARE", newValue: ownGridSquare)
             }
-            .floatingLabel(LocalizedStrings.gridSquare.localized, text: ownGridSquare)
-        
+            .autoFillLabel(LocalizedStrings.gridSquare.localized, text: ownGridSquare, isAutoFilled: autoFillEngine.isAutoFilled("MY_GRIDSQUARE"))
+
         TextField(LocalizedStrings.cqZone.localized, text: $ownCQZone)
             .keyboardType(.numberPad)
             .focused($focusedField, equals: "MY_CQ_ZONE")
-            .floatingLabel(LocalizedStrings.cqZone.localized, text: ownCQZone)
-        
+            .onChange(of: ownCQZone) { _ in autoFillEngine.trackFieldChange("MY_CQ_ZONE", newValue: ownCQZone) }
+            .autoFillLabel(LocalizedStrings.cqZone.localized, text: ownCQZone, isAutoFilled: autoFillEngine.isAutoFilled("MY_CQ_ZONE"))
+
         TextField(LocalizedStrings.ituZone.localized, text: $ownITUZone)
             .keyboardType(.numberPad)
             .focused($focusedField, equals: "MY_ITU_ZONE")
-            .floatingLabel(LocalizedStrings.ituZone.localized, text: ownITUZone)
+            .onChange(of: ownITUZone) { _ in autoFillEngine.trackFieldChange("MY_ITU_ZONE", newValue: ownITUZone) }
+            .autoFillLabel(LocalizedStrings.ituZone.localized, text: ownITUZone, isAutoFilled: autoFillEngine.isAutoFilled("MY_ITU_ZONE"))
     }
     
     // MARK: - Technical & Additional Sections
@@ -620,7 +617,8 @@ struct QSORecordView: View {
                 if hasTxPwr {
                     TextField("adif_field_tx_pwr".localized, text: $txPower)
                         .focused($focusedField, equals: "TX_PWR")
-                        .floatingLabel("adif_field_tx_pwr".localized, text: txPower)
+                        .onChange(of: txPower) { _ in autoFillEngine.trackFieldChange("TX_PWR", newValue: txPower) }
+                        .autoFillLabel("adif_field_tx_pwr".localized, text: txPower, isAutoFilled: autoFillEngine.isAutoFilled("TX_PWR"))
                 }
                 if hasSatName {
                     TextField(LocalizedStrings.satellite.localized, text: $satellite)
@@ -768,32 +766,72 @@ struct QSORecordView: View {
         }
     }
     
-    // MARK: - Data Loading
-    
-    private func loadOwnQTHDefaults() {
-        if autoFillManager.autoFillOwnQTH {
-            loadOwnQTHFromHistory()
+    // MARK: - AutoFill Engine Integration
+
+    /// Trigger autofill evaluation for a field change, respecting enabled settings.
+    private func applyAutoFillForTrigger(_ trigger: String) {
+        let freqModeEnabled = autoFillManager.autoFillFrequencyAndMode
+        let ownQTHEnabled = autoFillManager.autoFillOwnQTH
+
+        let results = autoFillEngine.evaluate(
+            trigger: trigger,
+            currentValues: currentFormValues(),
+            context: viewContext
+        )
+
+        // Filter results based on which autofill categories are enabled
+        let ownQTHKeys: Set<String> = ["MY_CITY", "MY_GRIDSQUARE", "MY_CQ_ZONE", "MY_ITU_ZONE"]
+        let freqModeKeys: Set<String> = ["FREQ", "TX_PWR",
+            "STATION_CALLSIGN", "OPERATOR", "MY_RIG", "MY_ANTENNA",
+            "MY_POTA_REF", "MY_SOTA_REF", "MY_WWFF_REF", "MY_SIG", "MY_SIG_INFO"]
+
+        var filtered: [String: String] = [:]
+        for (key, value) in results {
+            if ownQTHKeys.contains(key) && !ownQTHEnabled { continue }
+            if freqModeKeys.contains(key) && !freqModeEnabled { continue }
+            filtered[key] = value
+        }
+
+        applyAutoFillResults(filtered)
+    }
+
+    /// Apply autofill results to form fields.
+    private func applyAutoFillResults(_ results: [String: String]) {
+        for (field, value) in results {
+            switch field {
+            case "FREQ":        frequency = value
+            case "TX_PWR":      txPower = value
+            case "MY_CITY":     ownQTH = value
+            case "MY_GRIDSQUARE":
+                ownGridSquare = value
+                if !value.isEmpty {
+                    selectedOwnLocation = QTHManager.coordinateFromGridSquare(value)
+                }
+            case "MY_CQ_ZONE":  ownCQZone = value
+            case "MY_ITU_ZONE": ownITUZone = value
+            default:
+                // Extended fields (own station keys, etc.)
+                extendedFields[field] = value
+            }
         }
     }
-    
-    private func loadOwnQTHFromHistory() {
-        if let qthInfo = QSORecord.lastOwnQTHInfo(band: band, mode: mode, context: viewContext) {
-            ownQTH = qthInfo.myCity
-            ownGridSquare = qthInfo.myGridSquare
-            ownCQZone = qthInfo.myCQZone
-            ownITUZone = qthInfo.myITUZone
-            if let grid = qthInfo.myGridSquare.isEmpty ? nil : qthInfo.myGridSquare {
-                selectedOwnLocation = QTHManager.coordinateFromGridSquare(grid)
-            } else {
-                selectedOwnLocation = nil
-            }
-        } else {
-            ownQTH = ""
-            ownGridSquare = ""
-            ownCQZone = ""
-            ownITUZone = ""
-            selectedOwnLocation = nil
+
+    /// Snapshot of current form field values for the engine.
+    private func currentFormValues() -> [String: String] {
+        var values: [String: String] = [
+            "BAND": band,
+            "MODE": mode,
+            "FREQ": frequency,
+            "TX_PWR": txPower,
+            "MY_CITY": ownQTH,
+            "MY_GRIDSQUARE": ownGridSquare,
+            "MY_CQ_ZONE": ownCQZone,
+            "MY_ITU_ZONE": ownITUZone,
+        ]
+        for (key, val) in extendedFields {
+            values[key] = val
         }
+        return values
     }
     
     private func loadLatestQSOSettings() {
@@ -821,28 +859,6 @@ struct QSORecordView: View {
         }
     }
 
-    private func loadSameBandStationInfo(for targetBand: String) {
-        let request = QSORecord.fetchRequest() as NSFetchRequest<QSORecord>
-        request.predicate = NSPredicate(format: "band == %@", targetBand)
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \QSORecord.date, ascending: false)]
-        request.fetchLimit = 1
-
-        guard let record = try? viewContext.fetch(request).first else { return }
-
-        if let tp = record.txPower, !tp.isEmpty, txPower.isEmpty { txPower = tp }
-
-        let fields = record.adifFields
-        let keys = [
-            "STATION_CALLSIGN", "OPERATOR", "MY_RIG", "MY_ANTENNA",
-            "MY_POTA_REF", "MY_SOTA_REF", "MY_WWFF_REF",
-            "MY_SIG", "MY_SIG_INFO"
-        ]
-        for key in keys {
-            if let val = fields[key], !val.isEmpty, (extendedFields[key] ?? "").isEmpty {
-                extendedFields[key] = val
-            }
-        }
-    }
     
     // MARK: - Validation
     
@@ -988,6 +1004,7 @@ struct QSORecordView: View {
     }
     
     private func resetForm() {
+        autoFillEngine.resetAllSources()
         callsign = ""
         date = Date()
         endDate = Date()
@@ -1012,10 +1029,11 @@ struct QSORecordView: View {
         if autoFillManager.autoFillFrequencyAndMode {
             loadLatestQSOSettings()
         }
-        loadOwnQTHDefaults()
+        applyAutoFillForTrigger("BAND")
     }
     
     private func clearFields() {
+        // Preserve autofill sources for fields we're keeping
         let currentFrequency = frequency
         let currentBand = band
         let currentMode = mode

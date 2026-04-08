@@ -492,6 +492,7 @@
 "autofill_freq_mode_desc" = "根据最近的 QSO 记录自动填充波段、模式和频率";
 "autofill_own_qth" = "己方 QTH";
 "autofill_own_qth_desc" = "根据历史记录自动填充己方 QTH，联动波段和模式变更";
+"autofill_badge" = "自动";
 
 // MARK: - ICP备案
 "icp_info" = "浙ICP备2021031153号-6A";

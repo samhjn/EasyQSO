@@ -492,3 +492,4 @@
 "autofill_freq_mode_desc" = "根據最近的 QSO 記錄自動填充波段、模式和頻率";
 "autofill_own_qth" = "己方 QTH";
 "autofill_own_qth_desc" = "根據歷史記錄自動填充己方 QTH，連動波段和模式變更";
+"autofill_badge" = "自動";

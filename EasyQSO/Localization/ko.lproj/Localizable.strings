@@ -492,3 +492,4 @@
 "autofill_freq_mode_desc" = "최근 QSO 기록에서 밴드, 모드, 주파수를 자동으로 채웁니다";
 "autofill_own_qth" = "자국 QTH";
 "autofill_own_qth_desc" = "기록에서 자국 QTH를 자동으로 채우고, 밴드 및 모드 변경에 연동합니다";
+"autofill_badge" = "자동";

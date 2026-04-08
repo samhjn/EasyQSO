@@ -492,3 +492,4 @@
 "autofill_freq_mode_desc" = "最新のQSO記録からバンド、モード、周波数を自動入力";
 "autofill_own_qth" = "自局QTH";
 "autofill_own_qth_desc" = "履歴から自局QTHを自動入力し、バンドとモードの変更に連動";
+"autofill_badge" = "自動";
