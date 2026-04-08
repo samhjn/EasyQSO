@@ -72,6 +72,29 @@ struct AutoFillLabelModifier: ViewModifier {
     }
 }
 
+// MARK: - AutoFill Picker Label
+
+/// A label for Pickers that shows an "auto" badge when the value was autofilled.
+struct AutoFillPickerLabel: View {
+    let title: String
+    let isAutoFilled: Bool
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Text(title)
+            if isAutoFilled {
+                Text("autofill_badge".localized)
+                    .font(.system(size: 9, weight: .medium))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 1)
+                    .background(Color.orange.opacity(0.8))
+                    .cornerRadius(3)
+            }
+        }
+    }
+}
+
 struct ADIFDynamicFieldRows: View {
     @Binding var extendedFields: [String: String]
     let category: ADIFFieldCategory

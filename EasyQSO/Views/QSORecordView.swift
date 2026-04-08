@@ -244,7 +244,7 @@ struct QSORecordView: View {
                             .keyboardType(.decimalPad)
                             .focused($focusedField, equals: "FREQ")
                             .onChange(of: frequency) { newValue in
-                                autoFillEngine.trackFieldChange("FREQ", newValue: frequency)
+                                autoFillEngine.trackFieldChange("FREQ", newValue: newValue)
                                 if let freq = Double(newValue), let autoBand = QSORecord.bandForFrequency(freq) {
                                     if band != autoBand {
                                         isBandChangedByFrequency = true
@@ -255,23 +255,29 @@ struct QSORecordView: View {
                             .autoFillLabel(LocalizedStrings.frequency.localized, text: frequency, isAutoFilled: autoFillEngine.isAutoFilled("FREQ"))
                     }
                     
-                    Picker(LocalizedStrings.band.localized, selection: $band) {
+                    Picker(selection: $band) {
                         ForEach(bands, id: \.self) { Text($0) }
+                    } label: {
+                        AutoFillPickerLabel(title: LocalizedStrings.band.localized, isAutoFilled: autoFillEngine.isAutoFilled("BAND"))
                     }
                     .onChange(of: band) { newBand in
+                        autoFillEngine.trackFieldChange("BAND", newValue: newBand)
                         if isBandChangedByFrequency {
                             isBandChangedByFrequency = false
                         } else {
                             applyAutoFillForTrigger("BAND")
                         }
                     }
-                    
-                    Picker(LocalizedStrings.mode.localized, selection: modePickerTag) {
+
+                    Picker(selection: modePickerTag) {
                         ForEach(modePickerItems) { item in
                             Text(item.displayLabel).tag(item.tagValue)
                         }
+                    } label: {
+                        AutoFillPickerLabel(title: LocalizedStrings.mode.localized, isAutoFilled: autoFillEngine.isAutoFilled("MODE"))
                     }
-                    .onChange(of: mode) { _ in
+                    .onChange(of: mode) { newMode in
+                        autoFillEngine.trackFieldChange("MODE", newValue: newMode)
                         applyAutoFillForTrigger("MODE")
                     }
                     
@@ -837,14 +843,21 @@ struct QSORecordView: View {
     private func loadLatestQSOSettings() {
         if let latestQSO = QSORecord.getLatestQSO(context: viewContext) {
             band = latestQSO.band
+            autoFillEngine.recordAutoFill("BAND", value: latestQSO.band)
             mode = latestQSO.mode
+            autoFillEngine.recordAutoFill("MODE", value: latestQSO.mode)
             submode = latestQSO.adifFields["SUBMODE"] ?? ""
             if latestQSO.frequencyMHz > 0 {
-                frequency = String(latestQSO.frequencyMHz)
+                let freqStr = String(latestQSO.frequencyMHz)
+                frequency = freqStr
+                autoFillEngine.recordAutoFill("FREQ", value: freqStr)
             }
 
             let latestFields = latestQSO.adifFields
-            if let tp = latestQSO.txPower, !tp.isEmpty { txPower = tp }
+            if let tp = latestQSO.txPower, !tp.isEmpty {
+                txPower = tp
+                autoFillEngine.recordAutoFill("TX_PWR", value: tp)
+            }
 
             let ownStationKeys = [
                 "STATION_CALLSIGN", "OPERATOR", "MY_RIG", "MY_ANTENNA",
@@ -854,6 +867,7 @@ struct QSORecordView: View {
             for key in ownStationKeys {
                 if let val = latestFields[key], !val.isEmpty {
                     extendedFields[key] = val
+                    autoFillEngine.recordAutoFill(key, value: val)
                 }
             }
         }
