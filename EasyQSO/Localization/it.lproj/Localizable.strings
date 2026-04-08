@@ -491,5 +491,30 @@
 "autofill_freq_mode" = "Frequency & Mode";
 "autofill_freq_mode_desc" = "Auto-fill band, mode and frequency from latest QSO record";
 "autofill_own_qth" = "Own QTH";
-"autofill_own_qth_desc" = "Auto-fill own QTH from history, linked to band & mode changes";
+"autofill_own_qth_desc" = "Compila automaticamente il QTH proprio dalla cronologia, collegato ai cambiamenti di banda e modo";
 "autofill_badge" = "auto";
+"autofill_dxcc" = "Entità DXCC";
+"autofill_dxcc_desc" = "Compila automaticamente l'entità DXCC dal prefisso del nominativo";
+"autofill_dxcc_no_data" = "I dati DXCC non sono ancora stati importati. Tocca per importare.";
+"autofill_dxcc_hidden_hint" = "Abilita il campo DXCC nelle impostazioni dei campi per configurare. Tocca per gestire i dati DXCC.";
+
+// MARK: - Dati DXCC
+"dxcc_section" = "Dati DXCC";
+"dxcc_data_title" = "Dati DXCC";
+"dxcc_section_desc" = "Scarica il database dei prefissi DXCC da internet per la ricerca automatica dei nominativi.";
+"dxcc_import_button" = "Importa dati prefissi DXCC";
+"dxcc_downloading" = "Download in corso...";
+"dxcc_entities_count" = "Entità";
+"dxcc_last_update" = "Ultimo aggiornamento";
+"dxcc_import_success_title" = "Importazione riuscita";
+"dxcc_import_success_message" = "Importate con successo %d entità DXCC.";
+"dxcc_import_failed_title" = "Importazione fallita";
+"dxcc_invalid_url" = "URL di download non valido.";
+"dxcc_download_failed" = "Download fallito (HTTP %d).";
+"dxcc_parse_error" = "Impossibile analizzare i dati DXCC.";
+"dxcc_no_data" = "Nessun dato DXCC";
+"dxcc_no_data_hint" = "Vai in Impostazioni → Dati DXCC per importare prima i dati dei prefissi.";
+"dxcc_clear_selection" = "Cancella selezione";
+"dxcc_search_prompt" = "Cerca per nome, prefisso o codice";
+"dxcc_picker_title" = "Seleziona entità DXCC";
+"dxcc_not_set" = "Non impostato";

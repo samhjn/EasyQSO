@@ -225,6 +225,7 @@ struct QSORecordView: View {
                         .focused($focusedField, equals: "CALL")
                         .onChange(of: callsign) { newValue in
                             callsign = newValue.uppercased()
+                            autoFillDXCCFromCallsign(newValue.uppercased())
                         }
                         .floatingLabel(LocalizedStrings.callsign.localized, text: callsign)
                     
@@ -486,7 +487,7 @@ struct QSORecordView: View {
                 if contactedQTHVis == .visible {
                     contactedQTHFields
                 }
-                ADIFDynamicFieldRows(extendedFields: $extendedFields, category: .contactedStation, visibilityManager: fieldVisibility, focusedField: $focusedField)
+                ADIFDynamicFieldRows(extendedFields: $extendedFields, category: .contactedStation, visibilityManager: fieldVisibility, focusedField: $focusedField, isFieldAutoFilled: { autoFillEngine.isAutoFilled($0) })
             }
         }
     }
@@ -706,11 +707,15 @@ struct QSORecordView: View {
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                                 .listRowSeparator(.hidden)
-                            
+
                             ForEach(fields) { field in
-                                TextField(field.displayName, text: bindingForExtended(field.id))
-                                    .focused($focusedField, equals: field.id)
-                                    .floatingLabel(field.displayName, text: extendedFields[field.id] ?? "")
+                                if field.id == "DXCC" || field.id == "MY_DXCC" {
+                                    DXCCFieldRow(dxccCode: bindingForExtended(field.id), label: field.displayName, isAutoFilled: autoFillEngine.isAutoFilled(field.id))
+                                } else {
+                                    TextField(field.displayName, text: bindingForExtended(field.id))
+                                        .focused($focusedField, equals: field.id)
+                                        .floatingLabel(field.displayName, text: extendedFields[field.id] ?? "")
+                                }
                             }
                         }
                     }
@@ -718,7 +723,7 @@ struct QSORecordView: View {
             }
         }
     }
-    
+
     private func bindingForExtended(_ fieldId: String) -> Binding<String> {
         Binding(
             get: { extendedFields[fieldId] ?? "" },
@@ -819,6 +824,18 @@ struct QSORecordView: View {
                 // Extended fields (own station keys, etc.)
                 extendedFields[field] = value
             }
+        }
+    }
+
+    private func autoFillDXCCFromCallsign(_ call: String) {
+        guard autoFillManager.autoFillDXCC,
+              fieldVisibility.visibility(for: "DXCC") != .hidden,
+              DXCCManager.shared.isDataAvailable,
+              call.count >= 2 else { return }
+        if let entity = DXCCManager.shared.lookupCallsign(call) {
+            let code = String(entity.code)
+            extendedFields["DXCC"] = code
+            autoFillEngine.recordAutoFill("DXCC", value: code)
         }
     }
 

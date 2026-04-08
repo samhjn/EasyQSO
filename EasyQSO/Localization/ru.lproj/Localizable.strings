@@ -491,5 +491,30 @@
 "autofill_freq_mode" = "Frequency & Mode";
 "autofill_freq_mode_desc" = "Auto-fill band, mode and frequency from latest QSO record";
 "autofill_own_qth" = "Own QTH";
-"autofill_own_qth_desc" = "Auto-fill own QTH from history, linked to band & mode changes";
+"autofill_own_qth_desc" = "Автозаполнение своего QTH из истории, привязанное к изменениям диапазона и вида модуляции";
 "autofill_badge" = "авто";
+"autofill_dxcc" = "DXCC";
+"autofill_dxcc_desc" = "Автозаполнение DXCC по префиксу позывного";
+"autofill_dxcc_no_data" = "Данные DXCC ещё не импортированы. Нажмите для импорта.";
+"autofill_dxcc_hidden_hint" = "Включите поле DXCC в настройках полей для настройки. Нажмите для управления данными DXCC.";
+
+// MARK: - Данные DXCC
+"dxcc_section" = "Данные DXCC";
+"dxcc_data_title" = "Данные DXCC";
+"dxcc_section_desc" = "Загрузить базу данных DXCC-префиксов из интернета для автоматического поиска по позывным.";
+"dxcc_import_button" = "Импортировать данные DXCC-префиксов";
+"dxcc_downloading" = "Загрузка...";
+"dxcc_entities_count" = "Территории";
+"dxcc_last_update" = "Последнее обновление";
+"dxcc_import_success_title" = "Импорт выполнен";
+"dxcc_import_success_message" = "Успешно импортировано %d территорий DXCC.";
+"dxcc_import_failed_title" = "Ошибка импорта";
+"dxcc_invalid_url" = "Недействительный URL для загрузки.";
+"dxcc_download_failed" = "Ошибка загрузки (HTTP %d).";
+"dxcc_parse_error" = "Не удалось обработать данные DXCC.";
+"dxcc_no_data" = "Нет данных DXCC";
+"dxcc_no_data_hint" = "Перейдите в Настройки → Данные DXCC, чтобы сначала импортировать данные префиксов.";
+"dxcc_clear_selection" = "Очистить выбор";
+"dxcc_search_prompt" = "Поиск по названию, префиксу или коду";
+"dxcc_picker_title" = "Выбрать территорию DXCC";
+"dxcc_not_set" = "Не задано";
