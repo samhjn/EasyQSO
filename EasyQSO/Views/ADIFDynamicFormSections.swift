@@ -33,6 +33,43 @@ extension View {
     func floatingLabel(_ label: String, text: String) -> some View {
         modifier(FloatingLabelModifier(label: label, text: text))
     }
+
+    /// Floating label with an optional "auto" badge when the field was autofilled.
+    func autoFillLabel(_ label: String, text: String, isAutoFilled: Bool) -> some View {
+        modifier(AutoFillLabelModifier(label: label, text: text, isAutoFilled: isAutoFilled))
+    }
+}
+
+// MARK: - AutoFill Label Modifier
+
+struct AutoFillLabelModifier: ViewModifier {
+    let label: String
+    let text: String
+    let isAutoFilled: Bool
+
+    func body(content: Content) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            if !text.isEmpty {
+                HStack(spacing: 4) {
+                    Text(label)
+                        .font(.caption2)
+                        .foregroundColor(isAutoFilled ? .orange : .accentColor)
+                    if isAutoFilled {
+                        Text("autofill_badge".localized)
+                            .font(.system(size: 9, weight: .medium))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 1)
+                            .background(Color.orange.opacity(0.8))
+                            .cornerRadius(3)
+                    }
+                }
+            }
+            content
+        }
+        .animation(.easeInOut(duration: 0.15), value: text.isEmpty)
+        .animation(.easeInOut(duration: 0.15), value: isAutoFilled)
+    }
 }
 
 struct ADIFDynamicFieldRows: View {

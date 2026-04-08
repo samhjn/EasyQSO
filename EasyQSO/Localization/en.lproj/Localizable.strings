@@ -492,6 +492,7 @@
 "autofill_freq_mode_desc" = "Auto-fill band, mode and frequency from latest QSO record";
 "autofill_own_qth" = "Own QTH";
 "autofill_own_qth_desc" = "Auto-fill own QTH from history, linked to band & mode changes";
+"autofill_badge" = "auto";
 
 // MARK: - ICP Filing
 "icp_info" = "";
