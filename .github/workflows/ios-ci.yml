@@ -36,11 +36,24 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen generate
 
+      - name: Determine Simulator
+        run: |
+          SIMULATOR=$(xcrun simctl list devices available \
+            | grep -oE 'iPhone [0-9]+' \
+            | sort -t ' ' -k2 -n \
+            | tail -1)
+          if [ -z "$SIMULATOR" ]; then
+            echo "::error::No available iPhone simulator found"
+            exit 1
+          fi
+          echo "Using simulator: $SIMULATOR"
+          echo "SIMULATOR=$SIMULATOR" >> "$GITHUB_ENV"
+
       - name: Run tests
         run: |
           xcodebuild test \
             -scheme EasyQSO \
-            -destination "platform=iOS Simulator,name=iPhone 16,OS=latest" \
+            -destination "platform=iOS Simulator,name=$SIMULATOR,OS=latest" \
             -skipPackagePluginValidation \
             -resultBundlePath TestResults.xcresult \
             CODE_SIGNING_ALLOWED=NO
