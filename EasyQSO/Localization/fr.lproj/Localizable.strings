@@ -493,7 +493,7 @@
 "autofill_own_qth" = "Own QTH";
 "autofill_own_qth_desc" = "Remplir automatiquement le QTH propre depuis l'historique, lié aux changements de bande et de mode";
 "autofill_badge" = "auto";
-"autofill_dxcc" = "Recherche par préfixe";
+"autofill_dxcc" = "DXCC & zones";
 "autofill_dxcc_desc" = "Remplir automatiquement l'entité DXCC, CQ Zone et ITU Zone à partir du préfixe de l'indicatif";
 "autofill_dxcc_no_data" = "Les données DXCC n'ont pas encore été importées. Appuyez pour importer.";
 "autofill_dxcc_zones_disabled" = "CQ Zone et ITU Zone ne sont pas activés ; s'applique uniquement au DXCC.";

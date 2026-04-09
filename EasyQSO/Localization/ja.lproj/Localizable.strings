@@ -493,7 +493,7 @@
 "autofill_own_qth" = "自局QTH";
 "autofill_own_qth_desc" = "履歴から自局QTHを自動入力し、バンドとモードの変更に連動";
 "autofill_badge" = "自動";
-"autofill_dxcc" = "コールサインプレフィックス検索";
+"autofill_dxcc" = "DXCC & ゾーン";
 "autofill_dxcc_desc" = "コールサインのプレフィックスからDXCCエンティティ、CQ Zone、ITU Zoneを自動入力";
 "autofill_dxcc_no_data" = "DXCCデータがまだインポートされていません。タップしてインポート。";
 "autofill_dxcc_zones_disabled" = "CQ ZoneとITU Zoneが無効です。DXCCのみに適用されます。";

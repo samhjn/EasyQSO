@@ -493,7 +493,7 @@
 "autofill_own_qth" = "Own QTH";
 "autofill_own_qth_desc" = "Eigenes QTH automatisch aus der Historie ausfüllen, verknüpft mit Band- und Modusänderungen";
 "autofill_badge" = "auto";
-"autofill_dxcc" = "Rufzeichenpräfix-Suche";
+"autofill_dxcc" = "DXCC & Zonen";
 "autofill_dxcc_desc" = "DXCC-Entität, CQ Zone und ITU Zone automatisch anhand des Rufzeichenpräfixes ausfüllen";
 "autofill_dxcc_no_data" = "DXCC-Daten noch nicht importiert. Zum Importieren tippen.";
 "autofill_dxcc_zones_disabled" = "CQ Zone und ITU Zone sind nicht aktiviert; gilt nur für DXCC.";

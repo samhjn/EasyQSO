@@ -493,7 +493,7 @@
 "autofill_own_qth" = "Own QTH";
 "autofill_own_qth_desc" = "Auto-fill own QTH from history, linked to band & mode changes";
 "autofill_badge" = "auto";
-"autofill_dxcc" = "Callsign Prefix Lookup";
+"autofill_dxcc" = "DXCC & Zones";
 "autofill_dxcc_desc" = "Auto-fill DXCC entity, CQ Zone and ITU Zone from callsign prefix";
 "autofill_dxcc_no_data" = "DXCC data not imported yet. Tap to import.";
 "autofill_dxcc_zones_disabled" = "CQ Zone and ITU Zone are not enabled; only applies to DXCC.";
