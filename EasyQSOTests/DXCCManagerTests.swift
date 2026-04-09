@@ -415,7 +415,155 @@ final class DXCCManagerTests: XCTestCase {
         manager.dataSourceURL = ""
     }
 
+    // MARK: - Zone Override Parsing
+
+    func testParseCQZoneOverrideInAlias() throws {
+        // W4 with CQ zone override (4) and ITU zone override [8]
+        let csv = "K,United States,291,NA,5,8,37.53,-97.00,-5.0,K W4(4)[8];\n"
+        let (_, prefixes) = try manager.parseCTYCsv(csv)
+
+        let w4 = prefixes.first { $0.prefix == "W4" }
+        XCTAssertNotNil(w4)
+        XCTAssertEqual(w4?.cqZoneOverride, 4)
+        XCTAssertEqual(w4?.ituZoneOverride, 8)
+
+        // Primary prefix and plain alias should have no overrides
+        let k = prefixes.first { $0.prefix == "K" && !$0.exact }
+        XCTAssertNotNil(k)
+        XCTAssertNil(k?.cqZoneOverride)
+        XCTAssertNil(k?.ituZoneOverride)
+    }
+
+    func testParseCQZoneOverrideOnly() throws {
+        let csv = "K,United States,291,NA,5,8,37.53,-97.00,-5.0,K W0(4);\n"
+        let (_, prefixes) = try manager.parseCTYCsv(csv)
+
+        let w0 = prefixes.first { $0.prefix == "W0" }
+        XCTAssertNotNil(w0)
+        XCTAssertEqual(w0?.cqZoneOverride, 4)
+        XCTAssertNil(w0?.ituZoneOverride)
+    }
+
+    func testParseITUZoneOverrideOnly() throws {
+        let csv = "K,United States,291,NA,5,8,37.53,-97.00,-5.0,K W1[7];\n"
+        let (_, prefixes) = try manager.parseCTYCsv(csv)
+
+        let w1 = prefixes.first { $0.prefix == "W1" }
+        XCTAssertNotNil(w1)
+        XCTAssertNil(w1?.cqZoneOverride)
+        XCTAssertEqual(w1?.ituZoneOverride, 7)
+    }
+
+    func testParseExactMatchWithZoneOverride() throws {
+        let csv = "K,United States,291,NA,5,8,37.53,-97.00,-5.0,K =W1AW(3)[7];\n"
+        let (_, prefixes) = try manager.parseCTYCsv(csv)
+
+        let exact = prefixes.first { $0.prefix == "W1AW" && $0.exact }
+        XCTAssertNotNil(exact)
+        XCTAssertEqual(exact?.cqZoneOverride, 3)
+        XCTAssertEqual(exact?.ituZoneOverride, 7)
+    }
+
+    // MARK: - Zone-Aware Lookup
+
+    func testLookupWithZonesReturnsEntityDefaults() {
+        loadStandardTestData()
+
+        let result = manager.lookupCallsignWithZones("4X1ABC")
+        XCTAssertNotNil(result)
+        XCTAssertEqual(result?.entity.code, 336)
+        XCTAssertEqual(result?.cqZone, 20)  // Israel entity default
+        XCTAssertEqual(result?.ituZone, 39)
+    }
+
+    func testLookupWithZonesReturnsPrefixOverride() {
+        loadZoneOverrideTestData()
+
+        // W4 has CQ zone override 4, ITU zone override 9
+        let result = manager.lookupCallsignWithZones("W4ABC")
+        XCTAssertNotNil(result)
+        XCTAssertEqual(result?.entity.code, 291) // Still USA
+        XCTAssertEqual(result?.cqZone, 4)         // Overridden from 5 to 4
+        XCTAssertEqual(result?.ituZone, 9)         // Overridden from 8 to 9
+    }
+
+    func testLookupWithZonesNoOverrideFallsToEntity() {
+        loadZoneOverrideTestData()
+
+        // K prefix has no overrides → entity defaults
+        let result = manager.lookupCallsignWithZones("K1ABC")
+        XCTAssertNotNil(result)
+        XCTAssertEqual(result?.cqZone, 5)
+        XCTAssertEqual(result?.ituZone, 8)
+    }
+
+    func testLookupWithZonesExactMatchOverride() {
+        loadZoneOverrideTestData()
+
+        // Exact match W1AW has CQ zone 3
+        let result = manager.lookupCallsignWithZones("W1AW")
+        XCTAssertNotNil(result)
+        XCTAssertEqual(result?.cqZone, 3)
+        XCTAssertEqual(result?.ituZone, 8)  // No ITU override, entity default
+    }
+
+    func testLookupWithZonesPartialCQOverride() {
+        loadZoneOverrideTestData()
+
+        // W6 has only CQ zone override (3), no ITU override → ITU from entity
+        let result = manager.lookupCallsignWithZones("W6ABC")
+        XCTAssertNotNil(result)
+        XCTAssertEqual(result?.cqZone, 3)
+        XCTAssertEqual(result?.ituZone, 8)  // Entity default
+    }
+
+    func testLookupCallsignStillWorks() {
+        loadZoneOverrideTestData()
+
+        // The original lookupCallsign should still return the entity
+        let entity = manager.lookupCallsign("W4ABC")
+        XCTAssertNotNil(entity)
+        XCTAssertEqual(entity?.code, 291)
+    }
+
+    func testParseCTYCsvWithMixedOverrides() throws {
+        let csv = "UA,European Russia,54,EU,16,29,53.65,-41.37,-4.0,UA UA2(15)[29] UA9(16)[30];\n"
+        let (entities, prefixes) = try manager.parseCTYCsv(csv)
+
+        XCTAssertEqual(entities.count, 1)
+        XCTAssertEqual(entities[0].cqZone, 16)  // Entity default
+
+        let ua2 = prefixes.first { $0.prefix == "UA2" }
+        XCTAssertNotNil(ua2)
+        XCTAssertEqual(ua2?.cqZoneOverride, 15)
+        XCTAssertEqual(ua2?.ituZoneOverride, 29)
+
+        let ua9 = prefixes.first { $0.prefix == "UA9" }
+        XCTAssertNotNil(ua9)
+        XCTAssertEqual(ua9?.cqZoneOverride, 16)
+        XCTAssertEqual(ua9?.ituZoneOverride, 30)
+
+        let ua = prefixes.first { $0.prefix == "UA" && $0.cqZoneOverride == nil }
+        XCTAssertNotNil(ua)
+    }
+
     // MARK: - Helpers
+
+    private func loadZoneOverrideTestData() {
+        let entities = [
+            DXCCEntity(code: 291, name: "United States", cqZone: 5, ituZone: 8, continent: "NA", latitude: 40.0, longitude: -100.0, timeOffset: 5.0, primaryPrefix: "K"),
+        ]
+
+        let prefixes = [
+            DXCCPrefixEntry(prefix: "K", entityCode: 291, exact: false),
+            DXCCPrefixEntry(prefix: "W", entityCode: 291, exact: false),
+            DXCCPrefixEntry(prefix: "W4", entityCode: 291, exact: false, cqZoneOverride: 4, ituZoneOverride: 9),
+            DXCCPrefixEntry(prefix: "W6", entityCode: 291, exact: false, cqZoneOverride: 3),
+            DXCCPrefixEntry(prefix: "W1AW", entityCode: 291, exact: true, cqZoneOverride: 3),
+        ]
+
+        manager.loadTestData(entities: entities, prefixes: prefixes)
+    }
 
     private func loadStandardTestData() {
         let entities = [

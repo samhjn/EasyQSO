@@ -864,8 +864,16 @@ struct EditQSOView: View {
               fieldVisibility.visibility(for: "DXCC") != .hidden,
               DXCCManager.shared.isDataAvailable,
               call.count >= 2 else { return }
-        if let entity = DXCCManager.shared.lookupCallsign(call) {
-            extendedFields["DXCC"] = String(entity.code)
+        if let result = DXCCManager.shared.lookupCallsignWithZones(call) {
+            extendedFields["DXCC"] = String(result.entity.code)
+
+            // Autofill CQ/ITU zones from per-prefix overrides
+            if cqZone.isEmpty {
+                cqZone = String(result.cqZone)
+            }
+            if ituZone.isEmpty {
+                ituZone = String(result.ituZone)
+            }
         }
     }
 

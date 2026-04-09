@@ -37,6 +37,24 @@ struct DXCCPrefixEntry: Codable {
     let prefix: String
     let entityCode: Int
     let exact: Bool
+    let cqZoneOverride: Int?
+    let ituZoneOverride: Int?
+
+    init(prefix: String, entityCode: Int, exact: Bool, cqZoneOverride: Int? = nil, ituZoneOverride: Int? = nil) {
+        self.prefix = prefix
+        self.entityCode = entityCode
+        self.exact = exact
+        self.cqZoneOverride = cqZoneOverride
+        self.ituZoneOverride = ituZoneOverride
+    }
+}
+
+// MARK: - DXCC Lookup Result
+
+struct DXCCLookupResult {
+    let entity: DXCCEntity
+    let cqZone: Int
+    let ituZone: Int
 }
 
 // MARK: - DXCC Manager
@@ -60,11 +78,11 @@ class DXCCManager: ObservableObject {
     /// Sorted prefix entries (longest first for matching)
     private(set) var prefixEntries: [DXCCPrefixEntry] = []
 
-    /// Exact-match callsign overrides
-    private var exactCallsigns: [String: Int] = [:]
+    /// Exact-match callsign overrides (stores full entry for zone overrides)
+    private var exactCallsigns: [String: DXCCPrefixEntry] = [:]
 
-    /// Prefix map for fast lookup
-    private var prefixMap: [String: Int] = [:]
+    /// Prefix map for fast lookup (stores full entry for zone overrides)
+    private var prefixMap: [String: DXCCPrefixEntry] = [:]
 
     var isDataAvailable: Bool { !entities.isEmpty }
 
@@ -147,38 +165,56 @@ class DXCCManager: ObservableObject {
 
     /// Look up DXCC entity for a callsign
     func lookupCallsign(_ callsign: String) -> DXCCEntity? {
+        lookupCallsignWithZones(callsign)?.entity
+    }
+
+    /// Look up DXCC entity with per-prefix CQ/ITU zone overrides for a callsign.
+    ///
+    /// The returned `DXCCLookupResult` contains the resolved CQ and ITU zones,
+    /// which may differ from the parent entity's default zones when the matched
+    /// prefix carries an override (e.g. `W4(4)[8]` in the CTY CSV).
+    func lookupCallsignWithZones(_ callsign: String) -> DXCCLookupResult? {
         guard isDataAvailable else { return nil }
         let call = callsign.uppercased()
 
         let (dxccCandidate, baseCallsign) = extractCallsignParts(from: call)
 
         // Try the DXCC candidate (shorter / suffix part) first
-        if let candidate = dxccCandidate, let entity = performPrefixLookup(candidate) {
-            return entity
+        if let candidate = dxccCandidate, let result = performPrefixLookup(candidate) {
+            return result
         }
 
         // Fall back to the base callsign (e.g. BH5HSU/B6 → B6 has no DXCC match → use BH5HSU)
         return performPrefixLookup(baseCallsign)
     }
 
-    /// Look up a single call/prefix against exact and prefix tables
-    private func performPrefixLookup(_ call: String) -> DXCCEntity? {
-        if let code = exactCallsigns[call], let entity = entityByCode[code] {
-            return entity
+    /// Look up a single call/prefix against exact and prefix tables.
+    /// Returns a `DXCCLookupResult` with per-prefix zone overrides applied.
+    private func performPrefixLookup(_ call: String) -> DXCCLookupResult? {
+        if let entry = exactCallsigns[call], let entity = entityByCode[entry.entityCode] {
+            return DXCCLookupResult(
+                entity: entity,
+                cqZone: entry.cqZoneOverride ?? entity.cqZone,
+                ituZone: entry.ituZoneOverride ?? entity.ituZone
+            )
         }
 
-        var bestMatch: Int?
+        var bestEntry: DXCCPrefixEntry?
         var bestLength = 0
 
-        for (prefix, code) in prefixMap {
+        for (prefix, entry) in prefixMap {
             if call.hasPrefix(prefix) && prefix.count > bestLength {
                 bestLength = prefix.count
-                bestMatch = code
+                bestEntry = entry
             }
         }
 
-        if let code = bestMatch {
-            return entityByCode[code]
+        if let entry = bestEntry, let entity = entityByCode[entry.entityCode] {
+            return DXCCLookupResult(
+                entity: entity,
+                cqZone: entry.cqZoneOverride ?? entity.cqZone,
+                ituZone: entry.ituZoneOverride ?? entity.ituZone
+            )
         }
         return nil
     }
@@ -293,7 +329,7 @@ class DXCCManager: ObservableObject {
                     let pfx = alias.trimmingCharacters(in: .whitespaces)
                     if pfx.isEmpty { continue }
 
-                    let cleanAlias = stripOverrideMarkers(pfx)
+                    let (cleanAlias, aliasCQ, aliasITU) = extractOverrides(pfx)
                     if cleanAlias.isEmpty { continue }
 
                     let isExact = cleanAlias.hasPrefix("=")
@@ -302,7 +338,9 @@ class DXCCManager: ObservableObject {
                     prefixes.append(DXCCPrefixEntry(
                         prefix: finalPrefix.uppercased(),
                         entityCode: dxccCode,
-                        exact: isExact
+                        exact: isExact,
+                        cqZoneOverride: aliasCQ,
+                        ituZoneOverride: aliasITU
                     ))
                 }
             }
@@ -337,29 +375,42 @@ class DXCCManager: ObservableObject {
         return fields
     }
 
-    private func stripOverrideMarkers(_ prefix: String) -> String {
+    /// Extract CQ/ITU zone overrides from a prefix string and return the clean prefix.
+    ///
+    /// CTY CSV aliases can carry per-prefix overrides:
+    /// - `(xx)` — CQ zone override
+    /// - `[xx]` — ITU zone override
+    /// - `{XX}` — continent override (stripped, not preserved)
+    /// - `~xx~`  — time offset override (stripped, not preserved)
+    /// - `<xx/xx>` — lat/lon override (stripped, not preserved)
+    private func extractOverrides(_ prefix: String) -> (cleanPrefix: String, cqZone: Int?, ituZone: Int?) {
         var result = prefix
-        // Remove CQ zone override (xx)
-        while let range = result.range(of: #"\(\d+\)"#, options: .regularExpression) {
-            result.removeSubrange(range)
+        var cqZone: Int?
+        var ituZone: Int?
+
+        // Extract CQ zone override (xx)
+        if let match = result.range(of: #"\((\d+)\)"#, options: .regularExpression) {
+            let inner = result[match].dropFirst().dropLast() // strip ( and )
+            cqZone = Int(inner)
+            result.removeSubrange(match)
         }
-        // Remove ITU zone override [xx]
-        while let range = result.range(of: #"\[\d+\]"#, options: .regularExpression) {
-            result.removeSubrange(range)
+        // Extract ITU zone override [xx]
+        if let match = result.range(of: #"\[(\d+)\]"#, options: .regularExpression) {
+            let inner = result[match].dropFirst().dropLast() // strip [ and ]
+            ituZone = Int(inner)
+            result.removeSubrange(match)
         }
-        // Remove continent override {xx}
+        // Strip remaining non-zone overrides
         while let range = result.range(of: #"\{[A-Z]+\}"#, options: .regularExpression) {
             result.removeSubrange(range)
         }
-        // Remove time offset override ~xx~
         while let range = result.range(of: #"~[\d.\-]+~"#, options: .regularExpression) {
             result.removeSubrange(range)
         }
-        // Remove lat/lon override <xx/xx>
         while let range = result.range(of: #"<[\d.\-/]+>"#, options: .regularExpression) {
             result.removeSubrange(range)
         }
-        return result
+        return (result, cqZone, ituZone)
     }
 
     // MARK: - Prefix Matching Helpers
@@ -370,9 +421,9 @@ class DXCCManager: ObservableObject {
 
         for entry in prefixEntries {
             if entry.exact {
-                exactCallsigns[entry.prefix] = entry.entityCode
+                exactCallsigns[entry.prefix] = entry
             } else {
-                prefixMap[entry.prefix] = entry.entityCode
+                prefixMap[entry.prefix] = entry
             }
         }
     }

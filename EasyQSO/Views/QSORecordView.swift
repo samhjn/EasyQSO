@@ -834,10 +834,22 @@ struct QSORecordView: View {
               fieldVisibility.visibility(for: "DXCC") != .hidden,
               DXCCManager.shared.isDataAvailable,
               call.count >= 2 else { return }
-        if let entity = DXCCManager.shared.lookupCallsign(call) {
-            let code = String(entity.code)
+        if let result = DXCCManager.shared.lookupCallsignWithZones(call) {
+            let code = String(result.entity.code)
             extendedFields["DXCC"] = code
             autoFillEngine.recordAutoFill("DXCC", value: code)
+
+            // Autofill CQ/ITU zones from per-prefix overrides
+            if cqZone.isEmpty {
+                let zoneStr = String(result.cqZone)
+                cqZone = zoneStr
+                autoFillEngine.recordAutoFill("CQZ", value: zoneStr)
+            }
+            if ituZone.isEmpty {
+                let zoneStr = String(result.ituZone)
+                ituZone = zoneStr
+                autoFillEngine.recordAutoFill("ITUZ", value: zoneStr)
+            }
         }
     }
 
