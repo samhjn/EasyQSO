@@ -12,6 +12,8 @@ final class AutoFillEngineTests: XCTestCase {
     }
 
     override func tearDown() {
+        // Reset DXCC test data to avoid leaking between tests
+        DXCCManager.shared.loadTestData(entities: [], prefixes: [])
         context = nil
         super.tearDown()
     }
@@ -442,5 +444,215 @@ final class AutoFillEngineTests: XCTestCase {
         XCTAssertTrue(outputs.contains("MY_CQ_ZONE"))
         XCTAssertTrue(outputs.contains("MY_ITU_ZONE"))
         XCTAssertTrue(outputs.contains("STATION_CALLSIGN"))
+        XCTAssertTrue(outputs.contains("CQZ"))
+        XCTAssertTrue(outputs.contains("ITUZ"))
+        XCTAssertTrue(outputs.contains("DXCC"))
+    }
+
+    // MARK: - Standard Engine: CALL → Contacted CQ/ITU Zone Autofill
+
+    func testStandardEngine_CallToContactedZones() {
+        loadDXCCTestData()
+        let engine = AutoFillEngine.standardEngine()
+
+        let results = engine.evaluate(
+            trigger: "CALL",
+            currentValues: ["CALL": "W1AW"],
+            context: context
+        )
+
+        XCTAssertEqual(results["CQZ"], "5")
+        XCTAssertEqual(results["ITUZ"], "8")
+        XCTAssertEqual(results["DXCC"], "291")
+        XCTAssertTrue(engine.isAutoFilled("CQZ"))
+        XCTAssertTrue(engine.isAutoFilled("ITUZ"))
+        XCTAssertTrue(engine.isAutoFilled("DXCC"))
+    }
+
+    func testStandardEngine_CallToContactedZones_WithOverride() {
+        loadDXCCTestDataWithOverrides()
+        let engine = AutoFillEngine.standardEngine()
+
+        // W4 prefix has CQ zone override 4, ITU zone override 9
+        let results = engine.evaluate(
+            trigger: "CALL",
+            currentValues: ["CALL": "W4ABC"],
+            context: context
+        )
+
+        XCTAssertEqual(results["CQZ"], "4")
+        XCTAssertEqual(results["ITUZ"], "9")
+        XCTAssertEqual(results["DXCC"], "291")
+    }
+
+    func testStandardEngine_CallToContactedZones_ShortCallsignSkipped() {
+        loadDXCCTestData()
+        let engine = AutoFillEngine.standardEngine()
+
+        // Single character callsign should not trigger lookup
+        let results = engine.evaluate(
+            trigger: "CALL",
+            currentValues: ["CALL": "W"],
+            context: context
+        )
+
+        XCTAssertTrue(results.isEmpty)
+    }
+
+    func testStandardEngine_CallToContactedZones_EmptyCallsign() {
+        loadDXCCTestData()
+        let engine = AutoFillEngine.standardEngine()
+
+        let results = engine.evaluate(
+            trigger: "CALL",
+            currentValues: ["CALL": ""],
+            context: context
+        )
+
+        XCTAssertTrue(results.isEmpty)
+    }
+
+    func testStandardEngine_CallToContactedZones_UnknownCallsign() {
+        loadDXCCTestData()
+        let engine = AutoFillEngine.standardEngine()
+
+        let results = engine.evaluate(
+            trigger: "CALL",
+            currentValues: ["CALL": "QQ0ZZZ"],
+            context: context
+        )
+
+        XCTAssertTrue(results.isEmpty)
+    }
+
+    func testStandardEngine_CallToContactedZones_SkipsUserEdited() {
+        loadDXCCTestData()
+        let engine = AutoFillEngine.standardEngine()
+
+        // User manually edited CQZ
+        engine.trackFieldChange("CQZ", newValue: "99")
+
+        let results = engine.evaluate(
+            trigger: "CALL",
+            currentValues: ["CALL": "W1AW"],
+            context: context
+        )
+
+        // CQZ should NOT be in results (user-edited)
+        XCTAssertNil(results["CQZ"], "User-edited CQZ should not be overwritten")
+        // ITUZ and DXCC should still be autofilled
+        XCTAssertEqual(results["ITUZ"], "8")
+        XCTAssertEqual(results["DXCC"], "291")
+    }
+
+    func testStandardEngine_CallToContactedZones_AutoFilledCanBeUpdated() {
+        loadDXCCTestDataWithOverrides()
+        let engine = AutoFillEngine.standardEngine()
+
+        // First callsign → autofill zones
+        let results1 = engine.evaluate(
+            trigger: "CALL",
+            currentValues: ["CALL": "W1AW"],
+            context: context
+        )
+        XCTAssertEqual(results1["CQZ"], "5")
+        XCTAssertEqual(results1["ITUZ"], "8")
+        XCTAssertTrue(engine.isAutoFilled("CQZ"))
+
+        // Change callsign → zones should update (they're autofilled, not user-edited)
+        let results2 = engine.evaluate(
+            trigger: "CALL",
+            currentValues: ["CALL": "W4ABC"],
+            context: context
+        )
+        XCTAssertEqual(results2["CQZ"], "4")
+        XCTAssertEqual(results2["ITUZ"], "9")
+    }
+
+    func testStandardEngine_CallToContactedZones_UserEditThenAutoFillBlocked() {
+        loadDXCCTestDataWithOverrides()
+        let engine = AutoFillEngine.standardEngine()
+
+        // First: autofill from W1AW
+        let _ = engine.evaluate(
+            trigger: "CALL",
+            currentValues: ["CALL": "W1AW"],
+            context: context
+        )
+        XCTAssertTrue(engine.isAutoFilled("CQZ"))
+
+        // User edits CQZ to a different value
+        engine.trackFieldChange("CQZ", newValue: "99")
+        XCTAssertFalse(engine.isAutoFilled("CQZ"))
+
+        // Change callsign → CQZ should NOT update (user-edited)
+        let results = engine.evaluate(
+            trigger: "CALL",
+            currentValues: ["CALL": "W4ABC"],
+            context: context
+        )
+        XCTAssertNil(results["CQZ"])
+        // ITUZ was never user-edited, should still update
+        XCTAssertEqual(results["ITUZ"], "9")
+    }
+
+    func testStandardEngine_NoUnexpectedCycles_WithCallRule() {
+        let engine = AutoFillEngine.standardEngine()
+
+        // CALL → CQZ/ITUZ/DXCC should not create any cycles
+        let isAcyclic = engine.validateAcyclicExcluding(
+            allowedEdges: AutoFillEngine.knownBidirectionalEdges
+        )
+        XCTAssertTrue(isAcyclic, "Adding CALL rule should not introduce unexpected cycles")
+    }
+
+    func testStandardEngine_CallRuleOutputsDeclared() {
+        let engine = AutoFillEngine.standardEngine()
+        let callRule = engine.rules.first { $0.id == "call_to_contacted_zones" }
+        XCTAssertNotNil(callRule)
+        XCTAssertEqual(callRule?.inputs, ["CALL"])
+        XCTAssertEqual(callRule?.outputs, ["CQZ", "ITUZ", "DXCC"])
+    }
+
+    func testStandardEngine_CallToContactedZones_NoDXCCData() {
+        // Don't load any DXCC data → DXCCManager.shared.isDataAvailable is false
+        DXCCManager.shared.loadTestData(entities: [], prefixes: [])
+        let engine = AutoFillEngine.standardEngine()
+
+        let results = engine.evaluate(
+            trigger: "CALL",
+            currentValues: ["CALL": "W1AW"],
+            context: context
+        )
+
+        XCTAssertTrue(results.isEmpty, "No results when DXCC data is unavailable")
+    }
+
+    // MARK: - DXCC Test Data Helpers
+
+    private func loadDXCCTestData() {
+        let entities = [
+            DXCCEntity(code: 291, name: "United States", cqZone: 5, ituZone: 8, continent: "NA", latitude: 40.0, longitude: -100.0, timeOffset: 5.0, primaryPrefix: "K"),
+            DXCCEntity(code: 336, name: "Israel", cqZone: 20, ituZone: 39, continent: "AS", latitude: 31.32, longitude: -34.82, timeOffset: -2.0, primaryPrefix: "4X"),
+        ]
+        let prefixes = [
+            DXCCPrefixEntry(prefix: "K", entityCode: 291, exact: false),
+            DXCCPrefixEntry(prefix: "W", entityCode: 291, exact: false),
+            DXCCPrefixEntry(prefix: "N", entityCode: 291, exact: false),
+            DXCCPrefixEntry(prefix: "4X", entityCode: 336, exact: false),
+        ]
+        DXCCManager.shared.loadTestData(entities: entities, prefixes: prefixes)
+    }
+
+    private func loadDXCCTestDataWithOverrides() {
+        let entities = [
+            DXCCEntity(code: 291, name: "United States", cqZone: 5, ituZone: 8, continent: "NA", latitude: 40.0, longitude: -100.0, timeOffset: 5.0, primaryPrefix: "K"),
+        ]
+        let prefixes = [
+            DXCCPrefixEntry(prefix: "K", entityCode: 291, exact: false),
+            DXCCPrefixEntry(prefix: "W", entityCode: 291, exact: false),
+            DXCCPrefixEntry(prefix: "W4", entityCode: 291, exact: false, cqZoneOverride: 4, ituZoneOverride: 9),
+        ]
+        DXCCManager.shared.loadTestData(entities: entities, prefixes: prefixes)
     }
 }

@@ -226,7 +226,7 @@ struct QSORecordView: View {
                         .focused($focusedField, equals: "CALL")
                         .onChange(of: callsign) { newValue in
                             callsign = newValue.uppercased()
-                            autoFillDXCCFromCallsign(newValue.uppercased())
+                            applyAutoFillForTrigger("CALL")
                         }
                         .floatingLabel(LocalizedStrings.callsign.localized, text: callsign)
                     
@@ -520,12 +520,14 @@ struct QSORecordView: View {
         TextField(LocalizedStrings.cqZone.localized, text: $cqZone)
             .keyboardType(.numberPad)
             .focused($focusedField, equals: "CQZ")
-            .floatingLabel(LocalizedStrings.cqZone.localized, text: cqZone)
-        
+            .onChange(of: cqZone) { _ in autoFillEngine.trackFieldChange("CQZ", newValue: cqZone) }
+            .autoFillLabel(LocalizedStrings.cqZone.localized, text: cqZone, isAutoFilled: autoFillEngine.isAutoFilled("CQZ"))
+
         TextField(LocalizedStrings.ituZone.localized, text: $ituZone)
             .keyboardType(.numberPad)
             .focused($focusedField, equals: "ITUZ")
-            .floatingLabel(LocalizedStrings.ituZone.localized, text: ituZone)
+            .onChange(of: ituZone) { _ in autoFillEngine.trackFieldChange("ITUZ", newValue: ituZone) }
+            .autoFillLabel(LocalizedStrings.ituZone.localized, text: ituZone, isAutoFilled: autoFillEngine.isAutoFilled("ITUZ"))
     }
     
     // MARK: - Own Station Section
@@ -785,6 +787,7 @@ struct QSORecordView: View {
     private func applyAutoFillForTrigger(_ trigger: String) {
         let freqModeEnabled = autoFillManager.autoFillFrequencyAndMode
         let ownQTHEnabled = autoFillManager.autoFillOwnQTH
+        let dxccEnabled = autoFillManager.autoFillDXCC
 
         let results = autoFillEngine.evaluate(
             trigger: trigger,
@@ -797,11 +800,13 @@ struct QSORecordView: View {
         let freqModeKeys: Set<String> = ["FREQ", "TX_PWR",
             "STATION_CALLSIGN", "OPERATOR", "MY_RIG", "MY_ANTENNA",
             "MY_POTA_REF", "MY_SOTA_REF", "MY_WWFF_REF", "MY_SIG", "MY_SIG_INFO"]
+        let dxccKeys: Set<String> = ["CQZ", "ITUZ", "DXCC"]
 
         var filtered: [String: String] = [:]
         for (key, value) in results {
             if ownQTHKeys.contains(key) && !ownQTHEnabled { continue }
             if freqModeKeys.contains(key) && !freqModeEnabled { continue }
+            if dxccKeys.contains(key) && !dxccEnabled { continue }
             filtered[key] = value
         }
 
@@ -814,6 +819,8 @@ struct QSORecordView: View {
             switch field {
             case "FREQ":        frequency = value
             case "TX_PWR":      txPower = value
+            case "CQZ":         cqZone = value
+            case "ITUZ":        ituZone = value
             case "MY_CITY":     ownQTH = value
             case "MY_GRIDSQUARE":
                 ownGridSquare = value
@@ -823,43 +830,23 @@ struct QSORecordView: View {
             case "MY_CQ_ZONE":  ownCQZone = value
             case "MY_ITU_ZONE": ownITUZone = value
             default:
-                // Extended fields (own station keys, etc.)
+                // Extended fields (own station keys, DXCC, etc.)
                 extendedFields[field] = value
             }
         }
     }
 
-    private func autoFillDXCCFromCallsign(_ call: String) {
-        guard autoFillManager.autoFillDXCC,
-              fieldVisibility.visibility(for: "DXCC") != .hidden,
-              DXCCManager.shared.isDataAvailable,
-              call.count >= 2 else { return }
-        if let result = DXCCManager.shared.lookupCallsignWithZones(call) {
-            let code = String(result.entity.code)
-            extendedFields["DXCC"] = code
-            autoFillEngine.recordAutoFill("DXCC", value: code)
-
-            // Autofill CQ/ITU zones from per-prefix overrides
-            if cqZone.isEmpty {
-                let zoneStr = String(result.cqZone)
-                cqZone = zoneStr
-                autoFillEngine.recordAutoFill("CQZ", value: zoneStr)
-            }
-            if ituZone.isEmpty {
-                let zoneStr = String(result.ituZone)
-                ituZone = zoneStr
-                autoFillEngine.recordAutoFill("ITUZ", value: zoneStr)
-            }
-        }
-    }
 
     /// Snapshot of current form field values for the engine.
     private func currentFormValues() -> [String: String] {
         var values: [String: String] = [
+            "CALL": callsign,
             "BAND": band,
             "MODE": mode,
             "FREQ": frequency,
             "TX_PWR": txPower,
+            "CQZ": cqZone,
+            "ITUZ": ituZone,
             "MY_CITY": ownQTH,
             "MY_GRIDSQUARE": ownGridSquare,
             "MY_CQ_ZONE": ownCQZone,
