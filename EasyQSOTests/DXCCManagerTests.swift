@@ -187,6 +187,78 @@ final class DXCCManagerTests: XCTestCase {
         XCTAssertEqual(result?.code, 336)
     }
 
+    func testLookupDXCCSuffixAfterCallsign() {
+        loadStandardTestData()
+
+        // BH5HSU/VR2 → DXCC should be Hong Kong (VR2), not China (BH)
+        let result = manager.lookupCallsign("BH5HSU/VR2")
+        XCTAssertNotNil(result)
+        XCTAssertEqual(result?.code, 321) // Hong Kong
+    }
+
+    func testLookupDXCCPrefixBeforeCallsign() {
+        loadStandardTestData()
+
+        // VR2/BH5HSU → DXCC should be Hong Kong (VR2)
+        let result = manager.lookupCallsign("VR2/BH5HSU")
+        XCTAssertNotNil(result)
+        XCTAssertEqual(result?.code, 321)
+    }
+
+    func testLookupModifierP() {
+        loadStandardTestData()
+
+        // W1AW/P → portable modifier, DXCC should be USA
+        let result = manager.lookupCallsign("W1AW/P")
+        XCTAssertNotNil(result)
+        XCTAssertEqual(result?.code, 291)
+    }
+
+    func testLookupModifierMM() {
+        loadStandardTestData()
+
+        // W1AW/MM → maritime mobile modifier, DXCC from base callsign
+        let result = manager.lookupCallsign("W1AW/MM")
+        XCTAssertNotNil(result)
+        XCTAssertEqual(result?.code, 291)
+    }
+
+    func testLookupModifierQRP() {
+        loadStandardTestData()
+
+        // W1AW/QRP → QRP modifier, DXCC should be USA
+        let result = manager.lookupCallsign("W1AW/QRP")
+        XCTAssertNotNil(result)
+        XCTAssertEqual(result?.code, 291)
+    }
+
+    func testLookupNumericAreaIndicator() {
+        loadStandardTestData()
+
+        // W1AW/4 → numeric area indicator, DXCC should be USA
+        let result = manager.lookupCallsign("W1AW/4")
+        XCTAssertNotNil(result)
+        XCTAssertEqual(result?.code, 291)
+    }
+
+    func testLookupDXCCSuffixWithModifier() {
+        loadStandardTestData()
+
+        // VR2/BH5HSU/P → strip /P, then VR2 prefix → Hong Kong
+        let result = manager.lookupCallsign("VR2/BH5HSU/P")
+        XCTAssertNotNil(result)
+        XCTAssertEqual(result?.code, 321)
+    }
+
+    func testLookupShortDXCCPrefix() {
+        loadStandardTestData()
+
+        // W1AW/3A → 3A is Monaco, not a modifier
+        let result = manager.lookupCallsign("W1AW/3A")
+        XCTAssertNotNil(result)
+        XCTAssertEqual(result?.code, 260) // Monaco
+    }
+
     // MARK: - Entity Lookup by Code
 
     func testEntityForCode() {
@@ -287,6 +359,8 @@ final class DXCCManagerTests: XCTestCase {
             DXCCEntity(code: 336, name: "Israel", cqZone: 20, ituZone: 39, continent: "AS", latitude: 31.32, longitude: -34.82, timeOffset: -2.0, primaryPrefix: "4X"),
             DXCCEntity(code: 117, name: "Vienna Intl Ctr", cqZone: 15, ituZone: 28, continent: "EU", latitude: 48.20, longitude: -16.30, timeOffset: -1.0, primaryPrefix: "4U1V"),
             DXCCEntity(code: 260, name: "Monaco", cqZone: 14, ituZone: 27, continent: "EU", latitude: 43.73, longitude: -7.40, timeOffset: -1.0, primaryPrefix: "3A"),
+            DXCCEntity(code: 321, name: "Hong Kong", cqZone: 24, ituZone: 44, continent: "AS", latitude: 22.28, longitude: -114.18, timeOffset: -8.0, primaryPrefix: "VR2"),
+            DXCCEntity(code: 318, name: "China", cqZone: 24, ituZone: 44, continent: "AS", latitude: 36.0, longitude: -102.0, timeOffset: -8.0, primaryPrefix: "BY"),
         ]
 
         let prefixes = [
@@ -299,6 +373,10 @@ final class DXCCManagerTests: XCTestCase {
             DXCCPrefixEntry(prefix: "4U1VIC", entityCode: 117, exact: true),
             DXCCPrefixEntry(prefix: "4U1V", entityCode: 117, exact: false),
             DXCCPrefixEntry(prefix: "3A", entityCode: 260, exact: false),
+            DXCCPrefixEntry(prefix: "VR2", entityCode: 321, exact: false),
+            DXCCPrefixEntry(prefix: "BY", entityCode: 318, exact: false),
+            DXCCPrefixEntry(prefix: "BH", entityCode: 318, exact: false),
+            DXCCPrefixEntry(prefix: "BV", entityCode: 318, exact: false),
         ]
 
         manager.loadTestData(entities: entities, prefixes: prefixes)

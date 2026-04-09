@@ -346,22 +346,40 @@ class DXCCManager: ObservableObject {
         }
     }
 
-    /// Extract the effective prefix for lookup from a callsign that may contain "/" separators
+    /// Known operating modifiers that do NOT indicate a DXCC entity change
+    private static let portableModifiers: Set<String> = [
+        "P", "M", "MM", "AM", "QRP", "R", "B", "A"
+    ]
+
+    /// Extract the effective prefix for lookup from a callsign that may contain "/" separators.
+    ///
+    /// Rules:
+    /// - Known modifiers (/P, /MM, /QRP, etc.) and numeric area indicators (/1, /2)
+    ///   are stripped — DXCC is determined by the base callsign.
+    /// - For DXCC prefix suffixes (e.g. BH5HSU/VR2), the shorter part (VR2) is the
+    ///   DXCC indicator. Same for prefix format (VR2/BH5HSU).
     private func extractEffectivePrefix(from callsign: String) -> String {
-        let parts = callsign.components(separatedBy: "/")
+        var parts = callsign.components(separatedBy: "/")
         guard parts.count > 1 else { return callsign }
 
-        // If the suffix part is short (1-3 chars), it's usually a modifier like /P, /M, /QRP
-        if let last = parts.last, last.count <= 3 {
-            return parts[0]
+        // Strip trailing modifiers (/P, /MM, etc.) and numeric area indicators (/1, /2)
+        while parts.count > 1,
+              let last = parts.last,
+              Self.portableModifiers.contains(last) || last.allSatisfy({ $0.isNumber }) {
+            parts.removeLast()
         }
 
-        // Shorter part is usually the prefix indicator
-        if parts[0].count < parts[1].count {
-            return parts[0]
-        }
+        guard parts.count > 1 else { return parts[0] }
 
-        return parts[0]
+        // The shorter part is typically the DXCC prefix indicator:
+        // VR2/BH5HSU → VR2, BH5HSU/VR2 → VR2
+        let first = parts[0]
+        let second = parts[1]
+
+        if first.count < second.count {
+            return first
+        }
+        return second
     }
 
     // MARK: - Cache
