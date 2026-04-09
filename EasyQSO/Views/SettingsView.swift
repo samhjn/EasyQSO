@@ -70,8 +70,16 @@ struct SettingsView: View {
     
     let exportFormats = ["ADIF", "CSV"]
     
-    private var isDXCCFieldVisible: Bool {
+    private var isDXCCEnabled: Bool {
         fieldVisibility.visibility(for: "DXCC") != .hidden
+    }
+
+    private var isZonesEnabled: Bool {
+        fieldVisibility.groupVisibility(for: "group_contacted_qth") != .hidden
+    }
+
+    private var anyPrefixLookupFieldEnabled: Bool {
+        isDXCCEnabled || isZonesEnabled
     }
 
     var fieldSettingsSummary: String {
@@ -124,13 +132,22 @@ struct SettingsView: View {
                         }
                     }
 
-                    if isDXCCFieldVisible {
+                    if anyPrefixLookupFieldEnabled {
                         Toggle(isOn: $autoFillManager.autoFillDXCC) {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("autofill_dxcc".localized)
                                 Text("autofill_dxcc_desc".localized)
                                     .font(.caption)
                                     .foregroundColor(.secondary)
+                                if !isDXCCEnabled {
+                                    Text("autofill_dxcc_dxcc_disabled".localized)
+                                        .font(.caption)
+                                        .foregroundColor(.orange)
+                                } else if !isZonesEnabled {
+                                    Text("autofill_dxcc_zones_disabled".localized)
+                                        .font(.caption)
+                                        .foregroundColor(.orange)
+                                }
                                 if !dxccManager.isDataAvailable {
                                     Button(action: { navigateToDXCCData = true }) {
                                         Text("autofill_dxcc_no_data".localized)
@@ -143,7 +160,7 @@ struct SettingsView: View {
                         }
                         .disabled(!dxccManager.isDataAvailable)
                     } else {
-                        Button(action: { navigateToDXCCData = true }) {
+                        Button(action: { showingFieldSettings = true }) {
                             VStack(alignment: .leading, spacing: 2) {
                                 HStack {
                                     Text("autofill_dxcc".localized)
@@ -153,7 +170,7 @@ struct SettingsView: View {
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                 }
-                                Text("autofill_dxcc_hidden_hint".localized)
+                                Text("autofill_dxcc_all_disabled".localized)
                                     .font(.caption)
                                     .foregroundColor(.orange)
                             }

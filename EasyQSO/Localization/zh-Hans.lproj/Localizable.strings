@@ -493,10 +493,12 @@
 "autofill_own_qth" = "己方 QTH";
 "autofill_own_qth_desc" = "根据历史记录自动填充己方 QTH，联动波段和模式变更";
 "autofill_badge" = "自动";
-"autofill_dxcc" = "DXCC 实体";
-"autofill_dxcc_desc" = "根据呼号前缀自动填充 DXCC 实体";
+"autofill_dxcc" = "呼号前缀查询";
+"autofill_dxcc_desc" = "根据呼号前缀自动填充 DXCC 实体、CQ Zone 和 ITU Zone";
 "autofill_dxcc_no_data" = "尚未导入 DXCC 数据，点击前往导入。";
-"autofill_dxcc_hidden_hint" = "请在字段设置中启用 DXCC 字段以配置。点击前往管理 DXCC 数据。";
+"autofill_dxcc_zones_disabled" = "CQ Zone 和 ITU Zone 未启用，仅对 DXCC 生效。";
+"autofill_dxcc_dxcc_disabled" = "DXCC 未启用，仅对 CQ Zone 和 ITU Zone 生效。";
+"autofill_dxcc_all_disabled" = "DXCC、CQ Zone 和 ITU Zone 均未启用，点击前往字段设置。";
 
 // MARK: - DXCC 数据
 "dxcc_section" = "DXCC 数据";

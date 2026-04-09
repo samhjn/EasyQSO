@@ -79,7 +79,9 @@ struct ADIFFieldDef: Identifiable, Hashable {
     let category: ADIFFieldCategory
     let coreProperty: String?
     let isRequired: Bool
-    let defaultVisible: Bool
+    let defaultVisibility: ADIFFieldVisibility
+
+    var defaultVisible: Bool { defaultVisibility != .hidden }
     
     var displayName: String {
         "adif_field_\(id.lowercased())".localized
@@ -134,7 +136,16 @@ struct ADIFFields {
     private static func f(_ id: String, _ cat: ADIFFieldCategory,
                           core: String? = nil, req: Bool = false, vis: Bool = false) -> ADIFFieldDef {
         ADIFFieldDef(id: id, category: cat,
-                     coreProperty: core, isRequired: req, defaultVisible: vis)
+                     coreProperty: core, isRequired: req,
+                     defaultVisibility: vis ? .visible : .hidden)
+    }
+
+    private static func f(_ id: String, _ cat: ADIFFieldCategory,
+                          core: String? = nil, req: Bool = false,
+                          defaultVis: ADIFFieldVisibility) -> ADIFFieldDef {
+        ADIFFieldDef(id: id, category: cat,
+                     coreProperty: core, isRequired: req,
+                     defaultVisibility: defaultVis)
     }
     
     static let all: [ADIFFieldDef] = [
@@ -213,7 +224,7 @@ struct ADIFFields {
         f("STATE",         .contactedStation),
         f("CNTY",          .contactedStation),
         f("CNTY_ALT",      .contactedStation),
-        f("DXCC",          .contactedStation),
+        f("DXCC",          .contactedStation, defaultVis: .collapsed),
         f("CONT",          .contactedStation),
         f("REGION",        .contactedStation),
         f("PFX",           .contactedStation),

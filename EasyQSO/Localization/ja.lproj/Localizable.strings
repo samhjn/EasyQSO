@@ -493,10 +493,12 @@
 "autofill_own_qth" = "自局QTH";
 "autofill_own_qth_desc" = "履歴から自局QTHを自動入力し、バンドとモードの変更に連動";
 "autofill_badge" = "自動";
-"autofill_dxcc" = "DXCCエンティティ";
-"autofill_dxcc_desc" = "コールサインのプレフィックスからDXCCエンティティを自動入力";
+"autofill_dxcc" = "コールサインプレフィックス検索";
+"autofill_dxcc_desc" = "コールサインのプレフィックスからDXCCエンティティ、CQ Zone、ITU Zoneを自動入力";
 "autofill_dxcc_no_data" = "DXCCデータがまだインポートされていません。タップしてインポート。";
-"autofill_dxcc_hidden_hint" = "フィールド設定でDXCCフィールドを有効にして設定してください。タップしてDXCCデータを管理。";
+"autofill_dxcc_zones_disabled" = "CQ ZoneとITU Zoneが無効です。DXCCのみに適用されます。";
+"autofill_dxcc_dxcc_disabled" = "DXCCが無効です。CQ ZoneとITU Zoneのみに適用されます。";
+"autofill_dxcc_all_disabled" = "DXCC、CQ Zone、ITU Zoneがすべて無効です。タップしてフィールド設定へ。";
 
 // MARK: - DXCCデータ
 "dxcc_section" = "DXCCデータ";

@@ -120,7 +120,7 @@ class FieldVisibilityManager: ObservableObject {
     
     private func defaultVisibility(for fieldId: String) -> ADIFFieldVisibility {
         if let field = ADIFFields.field(for: fieldId) {
-            return field.defaultVisible ? .visible : .hidden
+            return field.defaultVisibility
         }
         return .hidden
     }

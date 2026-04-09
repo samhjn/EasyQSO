@@ -493,10 +493,12 @@
 "autofill_own_qth" = "Own QTH";
 "autofill_own_qth_desc" = "Автозаполнение своего QTH из истории, привязанное к изменениям диапазона и вида модуляции";
 "autofill_badge" = "авто";
-"autofill_dxcc" = "DXCC";
-"autofill_dxcc_desc" = "Автозаполнение DXCC по префиксу позывного";
+"autofill_dxcc" = "Поиск по префиксу";
+"autofill_dxcc_desc" = "Автозаполнение DXCC, CQ Zone и ITU Zone по префиксу позывного";
 "autofill_dxcc_no_data" = "Данные DXCC ещё не импортированы. Нажмите для импорта.";
-"autofill_dxcc_hidden_hint" = "Включите поле DXCC в настройках полей для настройки. Нажмите для управления данными DXCC.";
+"autofill_dxcc_zones_disabled" = "CQ Zone и ITU Zone не включены; применяется только к DXCC.";
+"autofill_dxcc_dxcc_disabled" = "DXCC не включено; применяется только к CQ Zone и ITU Zone.";
+"autofill_dxcc_all_disabled" = "DXCC, CQ Zone и ITU Zone отключены. Нажмите для настройки полей.";
 
 // MARK: - Данные DXCC
 "dxcc_section" = "Данные DXCC";
