@@ -512,6 +512,9 @@
 "dxcc_invalid_url" = "无效的下载地址。";
 "dxcc_download_failed" = "下载失败（HTTP %d）。";
 "dxcc_parse_error" = "解析 DXCC 数据失败。";
+"dxcc_data_source" = "数据源";
+"dxcc_data_source_desc" = "CTY CSV 文件的下载地址，支持标准 Big CTY 格式。";
+"dxcc_reset_url" = "恢复默认";
 "dxcc_no_data" = "无 DXCC 数据";
 "dxcc_no_data_hint" = "请前往 设置 → DXCC 数据 先导入前缀数据。";
 "dxcc_clear_selection" = "清除选择";

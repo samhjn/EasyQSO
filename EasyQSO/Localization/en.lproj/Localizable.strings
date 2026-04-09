@@ -512,6 +512,9 @@
 "dxcc_invalid_url" = "Invalid download URL.";
 "dxcc_download_failed" = "Download failed (HTTP %d).";
 "dxcc_parse_error" = "Failed to parse DXCC data.";
+"dxcc_data_source" = "Data Source";
+"dxcc_data_source_desc" = "URL for the CTY CSV file. Supports the standard Big CTY format.";
+"dxcc_reset_url" = "Reset to Default";
 "dxcc_no_data" = "No DXCC Data";
 "dxcc_no_data_hint" = "Go to Settings → DXCC Data to import prefix data first.";
 "dxcc_clear_selection" = "Clear Selection";

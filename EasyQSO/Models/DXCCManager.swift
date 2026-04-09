@@ -47,6 +47,7 @@ class DXCCManager: ObservableObject {
     private static let entitiesKey = "DXCCEntities"
     private static let prefixesKey = "DXCCPrefixes"
     private static let lastUpdateKey = "DXCCLastUpdate"
+    private static let customURLKey = "DXCCCustomURL"
 
     @Published private(set) var entities: [DXCCEntity] = []
     @Published private(set) var isLoading = false
@@ -67,7 +68,30 @@ class DXCCManager: ObservableObject {
 
     var isDataAvailable: Bool { !entities.isEmpty }
 
-    static let ctyCsvURL = "https://www.country-files.com/bigcty/cty.csv"
+    static let defaultCtyCsvURL = "https://www.country-files.com/bigcty/cty.csv"
+
+    /// User-configurable data source URL. Falls back to `defaultCtyCsvURL` when empty.
+    var dataSourceURL: String {
+        get {
+            let custom = UserDefaults.standard.string(forKey: Self.customURLKey) ?? ""
+            return custom.isEmpty ? Self.defaultCtyCsvURL : custom
+        }
+        set {
+            let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmed.isEmpty || trimmed == Self.defaultCtyCsvURL {
+                UserDefaults.standard.removeObject(forKey: Self.customURLKey)
+            } else {
+                UserDefaults.standard.set(trimmed, forKey: Self.customURLKey)
+            }
+            objectWillChange.send()
+        }
+    }
+
+    /// Whether the user has overridden the default data source
+    var isCustomURL: Bool {
+        let custom = UserDefaults.standard.string(forKey: Self.customURLKey) ?? ""
+        return !custom.isEmpty
+    }
 
     private init() {
         loadFromCache()
@@ -83,7 +107,7 @@ class DXCCManager: ObservableObject {
             Task { @MainActor in self.isLoading = false }
         }
 
-        guard let url = URL(string: Self.ctyCsvURL) else {
+        guard let url = URL(string: dataSourceURL) else {
             let msg = "dxcc_invalid_url".localized
             await MainActor.run { lastError = msg }
             throw DXCCError.invalidURL

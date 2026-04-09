@@ -369,6 +369,52 @@ final class DXCCManagerTests: XCTestCase {
         XCTAssertTrue(manager.isDataAvailable)
     }
 
+    // MARK: - Custom Data Source URL
+
+    func testDefaultDataSourceURL() {
+        // Clear any custom URL
+        UserDefaults.standard.removeObject(forKey: "DXCCCustomURL")
+        XCTAssertEqual(manager.dataSourceURL, DXCCManager.defaultCtyCsvURL)
+        XCTAssertFalse(manager.isCustomURL)
+    }
+
+    func testSetCustomDataSourceURL() {
+        let customURL = "https://example.com/cty.csv"
+        manager.dataSourceURL = customURL
+        XCTAssertEqual(manager.dataSourceURL, customURL)
+        XCTAssertTrue(manager.isCustomURL)
+
+        // Clean up
+        manager.dataSourceURL = ""
+    }
+
+    func testResetCustomURLToDefault() {
+        manager.dataSourceURL = "https://example.com/cty.csv"
+        XCTAssertTrue(manager.isCustomURL)
+
+        // Reset by setting empty string
+        manager.dataSourceURL = ""
+        XCTAssertEqual(manager.dataSourceURL, DXCCManager.defaultCtyCsvURL)
+        XCTAssertFalse(manager.isCustomURL)
+    }
+
+    func testResetCustomURLBySettingDefault() {
+        manager.dataSourceURL = "https://example.com/cty.csv"
+        XCTAssertTrue(manager.isCustomURL)
+
+        // Setting to default URL should also clear the override
+        manager.dataSourceURL = DXCCManager.defaultCtyCsvURL
+        XCTAssertFalse(manager.isCustomURL)
+    }
+
+    func testCustomURLTrimsWhitespace() {
+        manager.dataSourceURL = "  https://example.com/cty.csv  "
+        XCTAssertEqual(manager.dataSourceURL, "https://example.com/cty.csv")
+
+        // Clean up
+        manager.dataSourceURL = ""
+    }
+
     // MARK: - Helpers
 
     private func loadStandardTestData() {
