@@ -512,6 +512,9 @@
 "dxcc_invalid_url" = "無効なダウンロードURLです。";
 "dxcc_download_failed" = "ダウンロードに失敗しました (HTTP %d)。";
 "dxcc_parse_error" = "DXCCデータの解析に失敗しました。";
+"dxcc_data_source" = "データソース";
+"dxcc_data_source_desc" = "CTY CSVファイルのURL。標準のBig CTY形式に対応しています。";
+"dxcc_reset_url" = "デフォルトに戻す";
 "dxcc_no_data" = "DXCCデータなし";
 "dxcc_no_data_hint" = "設定 → DXCCデータからプレフィックスデータを先にインポートしてください。";
 "dxcc_clear_selection" = "選択を解除";

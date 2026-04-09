@@ -512,6 +512,9 @@
 "dxcc_invalid_url" = "無效的下載地址。";
 "dxcc_download_failed" = "下載失敗（HTTP %d）。";
 "dxcc_parse_error" = "解析 DXCC 資料失敗。";
+"dxcc_data_source" = "資料來源";
+"dxcc_data_source_desc" = "CTY CSV 檔案的下載網址，支援標準 Big CTY 格式。";
+"dxcc_reset_url" = "恢復預設";
 "dxcc_no_data" = "無 DXCC 資料";
 "dxcc_no_data_hint" = "請前往 設定 → DXCC 資料 先匯入前綴資料。";
 "dxcc_clear_selection" = "清除選擇";

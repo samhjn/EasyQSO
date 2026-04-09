@@ -16,6 +16,7 @@ struct DXCCDataView: View {
     @State private var showingAlert = false
     @State private var alertTitle = ""
     @State private var alertMessage = ""
+    @State private var editingURL = ""
 
     var body: some View {
         Form {
@@ -54,6 +55,32 @@ struct DXCCDataView: View {
                     .foregroundColor(.secondary)
             }
 
+            Section(header: Text("dxcc_data_source".localized)) {
+                TextField("URL", text: $editingURL)
+                    .keyboardType(.URL)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+                    .onChange(of: editingURL) { newValue in
+                        dxccManager.dataSourceURL = newValue
+                    }
+
+                if dxccManager.isCustomURL {
+                    Button(action: {
+                        dxccManager.dataSourceURL = ""
+                        editingURL = DXCCManager.defaultCtyCsvURL
+                    }) {
+                        HStack {
+                            Image(systemName: "arrow.counterclockwise")
+                            Text("dxcc_reset_url".localized)
+                        }
+                    }
+                }
+
+                Text("dxcc_data_source_desc".localized)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
             Section {
                 HStack {
                     Text("dxcc_entities_count".localized)
@@ -73,6 +100,9 @@ struct DXCCDataView: View {
             }
         }
         .navigationTitle("dxcc_data_title".localized)
+        .onAppear {
+            editingURL = dxccManager.dataSourceURL
+        }
         .alert(isPresented: $showingAlert) {
             Alert(title: Text(alertTitle), message: Text(alertMessage))
         }

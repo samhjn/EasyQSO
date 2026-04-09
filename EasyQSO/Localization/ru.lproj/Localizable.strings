@@ -512,6 +512,9 @@
 "dxcc_invalid_url" = "Недействительный URL для загрузки.";
 "dxcc_download_failed" = "Ошибка загрузки (HTTP %d).";
 "dxcc_parse_error" = "Не удалось обработать данные DXCC.";
+"dxcc_data_source" = "Источник данных";
+"dxcc_data_source_desc" = "URL файла CTY CSV. Поддерживается стандартный формат Big CTY.";
+"dxcc_reset_url" = "Сбросить по умолчанию";
 "dxcc_no_data" = "Нет данных DXCC";
 "dxcc_no_data_hint" = "Перейдите в Настройки → Данные DXCC, чтобы сначала импортировать данные префиксов.";
 "dxcc_clear_selection" = "Очистить выбор";

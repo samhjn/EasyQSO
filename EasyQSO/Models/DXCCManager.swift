@@ -47,6 +47,7 @@ class DXCCManager: ObservableObject {
     private static let entitiesKey = "DXCCEntities"
     private static let prefixesKey = "DXCCPrefixes"
     private static let lastUpdateKey = "DXCCLastUpdate"
+    private static let customURLKey = "DXCCCustomURL"
 
     @Published private(set) var entities: [DXCCEntity] = []
     @Published private(set) var isLoading = false
@@ -67,7 +68,30 @@ class DXCCManager: ObservableObject {
 
     var isDataAvailable: Bool { !entities.isEmpty }
 
-    static let ctyCsvURL = "https://www.country-files.com/bigcty/cty.csv"
+    static let defaultCtyCsvURL = "https://www.country-files.com/bigcty/cty.csv"
+
+    /// User-configurable data source URL. Falls back to `defaultCtyCsvURL` when empty.
+    var dataSourceURL: String {
+        get {
+            let custom = UserDefaults.standard.string(forKey: Self.customURLKey) ?? ""
+            return custom.isEmpty ? Self.defaultCtyCsvURL : custom
+        }
+        set {
+            let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmed.isEmpty || trimmed == Self.defaultCtyCsvURL {
+                UserDefaults.standard.removeObject(forKey: Self.customURLKey)
+            } else {
+                UserDefaults.standard.set(trimmed, forKey: Self.customURLKey)
+            }
+            objectWillChange.send()
+        }
+    }
+
+    /// Whether the user has overridden the default data source
+    var isCustomURL: Bool {
+        let custom = UserDefaults.standard.string(forKey: Self.customURLKey) ?? ""
+        return !custom.isEmpty
+    }
 
     private init() {
         loadFromCache()
@@ -83,7 +107,7 @@ class DXCCManager: ObservableObject {
             Task { @MainActor in self.isLoading = false }
         }
 
-        guard let url = URL(string: Self.ctyCsvURL) else {
+        guard let url = URL(string: dataSourceURL) else {
             let msg = "dxcc_invalid_url".localized
             await MainActor.run { lastError = msg }
             throw DXCCError.invalidURL
@@ -126,20 +150,28 @@ class DXCCManager: ObservableObject {
         guard isDataAvailable else { return nil }
         let call = callsign.uppercased()
 
-        // Handle portable callsigns (e.g., W1ABC/VP9 → use VP9 prefix)
-        let effectiveCall = extractEffectivePrefix(from: call)
+        let (dxccCandidate, baseCallsign) = extractCallsignParts(from: call)
 
-        // Check exact match first
-        if let code = exactCallsigns[effectiveCall], let entity = entityByCode[code] {
+        // Try the DXCC candidate (shorter / suffix part) first
+        if let candidate = dxccCandidate, let entity = performPrefixLookup(candidate) {
             return entity
         }
 
-        // Longest prefix match
+        // Fall back to the base callsign (e.g. BH5HSU/B6 → B6 has no DXCC match → use BH5HSU)
+        return performPrefixLookup(baseCallsign)
+    }
+
+    /// Look up a single call/prefix against exact and prefix tables
+    private func performPrefixLookup(_ call: String) -> DXCCEntity? {
+        if let code = exactCallsigns[call], let entity = entityByCode[code] {
+            return entity
+        }
+
         var bestMatch: Int?
         var bestLength = 0
 
         for (prefix, code) in prefixMap {
-            if effectiveCall.hasPrefix(prefix) && prefix.count > bestLength {
+            if call.hasPrefix(prefix) && prefix.count > bestLength {
                 bestLength = prefix.count
                 bestMatch = code
             }
@@ -148,7 +180,6 @@ class DXCCManager: ObservableObject {
         if let code = bestMatch {
             return entityByCode[code]
         }
-
         return nil
     }
 
@@ -346,22 +377,40 @@ class DXCCManager: ObservableObject {
         }
     }
 
-    /// Extract the effective prefix for lookup from a callsign that may contain "/" separators
-    private func extractEffectivePrefix(from callsign: String) -> String {
-        let parts = callsign.components(separatedBy: "/")
-        guard parts.count > 1 else { return callsign }
+    /// Known operating modifiers that do NOT indicate a DXCC entity change
+    private static let portableModifiers: Set<String> = [
+        "P", "M", "MM", "AM", "QRP", "R", "B", "A"
+    ]
 
-        // If the suffix part is short (1-3 chars), it's usually a modifier like /P, /M, /QRP
-        if let last = parts.last, last.count <= 3 {
-            return parts[0]
+    /// Extract the DXCC candidate and base callsign from a compound callsign.
+    ///
+    /// Returns `(dxccCandidate, baseCallsign)`:
+    /// - For simple callsigns: `(nil, callsign)`.
+    /// - For modifier-only suffixes (/P, /MM, /4): `(nil, baseCallsign)`.
+    /// - For DXCC-style compound calls: the shorter part is the candidate,
+    ///   the longer part is the base (fallback).
+    private func extractCallsignParts(from callsign: String) -> (dxccCandidate: String?, baseCallsign: String) {
+        var parts = callsign.components(separatedBy: "/")
+        guard parts.count > 1 else { return (nil, callsign) }
+
+        // Strip trailing modifiers (/P, /MM, etc.) and numeric area indicators (/1, /2)
+        while parts.count > 1,
+              let last = parts.last,
+              Self.portableModifiers.contains(last) || last.allSatisfy({ $0.isNumber }) {
+            parts.removeLast()
         }
 
-        // Shorter part is usually the prefix indicator
-        if parts[0].count < parts[1].count {
-            return parts[0]
-        }
+        guard parts.count > 1 else { return (nil, parts[0]) }
 
-        return parts[0]
+        // The shorter part is the DXCC candidate (e.g. VR2 in BH5HSU/VR2),
+        // the longer part is the base callsign used as fallback.
+        let first = parts[0]
+        let second = parts[1]
+
+        if first.count < second.count {
+            return (dxccCandidate: first, baseCallsign: second)
+        }
+        return (dxccCandidate: second, baseCallsign: first)
     }
 
     // MARK: - Cache

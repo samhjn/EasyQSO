@@ -512,6 +512,9 @@
 "dxcc_invalid_url" = "잘못된 다운로드 URL입니다.";
 "dxcc_download_failed" = "다운로드 실패 (HTTP %d).";
 "dxcc_parse_error" = "DXCC 데이터를 분석하지 못했습니다.";
+"dxcc_data_source" = "데이터 소스";
+"dxcc_data_source_desc" = "CTY CSV 파일의 URL입니다. 표준 Big CTY 형식을 지원합니다.";
+"dxcc_reset_url" = "기본값으로 재설정";
 "dxcc_no_data" = "DXCC 데이터 없음";
 "dxcc_no_data_hint" = "설정 → DXCC 데이터에서 먼저 프리픽스 데이터를 가져오세요.";
 "dxcc_clear_selection" = "선택 해제";

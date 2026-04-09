@@ -512,6 +512,9 @@
 "dxcc_invalid_url" = "Ungültige Download-URL.";
 "dxcc_download_failed" = "Download fehlgeschlagen (HTTP %d).";
 "dxcc_parse_error" = "DXCC-Daten konnten nicht verarbeitet werden.";
+"dxcc_data_source" = "Datenquelle";
+"dxcc_data_source_desc" = "URL der CTY-CSV-Datei. Unterstützt das Standard-Big-CTY-Format.";
+"dxcc_reset_url" = "Standard wiederherstellen";
 "dxcc_no_data" = "Keine DXCC-Daten";
 "dxcc_no_data_hint" = "Gehen Sie zu Einstellungen → DXCC-Daten, um zuerst die Präfixdaten zu importieren.";
 "dxcc_clear_selection" = "Auswahl löschen";
