@@ -273,6 +273,7 @@ extension AutoFillEngine {
     ///
     /// Dependency graph (note: FREQ ↔ BAND is a known cycle, guarded at runtime):
     /// ```
+    ///   CALL ──→ { CQZ, ITUZ, DXCC }  (callsign determines contacted zones via DXCC)
     ///   FREQ ──→ BAND          (frequency determines band)
     ///   BAND ──→ FREQ          (band loads last-used frequency)
     ///   BAND ──→ { TX_PWR, own-station-keys }
@@ -281,6 +282,23 @@ extension AutoFillEngine {
     /// ```
     static func standardEngine() -> AutoFillEngine {
         let engine = AutoFillEngine()
+
+        // Rule: CALL change → autofill CQZ, ITUZ, DXCC from DXCC prefix lookup
+        engine.addRule(AutoFillRule(
+            id: "call_to_contacted_zones",
+            inputs: ["CALL"],
+            outputs: ["CQZ", "ITUZ", "DXCC"],
+            compute: { values, _ in
+                guard let call = values["CALL"], call.count >= 2,
+                      DXCCManager.shared.isDataAvailable else { return [:] }
+                guard let result = DXCCManager.shared.lookupCallsignWithZones(call) else { return [:] }
+                return [
+                    "CQZ": String(result.cqZone),
+                    "ITUZ": String(result.ituZone),
+                    "DXCC": String(result.entity.code)
+                ]
+            }
+        ))
 
         // Rule: BAND change → autofill frequency from last QSO on that band
         engine.addRule(AutoFillRule(

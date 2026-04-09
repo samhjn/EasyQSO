@@ -49,7 +49,10 @@ struct EditQSOView: View {
     @State private var extendedFields: [String: String]
     
     @State private var isBandChangedByFrequency = false
-    
+
+    /// Tracks fields auto-populated by DXCC callsign lookup (can be overwritten on next lookup)
+    @State private var dxccAutoFilledFields: Set<String> = []
+
     // 己方QTH
     @State private var ownQTH = ""
     @State private var ownGridSquare = ""
@@ -587,14 +590,16 @@ struct EditQSOView: View {
         TextField(LocalizedStrings.cqZone.localized, text: $cqZone)
             .keyboardType(.numberPad)
             .focused($focusedField, equals: "CQZ")
+            .onChange(of: cqZone) { _ in dxccAutoFilledFields.remove("CQZ") }
             .floatingLabel(LocalizedStrings.cqZone.localized, text: cqZone)
-        
+
         TextField(LocalizedStrings.ituZone.localized, text: $ituZone)
             .keyboardType(.numberPad)
             .focused($focusedField, equals: "ITUZ")
+            .onChange(of: ituZone) { _ in dxccAutoFilledFields.remove("ITUZ") }
             .floatingLabel(LocalizedStrings.ituZone.localized, text: ituZone)
     }
-    
+
     // MARK: - Own Station Section
     
     @ViewBuilder
@@ -861,11 +866,22 @@ struct EditQSOView: View {
     
     private func autoFillDXCCFromCallsign(_ call: String) {
         guard autoFillManager.autoFillDXCC,
-              fieldVisibility.visibility(for: "DXCC") != .hidden,
               DXCCManager.shared.isDataAvailable,
               call.count >= 2 else { return }
-        if let entity = DXCCManager.shared.lookupCallsign(call) {
-            extendedFields["DXCC"] = String(entity.code)
+        if let result = DXCCManager.shared.lookupCallsignWithZones(call) {
+            extendedFields["DXCC"] = String(result.entity.code)
+
+            // Autofill CQ/ITU zones — allow overwriting if previously auto-filled
+            let cqStr = String(result.cqZone)
+            if cqZone.isEmpty || dxccAutoFilledFields.contains("CQZ") {
+                cqZone = cqStr
+                dxccAutoFilledFields.insert("CQZ")
+            }
+            let ituStr = String(result.ituZone)
+            if ituZone.isEmpty || dxccAutoFilledFields.contains("ITUZ") {
+                ituZone = ituStr
+                dxccAutoFilledFields.insert("ITUZ")
+            }
         }
     }
 
