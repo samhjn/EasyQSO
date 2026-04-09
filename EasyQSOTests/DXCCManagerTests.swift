@@ -259,6 +259,24 @@ final class DXCCManagerTests: XCTestCase {
         XCTAssertEqual(result?.code, 260) // Monaco
     }
 
+    func testLookupNonDXCCSuffixFallsBackToBase() {
+        loadStandardTestData()
+
+        // BH5HSU/B6 → B6 is not a known DXCC prefix, fall back to BH5HSU → China
+        let result = manager.lookupCallsign("BH5HSU/B6")
+        XCTAssertNotNil(result)
+        XCTAssertEqual(result?.code, 318) // China
+    }
+
+    func testLookupNonDXCCPrefixFallsBackToBase() {
+        loadStandardTestData()
+
+        // B6/BH5HSU → B6 is not a known DXCC prefix, fall back to BH5HSU → China
+        let result = manager.lookupCallsign("B6/BH5HSU")
+        XCTAssertNotNil(result)
+        XCTAssertEqual(result?.code, 318) // China
+    }
+
     // MARK: - Entity Lookup by Code
 
     func testEntityForCode() {

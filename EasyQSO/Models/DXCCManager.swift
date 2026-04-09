@@ -126,20 +126,28 @@ class DXCCManager: ObservableObject {
         guard isDataAvailable else { return nil }
         let call = callsign.uppercased()
 
-        // Handle portable callsigns (e.g., W1ABC/VP9 → use VP9 prefix)
-        let effectiveCall = extractEffectivePrefix(from: call)
+        let (dxccCandidate, baseCallsign) = extractCallsignParts(from: call)
 
-        // Check exact match first
-        if let code = exactCallsigns[effectiveCall], let entity = entityByCode[code] {
+        // Try the DXCC candidate (shorter / suffix part) first
+        if let candidate = dxccCandidate, let entity = performPrefixLookup(candidate) {
             return entity
         }
 
-        // Longest prefix match
+        // Fall back to the base callsign (e.g. BH5HSU/B6 → B6 has no DXCC match → use BH5HSU)
+        return performPrefixLookup(baseCallsign)
+    }
+
+    /// Look up a single call/prefix against exact and prefix tables
+    private func performPrefixLookup(_ call: String) -> DXCCEntity? {
+        if let code = exactCallsigns[call], let entity = entityByCode[code] {
+            return entity
+        }
+
         var bestMatch: Int?
         var bestLength = 0
 
         for (prefix, code) in prefixMap {
-            if effectiveCall.hasPrefix(prefix) && prefix.count > bestLength {
+            if call.hasPrefix(prefix) && prefix.count > bestLength {
                 bestLength = prefix.count
                 bestMatch = code
             }
@@ -148,7 +156,6 @@ class DXCCManager: ObservableObject {
         if let code = bestMatch {
             return entityByCode[code]
         }
-
         return nil
     }
 
@@ -351,16 +358,16 @@ class DXCCManager: ObservableObject {
         "P", "M", "MM", "AM", "QRP", "R", "B", "A"
     ]
 
-    /// Extract the effective prefix for lookup from a callsign that may contain "/" separators.
+    /// Extract the DXCC candidate and base callsign from a compound callsign.
     ///
-    /// Rules:
-    /// - Known modifiers (/P, /MM, /QRP, etc.) and numeric area indicators (/1, /2)
-    ///   are stripped — DXCC is determined by the base callsign.
-    /// - For DXCC prefix suffixes (e.g. BH5HSU/VR2), the shorter part (VR2) is the
-    ///   DXCC indicator. Same for prefix format (VR2/BH5HSU).
-    private func extractEffectivePrefix(from callsign: String) -> String {
+    /// Returns `(dxccCandidate, baseCallsign)`:
+    /// - For simple callsigns: `(nil, callsign)`.
+    /// - For modifier-only suffixes (/P, /MM, /4): `(nil, baseCallsign)`.
+    /// - For DXCC-style compound calls: the shorter part is the candidate,
+    ///   the longer part is the base (fallback).
+    private func extractCallsignParts(from callsign: String) -> (dxccCandidate: String?, baseCallsign: String) {
         var parts = callsign.components(separatedBy: "/")
-        guard parts.count > 1 else { return callsign }
+        guard parts.count > 1 else { return (nil, callsign) }
 
         // Strip trailing modifiers (/P, /MM, etc.) and numeric area indicators (/1, /2)
         while parts.count > 1,
@@ -369,17 +376,17 @@ class DXCCManager: ObservableObject {
             parts.removeLast()
         }
 
-        guard parts.count > 1 else { return parts[0] }
+        guard parts.count > 1 else { return (nil, parts[0]) }
 
-        // The shorter part is typically the DXCC prefix indicator:
-        // VR2/BH5HSU → VR2, BH5HSU/VR2 → VR2
+        // The shorter part is the DXCC candidate (e.g. VR2 in BH5HSU/VR2),
+        // the longer part is the base callsign used as fallback.
         let first = parts[0]
         let second = parts[1]
 
         if first.count < second.count {
-            return first
+            return (dxccCandidate: first, baseCallsign: second)
         }
-        return second
+        return (dxccCandidate: second, baseCallsign: first)
     }
 
     // MARK: - Cache
