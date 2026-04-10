@@ -493,10 +493,12 @@
 "autofill_own_qth" = "자국 QTH";
 "autofill_own_qth_desc" = "기록에서 자국 QTH를 자동으로 채우고, 밴드 및 모드 변경에 연동합니다";
 "autofill_badge" = "자동";
-"autofill_dxcc" = "DXCC 엔티티";
-"autofill_dxcc_desc" = "콜사인 프리픽스에서 DXCC 엔티티를 자동으로 채웁니다";
+"autofill_dxcc" = "DXCC & 존";
+"autofill_dxcc_desc" = "콜사인 프리픽스에서 DXCC 엔티티, CQ Zone, ITU Zone을 자동으로 채웁니다";
 "autofill_dxcc_no_data" = "DXCC 데이터가 아직 가져오지 않았습니다. 탭하여 가져오기.";
-"autofill_dxcc_hidden_hint" = "필드 설정에서 DXCC 필드를 활성화하여 구성하세요. 탭하여 DXCC 데이터 관리.";
+"autofill_dxcc_zones_disabled" = "CQ Zone과 ITU Zone이 활성화되지 않았습니다. DXCC에만 적용됩니다.";
+"autofill_dxcc_dxcc_disabled" = "DXCC가 활성화되지 않았습니다. CQ Zone과 ITU Zone에만 적용됩니다.";
+"autofill_dxcc_all_disabled" = "DXCC, CQ Zone, ITU Zone이 모두 비활성화되어 있습니다. 탭하여 필드 설정으로 이동.";
 
 // MARK: - DXCC 데이터
 "dxcc_section" = "DXCC 데이터";

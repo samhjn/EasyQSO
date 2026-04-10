@@ -493,10 +493,12 @@
 "autofill_own_qth" = "Own QTH";
 "autofill_own_qth_desc" = "Compila automaticamente il QTH proprio dalla cronologia, collegato ai cambiamenti di banda e modo";
 "autofill_badge" = "auto";
-"autofill_dxcc" = "Entità DXCC";
-"autofill_dxcc_desc" = "Compila automaticamente l'entità DXCC dal prefisso del nominativo";
+"autofill_dxcc" = "DXCC e zone";
+"autofill_dxcc_desc" = "Compila automaticamente l'entità DXCC, CQ Zone e ITU Zone dal prefisso del nominativo";
 "autofill_dxcc_no_data" = "I dati DXCC non sono ancora stati importati. Tocca per importare.";
-"autofill_dxcc_hidden_hint" = "Abilita il campo DXCC nelle impostazioni dei campi per configurare. Tocca per gestire i dati DXCC.";
+"autofill_dxcc_zones_disabled" = "CQ Zone e ITU Zone non sono abilitati; si applica solo a DXCC.";
+"autofill_dxcc_dxcc_disabled" = "DXCC non è abilitato; si applica solo a CQ Zone e ITU Zone.";
+"autofill_dxcc_all_disabled" = "DXCC, CQ Zone e ITU Zone sono tutti disabilitati. Tocca per gestire i campi.";
 
 // MARK: - Dati DXCC
 "dxcc_section" = "Dati DXCC";

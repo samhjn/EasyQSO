@@ -493,10 +493,12 @@
 "autofill_own_qth" = "Own QTH";
 "autofill_own_qth_desc" = "Remplir automatiquement le QTH propre depuis l'historique, lié aux changements de bande et de mode";
 "autofill_badge" = "auto";
-"autofill_dxcc" = "Entité DXCC";
-"autofill_dxcc_desc" = "Remplir automatiquement l'entité DXCC à partir du préfixe de l'indicatif";
+"autofill_dxcc" = "DXCC & zones";
+"autofill_dxcc_desc" = "Remplir automatiquement l'entité DXCC, CQ Zone et ITU Zone à partir du préfixe de l'indicatif";
 "autofill_dxcc_no_data" = "Les données DXCC n'ont pas encore été importées. Appuyez pour importer.";
-"autofill_dxcc_hidden_hint" = "Activez le champ DXCC dans les paramètres de champs pour configurer. Appuyez pour gérer les données DXCC.";
+"autofill_dxcc_zones_disabled" = "CQ Zone et ITU Zone ne sont pas activés ; s'applique uniquement au DXCC.";
+"autofill_dxcc_dxcc_disabled" = "DXCC n'est pas activé ; s'applique uniquement à CQ Zone et ITU Zone.";
+"autofill_dxcc_all_disabled" = "DXCC, CQ Zone et ITU Zone sont tous désactivés. Appuyez pour gérer les champs.";
 
 // MARK: - Données DXCC
 "dxcc_section" = "Données DXCC";

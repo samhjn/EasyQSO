@@ -150,6 +150,15 @@ struct DXCCFieldRow: View {
                     Text(entity.displayName)
                         .foregroundColor(.secondary)
                         .lineLimit(1)
+                } else if dxccManager.isDataAvailable {
+                    // Data loaded but code is invalid
+                    HStack(spacing: 4) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.caption2)
+                            .foregroundColor(.orange)
+                        Text(dxccCode)
+                            .foregroundColor(.orange)
+                    }
                 } else {
                     Text("#\(dxccCode)")
                         .foregroundColor(.secondary)
