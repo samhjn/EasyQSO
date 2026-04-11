@@ -219,7 +219,7 @@ struct SettingsView: View {
 
                     NavigationLink(destination: SatelliteSettingsView()) {
                         HStack {
-                            Image(systemName: "satellite.fill" )
+                            Image(systemName: "dot.radiowaves.up.forward")
                             Text("satellite_settings_title".localized)
                             Spacer()
                             Text("\(satelliteManager.enabledItemCount)")
