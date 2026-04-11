@@ -219,10 +219,12 @@ struct SettingsView: View {
 
                     NavigationLink(destination: SatelliteSettingsView()) {
                         HStack {
-                            if #available(iOS 17.0, *) {
-                                Image(systemName: "satellite.fill")
-                            } else {
+                            if #available(iOS 18.0, *) {
+                                Image(systemName: "satellite")
+                            } else if #available(iOS 16.0, *) {
                                 Image(systemName: "dot.radiowaves.up.forward")
+                            } else {
+                                Image(systemName: "dot.radiowaves.right")
                             }
                             Text("satellite_settings_title".localized)
                             Spacer()
