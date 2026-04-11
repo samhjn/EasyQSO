@@ -231,6 +231,24 @@
 "preset_modes" = "Voreingestellte Betriebsarten";
 "mode_search_placeholder" = "Betriebsarten suchen...";
 
+// MARK: - Satellitenverwaltung
+"satellite_settings_title" = "Satellitenverwaltung";
+"satellite_settings_desc" = "Verwalten Sie die in QSO-Einträgen verfügbaren Satelliten. Sie können voreingestellte Satelliten ein-/ausblenden und benutzerdefinierte hinzufügen. Die Voreinstellungsliste enthält gängige Amateurfunk-Satelliten.";
+"satellite_search_placeholder" = "Satelliten suchen...";
+"preset_satellites" = "Voreingestellte Satelliten";
+"custom_satellites" = "Benutzerdefinierte Satelliten";
+"new_satellite_placeholder" = "Neuen Satellitennamen eingeben";
+"satellite_already_exists" = "Dieser Satellit existiert bereits";
+
+// MARK: - Wettbewerbsverwaltung
+"contest_settings_title" = "Wettbewerbsverwaltung";
+"contest_settings_desc" = "Verwalten Sie die in QSO-Einträgen verfügbaren Wettbewerbe. Sie können voreingestellte Wettbewerbe ein-/ausblenden und benutzerdefinierte Contest-IDs hinzufügen. Die Voreinstellungsliste enthält gängige Amateurfunk-Wettbewerbe.";
+"contest_search_placeholder" = "Wettbewerbe suchen...";
+"preset_contests" = "Voreingestellte Wettbewerbe";
+"custom_contests" = "Benutzerdefinierte Wettbewerbe";
+"new_contest_placeholder" = "Neue Contest-ID eingeben";
+"contest_already_exists" = "Dieser Wettbewerb existiert bereits";
+
 // MARK: - RX-Band
 "rx_band" = "RX-Band";
 

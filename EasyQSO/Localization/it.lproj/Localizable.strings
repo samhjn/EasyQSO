@@ -231,6 +231,24 @@
 "preset_modes" = "Modalità preimpostate";
 "mode_search_placeholder" = "Cerca modalità...";
 
+// MARK: - Gestione satelliti
+"satellite_settings_title" = "Gestione satelliti";
+"satellite_settings_desc" = "Gestisci i satelliti disponibili nei record QSO. Puoi mostrare o nascondere i satelliti preimpostati e aggiungere satelliti personalizzati. L'elenco preimpostato include i satelliti radioamatoriali più comuni.";
+"satellite_search_placeholder" = "Cerca satelliti...";
+"preset_satellites" = "Satelliti preimpostati";
+"custom_satellites" = "Satelliti personalizzati";
+"new_satellite_placeholder" = "Inserire nome satellite";
+"satellite_already_exists" = "Questo satellite esiste già";
+
+// MARK: - Gestione contest
+"contest_settings_title" = "Gestione contest";
+"contest_settings_desc" = "Gestisci i contest disponibili nei record QSO. Puoi mostrare o nascondere i contest preimpostati e aggiungere ID contest personalizzati. L'elenco preimpostato include i contest radioamatoriali più comuni.";
+"contest_search_placeholder" = "Cerca contest...";
+"preset_contests" = "Contest preimpostati";
+"custom_contests" = "Contest personalizzati";
+"new_contest_placeholder" = "Inserire ID contest";
+"contest_already_exists" = "Questo contest esiste già";
+
 // MARK: - RX Band
 "rx_band" = "Banda RX";
 

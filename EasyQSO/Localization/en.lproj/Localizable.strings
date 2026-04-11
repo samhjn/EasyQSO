@@ -231,6 +231,24 @@
 "preset_modes" = "Preset Modes";
 "mode_search_placeholder" = "Search modes...";
 
+// MARK: - Satellite Settings
+"satellite_settings_title" = "Satellite Management";
+"satellite_settings_desc" = "Manage satellites available in QSO records. You can show or hide preset satellites, and add custom satellites. The preset list includes commonly used amateur radio satellites.";
+"satellite_search_placeholder" = "Search satellites...";
+"preset_satellites" = "Preset Satellites";
+"custom_satellites" = "Custom Satellites";
+"new_satellite_placeholder" = "Enter new satellite name";
+"satellite_already_exists" = "This satellite already exists";
+
+// MARK: - Contest Settings
+"contest_settings_title" = "Contest Management";
+"contest_settings_desc" = "Manage contests available in QSO records. You can show or hide preset contests, and add custom contest IDs. The preset list includes commonly used amateur radio contests.";
+"contest_search_placeholder" = "Search contests...";
+"preset_contests" = "Preset Contests";
+"custom_contests" = "Custom Contests";
+"new_contest_placeholder" = "Enter new contest ID";
+"contest_already_exists" = "This contest already exists";
+
 // MARK: - RX Band
 "rx_band" = "RX Band";
 

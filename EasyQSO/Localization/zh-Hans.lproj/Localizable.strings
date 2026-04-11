@@ -231,6 +231,24 @@
 "preset_modes" = "预置模式";
 "mode_search_placeholder" = "搜索模式...";
 
+// MARK: - 卫星管理
+"satellite_settings_title" = "卫星管理";
+"satellite_settings_desc" = "管理QSO记录中可用的卫星。可以显示或隐藏预置卫星，也可以添加自定义卫星。预置列表包含常用的业余无线电卫星。";
+"satellite_search_placeholder" = "搜索卫星...";
+"preset_satellites" = "预置卫星";
+"custom_satellites" = "自定义卫星";
+"new_satellite_placeholder" = "输入新卫星名称";
+"satellite_already_exists" = "该卫星已存在";
+
+// MARK: - 竞赛管理
+"contest_settings_title" = "竞赛管理";
+"contest_settings_desc" = "管理QSO记录中可用的竞赛。可以显示或隐藏预置竞赛，也可以添加自定义竞赛ID。预置列表包含常用的业余无线电竞赛。";
+"contest_search_placeholder" = "搜索竞赛...";
+"preset_contests" = "预置竞赛";
+"custom_contests" = "自定义竞赛";
+"new_contest_placeholder" = "输入新竞赛ID";
+"contest_already_exists" = "该竞赛已存在";
+
 // MARK: - 接收波段
 "rx_band" = "接收波段";
 
