@@ -189,6 +189,7 @@
 "filter_min_freq" = "最小频率";
 "filter_max_freq" = "最大频率";
 "filter_satellite" = "卫星";
+"filter_contest" = "竞赛";
 "filter_no_filters" = "无筛选条件";
 
 // MARK: - 关于和许可证

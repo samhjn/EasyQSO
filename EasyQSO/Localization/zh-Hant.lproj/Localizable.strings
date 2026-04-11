@@ -189,6 +189,7 @@
 "filter_min_freq" = "最小頻率";
 "filter_max_freq" = "最大頻率";
 "filter_satellite" = "衛星";
+"filter_contest" = "競賽";
 "filter_no_filters" = "無篩選條件";
 
 // MARK: - 關於和授權

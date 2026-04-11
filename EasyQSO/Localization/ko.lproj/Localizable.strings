@@ -189,6 +189,7 @@
 "filter_min_freq" = "최소 주파수";
 "filter_max_freq" = "최대 주파수";
 "filter_satellite" = "위성";
+"filter_contest" = "콘테스트";
 "filter_no_filters" = "필터 없음";
 
 // MARK: - 정보 및 라이선스

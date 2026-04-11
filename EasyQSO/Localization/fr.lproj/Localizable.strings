@@ -189,6 +189,7 @@
 "filter_min_freq" = "Fréq. min.";
 "filter_max_freq" = "Fréq. max.";
 "filter_satellite" = "Satellite";
+"filter_contest" = "Concours";
 "filter_no_filters" = "Aucun filtre";
 
 // MARK: - À propos et licence

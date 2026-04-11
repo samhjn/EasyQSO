@@ -189,6 +189,7 @@
 "filter_min_freq" = "最小周波数";
 "filter_max_freq" = "最大周波数";
 "filter_satellite" = "衛星";
+"filter_contest" = "コンテスト";
 "filter_no_filters" = "フィルターなし";
 
 // MARK: - 情報とライセンス

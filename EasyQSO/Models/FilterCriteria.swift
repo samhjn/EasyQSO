@@ -64,6 +64,9 @@ struct FilterCriteria {
     // 卫星筛选
     var satelliteFilter: String = ""
 
+    // 竞赛筛选
+    var contestFilter: String = ""
+
     // 重置所有筛选条件
     mutating func reset() {
         searchMode = .fuzzy
@@ -81,6 +84,7 @@ struct FilterCriteria {
         minFrequency = nil
         maxFrequency = nil
         satelliteFilter = ""
+        contestFilter = ""
     }
 
     // 判断是否有活动的筛选条件
@@ -98,7 +102,8 @@ struct FilterCriteria {
                !gridSquareFilter.isEmpty ||
                minFrequency != nil ||
                maxFrequency != nil ||
-               !satelliteFilter.isEmpty
+               !satelliteFilter.isEmpty ||
+               !contestFilter.isEmpty
     }
 
     // 应用筛选条件到记录数组
@@ -247,6 +252,18 @@ struct FilterCriteria {
             }
         }
 
+        // 应用竞赛筛选
+        if !contestFilter.isEmpty {
+            filtered = filtered.filter { record in
+                guard let contestId = record.adifFields["CONTEST_ID"] else { return false }
+                if searchMode == .fuzzy {
+                    return contestId.localizedCaseInsensitiveContains(contestFilter)
+                } else {
+                    return contestId.caseInsensitiveCompare(contestFilter) == .orderedSame
+                }
+            }
+        }
+
         return filtered
     }
 
@@ -313,6 +330,10 @@ struct FilterCriteria {
 
         if !satelliteFilter.isEmpty {
             descriptions.append("\(LocalizedStrings.filterSatellite.localized): \(satelliteFilter)")
+        }
+
+        if !contestFilter.isEmpty {
+            descriptions.append("\(LocalizedStrings.filterContest.localized): \(contestFilter)")
         }
 
         return descriptions.isEmpty ? LocalizedStrings.filterNoFilters.localized : descriptions.joined(separator: " • ")

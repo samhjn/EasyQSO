@@ -104,6 +104,7 @@ struct ADIFDynamicFieldRows: View {
     var isFieldAutoFilled: ((String) -> Bool)? = nil
 
     private static let dxccFieldIds: Set<String> = ["DXCC", "MY_DXCC"]
+    @ObservedObject private var contestManager = ContestManager.shared
 
     var body: some View {
         let visible = visibilityManager.visibleFields(for: category).filter {
@@ -113,6 +114,13 @@ struct ADIFDynamicFieldRows: View {
         ForEach(visible) { field in
             if Self.dxccFieldIds.contains(field.id) {
                 DXCCFieldRow(dxccCode: bindingFor(field.id), label: field.displayName, isAutoFilled: isFieldAutoFilled?(field.id) ?? false)
+            } else if field.id == "CONTEST_ID" {
+                Picker(field.displayName, selection: bindingFor(field.id)) {
+                    Text("").tag("")
+                    ForEach(contestManager.pickerItems(current: extendedFields[field.id] ?? "")) { item in
+                        Text(item.displayLabel).tag(item.contestId)
+                    }
+                }
             } else {
                 TextField(field.displayName, text: bindingFor(field.id))
                     .focused($focusedField, equals: field.id)
@@ -166,26 +174,34 @@ struct ADIFCollapsedFieldsSection: View {
     @FocusState.Binding var focusedField: String?
 
     private let dxccFieldIds: Set<String> = ["DXCC", "MY_DXCC"]
+    @ObservedObject private var contestManager = ContestManager.shared
 
     var body: some View {
         let allCollapsed = visibilityManager.allCollapsedFields()
-        
+
         if !allCollapsed.isEmpty {
             Section {
                 DisclosureGroup("adif_more_fields".localized) {
                     let grouped = Dictionary(grouping: allCollapsed) { $0.category }
                     let sortedCats = grouped.keys.sorted { $0.sortOrder < $1.sortOrder }
-                    
+
                     ForEach(sortedCats, id: \.self) { category in
                         if let fields = grouped[category] {
                             Text(category.displayName)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                                 .listRowSeparator(.hidden)
-                            
+
                             ForEach(fields) { field in
                                 if dxccFieldIds.contains(field.id) {
                                     DXCCFieldRow(dxccCode: bindingFor(field.id), label: field.displayName)
+                                } else if field.id == "CONTEST_ID" {
+                                    Picker(field.displayName, selection: bindingFor(field.id)) {
+                                        Text("").tag("")
+                                        ForEach(contestManager.pickerItems(current: extendedFields[field.id] ?? "")) { item in
+                                            Text(item.displayLabel).tag(item.contestId)
+                                        }
+                                    }
                                 } else {
                                     TextField(field.displayName, text: bindingFor(field.id))
                                         .focused($focusedField, equals: field.id)

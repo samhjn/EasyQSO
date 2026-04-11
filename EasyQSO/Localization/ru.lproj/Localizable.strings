@@ -189,6 +189,7 @@
 "filter_min_freq" = "Мин. частота";
 "filter_max_freq" = "Макс. частота";
 "filter_satellite" = "Спутник";
+"filter_contest" = "Соревнование";
 "filter_no_filters" = "Нет фильтров";
 
 // MARK: - About and License
