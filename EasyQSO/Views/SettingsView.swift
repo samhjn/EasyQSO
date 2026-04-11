@@ -219,7 +219,11 @@ struct SettingsView: View {
 
                     NavigationLink(destination: SatelliteSettingsView()) {
                         HStack {
-                            Image(systemName: "dot.radiowaves.up.forward")
+                            if #available(iOS 17.0, *) {
+                                Image(systemName: "satellite.fill")
+                            } else {
+                                Image(systemName: "dot.radiowaves.up.forward")
+                            }
                             Text("satellite_settings_title".localized)
                             Spacer()
                             Text("\(satelliteManager.enabledItemCount)")
