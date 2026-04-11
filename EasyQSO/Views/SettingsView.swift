@@ -49,6 +49,8 @@ struct SettingsView: View {
     @State private var navigateToDXCCData = false
     @ObservedObject private var visibilityManager = FieldVisibilityManager.shared
     @ObservedObject private var modeManager = ModeManager.shared
+    @ObservedObject private var satelliteManager = SatelliteManager.shared
+    @ObservedObject private var contestManager = ContestManager.shared
     @ObservedObject private var autoFillManager = AutoFillManager.shared
     @ObservedObject private var dxccManager = DXCCManager.shared
     @ObservedObject private var fieldVisibility = FieldVisibilityManager.shared
@@ -210,6 +212,32 @@ struct SettingsView: View {
                             Text("mode_settings_title".localized)
                             Spacer()
                             Text("\(modeManager.enabledItemCount)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+
+                    NavigationLink(destination: SatelliteSettingsView()) {
+                        HStack {
+                            if #available(iOS 16.0, *) {
+                                Image(systemName: "dot.radiowaves.up.forward")
+                            } else {
+                                Image(systemName: "dot.radiowaves.right")
+                            }
+                            Text("satellite_settings_title".localized)
+                            Spacer()
+                            Text("\(satelliteManager.enabledItemCount)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+
+                    NavigationLink(destination: ContestSettingsView()) {
+                        HStack {
+                            Image(systemName: "trophy.fill")
+                            Text("contest_settings_title".localized)
+                            Spacer()
+                            Text("\(contestManager.enabledItemCount)")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }

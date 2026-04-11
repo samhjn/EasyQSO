@@ -189,6 +189,7 @@
 "filter_min_freq" = "Fréq. min.";
 "filter_max_freq" = "Fréq. max.";
 "filter_satellite" = "Satellite";
+"filter_contest" = "Concours";
 "filter_no_filters" = "Aucun filtre";
 
 // MARK: - À propos et licence
@@ -229,6 +230,24 @@
 "mode_settings_desc" = "Gérez les modes de communication disponibles dans les enregistrements QSO. Vous pouvez afficher ou masquer les modes prédéfinis et ajouter des modes personnalisés. La liste prédéfinie ne contient que les modes couramment utilisés.";
 "preset_modes" = "Modes prédéfinis";
 "mode_search_placeholder" = "Rechercher des modes...";
+
+// MARK: - Gestion des satellites
+"satellite_settings_title" = "Gestion des satellites";
+"satellite_settings_desc" = "Gérez les satellites disponibles dans les enregistrements QSO. Vous pouvez afficher ou masquer les satellites prédéfinis et ajouter des satellites personnalisés. La liste prédéfinie inclut les satellites radioamateurs courants.";
+"satellite_search_placeholder" = "Rechercher des satellites...";
+"preset_satellites" = "Satellites prédéfinis";
+"custom_satellites" = "Satellites personnalisés";
+"new_satellite_placeholder" = "Entrer un nom de satellite";
+"satellite_already_exists" = "Ce satellite existe déjà";
+
+// MARK: - Gestion des concours
+"contest_settings_title" = "Gestion des concours";
+"contest_settings_desc" = "Gérez les concours disponibles dans les enregistrements QSO. Vous pouvez afficher ou masquer les concours prédéfinis et ajouter des IDs de concours personnalisés. La liste prédéfinie inclut les concours radioamateurs courants.";
+"contest_search_placeholder" = "Rechercher des concours...";
+"preset_contests" = "Concours prédéfinis";
+"custom_contests" = "Concours personnalisés";
+"new_contest_placeholder" = "Entrer un ID de concours";
+"contest_already_exists" = "Ce concours existe déjà";
 
 // MARK: - RX Band
 "rx_band" = "Bande RX";

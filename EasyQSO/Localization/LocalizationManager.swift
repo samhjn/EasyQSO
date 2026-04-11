@@ -235,6 +235,7 @@ struct LocalizedStrings {
     static let filterMinFreq = "filter_min_freq"
     static let filterMaxFreq = "filter_max_freq"
     static let filterSatellite = "filter_satellite"
+    static let filterContest = "filter_contest"
     static let filterNoFilters = "filter_no_filters"
     
     // MARK: - About and License

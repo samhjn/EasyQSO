@@ -189,6 +189,7 @@
 "filter_min_freq" = "Frec. mín.";
 "filter_max_freq" = "Frec. máx.";
 "filter_satellite" = "Satélite";
+"filter_contest" = "Concurso";
 "filter_no_filters" = "Sin filtros";
 
 // MARK: - Acerca de y licencia
@@ -229,6 +230,24 @@
 "mode_settings_desc" = "Gestione los modos de comunicación disponibles en los registros QSO. Puede mostrar u ocultar los modos preestablecidos y agregar modos personalizados. La lista preestablecida solo contiene los modos más comunes.";
 "preset_modes" = "Modos preestablecidos";
 "mode_search_placeholder" = "Buscar modos...";
+
+// MARK: - Gestión de satélites
+"satellite_settings_title" = "Gestión de satélites";
+"satellite_settings_desc" = "Gestione los satélites disponibles en los registros QSO. Puede mostrar u ocultar los satélites preestablecidos y agregar satélites personalizados. La lista preestablecida incluye satélites de radioaficionados de uso común.";
+"satellite_search_placeholder" = "Buscar satélites...";
+"preset_satellites" = "Satélites preestablecidos";
+"custom_satellites" = "Satélites personalizados";
+"new_satellite_placeholder" = "Introducir nombre de satélite";
+"satellite_already_exists" = "Este satélite ya existe";
+
+// MARK: - Gestión de concursos
+"contest_settings_title" = "Gestión de concursos";
+"contest_settings_desc" = "Gestione los concursos disponibles en los registros QSO. Puede mostrar u ocultar los concursos preestablecidos y agregar IDs de concursos personalizados. La lista preestablecida incluye concursos de radioaficionados de uso común.";
+"contest_search_placeholder" = "Buscar concursos...";
+"preset_contests" = "Concursos preestablecidos";
+"custom_contests" = "Concursos personalizados";
+"new_contest_placeholder" = "Introducir ID de concurso";
+"contest_already_exists" = "Este concurso ya existe";
 
 // MARK: - RX Band
 "rx_band" = "Banda RX";

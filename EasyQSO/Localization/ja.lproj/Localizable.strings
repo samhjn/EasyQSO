@@ -189,6 +189,7 @@
 "filter_min_freq" = "最小周波数";
 "filter_max_freq" = "最大周波数";
 "filter_satellite" = "衛星";
+"filter_contest" = "コンテスト";
 "filter_no_filters" = "フィルターなし";
 
 // MARK: - 情報とライセンス
@@ -229,6 +230,24 @@
 "mode_settings_desc" = "QSO記録で使用可能な通信モードを管理します。プリセットモードの表示/非表示を切り替えたり、カスタムモードを追加できます。プリセットリストはよく使われるモードのみで、ADIF標準の全モードではありません。";
 "preset_modes" = "プリセットモード";
 "mode_search_placeholder" = "モードを検索...";
+
+// MARK: - 衛星管理
+"satellite_settings_title" = "衛星管理";
+"satellite_settings_desc" = "QSO記録で使用可能な衛星を管理します。プリセット衛星の表示/非表示を切り替えたり、カスタム衛星を追加できます。プリセットリストには一般的なアマチュア無線衛星が含まれています。";
+"satellite_search_placeholder" = "衛星を検索...";
+"preset_satellites" = "プリセット衛星";
+"custom_satellites" = "カスタム衛星";
+"new_satellite_placeholder" = "新しい衛星名を入力";
+"satellite_already_exists" = "この衛星はすでに存在します";
+
+// MARK: - コンテスト管理
+"contest_settings_title" = "コンテスト管理";
+"contest_settings_desc" = "QSO記録で使用可能なコンテストを管理します。プリセットコンテストの表示/非表示を切り替えたり、カスタムコンテストIDを追加できます。プリセットリストには一般的なアマチュア無線コンテストが含まれています。";
+"contest_search_placeholder" = "コンテストを検索...";
+"preset_contests" = "プリセットコンテスト";
+"custom_contests" = "カスタムコンテスト";
+"new_contest_placeholder" = "新しいコンテストIDを入力";
+"contest_already_exists" = "このコンテストはすでに存在します";
 
 // MARK: - 受信バンド
 "rx_band" = "受信バンド";

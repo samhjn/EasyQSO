@@ -189,6 +189,7 @@
 "filter_min_freq" = "최소 주파수";
 "filter_max_freq" = "최대 주파수";
 "filter_satellite" = "위성";
+"filter_contest" = "콘테스트";
 "filter_no_filters" = "필터 없음";
 
 // MARK: - 정보 및 라이선스
@@ -229,6 +230,24 @@
 "mode_settings_desc" = "QSO 기록에서 사용할 수 있는 통신 모드를 관리합니다. 프리셋 모드를 표시하거나 숨기고, 사용자 정의 모드를 추가할 수 있습니다. 프리셋 목록은 자주 사용하는 모드만 포함하며 ADIF 표준의 모든 모드가 아닙니다.";
 "preset_modes" = "프리셋 모드";
 "mode_search_placeholder" = "모드 검색...";
+
+// MARK: - 위성 관리
+"satellite_settings_title" = "위성 관리";
+"satellite_settings_desc" = "QSO 기록에서 사용할 수 있는 위성을 관리합니다. 프리셋 위성을 표시하거나 숨기고, 사용자 정의 위성을 추가할 수 있습니다. 프리셋 목록에는 일반적인 아마추어 무선 위성이 포함되어 있습니다.";
+"satellite_search_placeholder" = "위성 검색...";
+"preset_satellites" = "프리셋 위성";
+"custom_satellites" = "사용자 정의 위성";
+"new_satellite_placeholder" = "새 위성 이름 입력";
+"satellite_already_exists" = "이 위성은 이미 존재합니다";
+
+// MARK: - 콘테스트 관리
+"contest_settings_title" = "콘테스트 관리";
+"contest_settings_desc" = "QSO 기록에서 사용할 수 있는 콘테스트를 관리합니다. 프리셋 콘테스트를 표시하거나 숨기고, 사용자 정의 콘테스트 ID를 추가할 수 있습니다. 프리셋 목록에는 일반적인 아마추어 무선 콘테스트가 포함되어 있습니다.";
+"contest_search_placeholder" = "콘테스트 검색...";
+"preset_contests" = "프리셋 콘테스트";
+"custom_contests" = "사용자 정의 콘테스트";
+"new_contest_placeholder" = "새 콘테스트 ID 입력";
+"contest_already_exists" = "이 콘테스트는 이미 존재합니다";
 
 // MARK: - 수신 밴드
 "rx_band" = "수신 밴드";
