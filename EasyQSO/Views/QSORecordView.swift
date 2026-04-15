@@ -47,6 +47,8 @@ struct QSORecordView: View {
     @State private var pullDistance: CGFloat = 0
     @State private var showingPullHint = false
     @State private var formResetToken = UUID()
+    @State private var formScrollAtTop = true
+    @State private var formScrollInitialY: CGFloat?
     
     // ADIF extended fields
     @State private var extendedFields: [String: String] = [:]
@@ -143,7 +145,7 @@ struct QSORecordView: View {
     }
     
     private var shouldShowPullHint: Bool {
-        pullDistance > 42
+        pullDistance > 42 && formScrollAtTop
     }
     
     private var pullHintText: String {
@@ -219,6 +221,16 @@ struct QSORecordView: View {
     var body: some View {
         ZStack {
             Form {
+                // Invisible scroll-position tracker
+                GeometryReader { proxy in
+                    Color.clear.preference(
+                        key: FormScrollOffsetKey.self,
+                        value: proxy.frame(in: .named("formContainer")).minY
+                    )
+                }
+                .frame(height: 0)
+                .listRowInsets(EdgeInsets())
+
                 // ═══════════ Basic Info ═══════════
                 Section(header: Text(LocalizedStrings.basicInfo.localized)) {
                     TextField(LocalizedStrings.callsign.localized, text: $callsign)
@@ -329,6 +341,10 @@ struct QSORecordView: View {
                 collapsedSection
             }
             .id(formResetToken)
+            .onPreferenceChange(FormScrollOffsetKey.self) { value in
+                if formScrollInitialY == nil { formScrollInitialY = value }
+                formScrollAtTop = value >= (formScrollInitialY ?? value) - 10
+            }
             .simultaneousGesture(
                 DragGesture(minimumDistance: 12)
                     .onChanged { value in
@@ -414,6 +430,7 @@ struct QSORecordView: View {
             }
             .allowsHitTesting(true)
         }
+        .coordinateSpace(name: "formContainer")
         .navigationTitle(LocalizedStrings.recordQSO.localized)
         .toolbar {
             KeyboardToolbar(focusedField: $focusedField, orderedFields: keyboardOrderedFieldIDs)
@@ -1161,5 +1178,14 @@ enum ADIFDateTimeHelper {
         f.dateFormat = "yyyyMMddHHmmss"
         f.timeZone = utcTimeZone
         return f.date(from: d + padded)
+    }
+}
+
+// MARK: - Scroll Offset Tracking
+
+private struct FormScrollOffsetKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
     }
 }
