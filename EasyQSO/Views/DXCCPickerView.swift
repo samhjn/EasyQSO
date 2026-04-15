@@ -99,7 +99,7 @@ struct DXCCPickerView: View {
 
 // MARK: - iOS 15+ searchable compatibility
 
-private extension View {
+extension View {
     @ViewBuilder
     func searchableCompat(text: Binding<String>, prompt: String) -> some View {
         if #available(iOS 15.0, *) {

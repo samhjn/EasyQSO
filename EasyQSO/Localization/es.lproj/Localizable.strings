@@ -249,6 +249,12 @@
 "new_contest_placeholder" = "Introducir ID de concurso";
 "contest_already_exists" = "Este concurso ya existe";
 
+// MARK: - Selectores
+"satellite_picker_title" = "Seleccionar satélite";
+"satellite_not_set" = "No establecido";
+"contest_picker_title" = "Seleccionar concurso";
+"contest_not_set" = "No establecido";
+
 // MARK: - RX Band
 "rx_band" = "Banda RX";
 

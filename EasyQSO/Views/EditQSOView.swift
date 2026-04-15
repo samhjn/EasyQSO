@@ -16,7 +16,6 @@ struct EditQSOView: View {
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject private var fieldVisibility = FieldVisibilityManager.shared
     @ObservedObject private var modeManager = ModeManager.shared
-    @ObservedObject private var satelliteManager = SatelliteManager.shared
     @ObservedObject private var autoFillManager = AutoFillManager.shared
     @FocusState private var focusedField: String?
     
@@ -699,12 +698,7 @@ struct EditQSOView: View {
                         .floatingLabel("adif_field_tx_pwr".localized, text: txPower)
                 }
                 if hasSatName {
-                    Picker(LocalizedStrings.satellite.localized, selection: $satellite) {
-                        Text("").tag("")
-                        ForEach(satelliteManager.pickerItems(current: satellite)) { item in
-                            Text(item.displayLabel).tag(item.satName)
-                        }
-                    }
+                    SatelliteFieldRow(selectedSatellite: $satellite, label: LocalizedStrings.satellite.localized)
                 }
                 ADIFDynamicFieldRows(extendedFields: $extendedFields, category: .technical, visibilityManager: fieldVisibility, focusedField: $focusedField, excludeFieldIds: techExcludeIds)
                 ADIFDynamicFieldRows(extendedFields: $extendedFields, category: .satellite, visibilityManager: fieldVisibility, focusedField: $focusedField)
@@ -782,12 +776,7 @@ struct EditQSOView: View {
                                 if field.id == "DXCC" || field.id == "MY_DXCC" {
                                     DXCCFieldRow(dxccCode: bindingForExtended(field.id), label: field.displayName)
                                 } else if field.id == "CONTEST_ID" {
-                                    Picker(field.displayName, selection: bindingForExtended(field.id)) {
-                                        Text("").tag("")
-                                        ForEach(ContestManager.shared.pickerItems(current: extendedFields[field.id] ?? "")) { item in
-                                            Text(item.displayLabel).tag(item.contestId)
-                                        }
-                                    }
+                                    ContestFieldRow(selectedContest: bindingForExtended(field.id), label: field.displayName)
                                 } else {
                                     TextField(field.displayName, text: bindingForExtended(field.id))
                                         .focused($focusedField, equals: field.id)

@@ -249,6 +249,12 @@
 "new_contest_placeholder" = "Enter new contest ID";
 "contest_already_exists" = "This contest already exists";
 
+// MARK: - Pickers
+"satellite_picker_title" = "Select Satellite";
+"satellite_not_set" = "Not Set";
+"contest_picker_title" = "Select Contest";
+"contest_not_set" = "Not Set";
+
 // MARK: - RX Band
 "rx_band" = "RX Band";
 

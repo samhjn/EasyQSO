@@ -249,6 +249,12 @@
 "new_contest_placeholder" = "Введите ID соревнования";
 "contest_already_exists" = "Это соревнование уже существует";
 
+// MARK: - Выбор
+"satellite_picker_title" = "Выбрать спутник";
+"satellite_not_set" = "Не задан";
+"contest_picker_title" = "Выбрать соревнование";
+"contest_not_set" = "Не задано";
+
 // MARK: - RX Band
 "rx_band" = "Диапазон приёма";
 

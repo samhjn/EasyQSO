@@ -25,9 +25,6 @@ struct AdvancedFilterView: View {
     let availableBands: [String]
     let availableModes: [String]
 
-    @ObservedObject private var satelliteManager = SatelliteManager.shared
-    @ObservedObject private var contestManager = ContestManager.shared
-
     @State private var minFrequencyText: String = ""
     @State private var maxFrequencyText: String = ""
 
@@ -190,19 +187,9 @@ struct AdvancedFilterView: View {
                         .disableAutocorrection(true)
                         .autocapitalization(.allCharacters)
 
-                    Picker(LocalizedStrings.satellite.localized, selection: $filterCriteria.satelliteFilter) {
-                        Text("").tag("")
-                        ForEach(satelliteManager.pickerItems(current: filterCriteria.satelliteFilter)) { item in
-                            Text(item.displayLabel).tag(item.satName)
-                        }
-                    }
+                    SatelliteFieldRow(selectedSatellite: $filterCriteria.satelliteFilter, label: LocalizedStrings.satellite.localized)
 
-                    Picker("filter_contest".localized, selection: $filterCriteria.contestFilter) {
-                        Text("").tag("")
-                        ForEach(contestManager.pickerItems(current: filterCriteria.contestFilter)) { item in
-                            Text(item.displayLabel).tag(item.contestId)
-                        }
-                    }
+                    ContestFieldRow(selectedContest: $filterCriteria.contestFilter, label: "filter_contest".localized)
                 }
 
                 // 操作按钮

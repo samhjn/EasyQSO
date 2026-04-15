@@ -249,6 +249,12 @@
 "new_contest_placeholder" = "輸入新競賽ID";
 "contest_already_exists" = "該競賽已存在";
 
+// MARK: - 選擇器
+"satellite_picker_title" = "選擇衛星";
+"satellite_not_set" = "未設定";
+"contest_picker_title" = "選擇競賽";
+"contest_not_set" = "未設定";
+
 // MARK: - 接收波段
 "rx_band" = "接收波段";
 
