@@ -545,3 +545,8 @@
 
 // MARK: - ICP Filing
 "icp_info" = "";
+
+// MARK: - ADIF File Open Import
+"adif_import_confirm_title" = "Import ADIF File";
+"adif_import_confirm_message" = "Do you want to import the QSO records from \"%@\"?";
+"import_action" = "Import";

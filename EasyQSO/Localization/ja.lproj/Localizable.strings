@@ -542,3 +542,8 @@
 "dxcc_search_prompt" = "名前、プレフィックス、コードで検索";
 "dxcc_picker_title" = "DXCCエンティティを選択";
 "dxcc_not_set" = "未設定";
+
+// MARK: - ADIFファイルインポート
+"adif_import_confirm_title" = "ADIFファイルのインポート";
+"adif_import_confirm_message" = "「%@」からQSOレコードをインポートしますか？";
+"import_action" = "インポート";
