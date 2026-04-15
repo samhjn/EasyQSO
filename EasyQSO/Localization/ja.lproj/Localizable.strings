@@ -249,6 +249,12 @@
 "new_contest_placeholder" = "新しいコンテストIDを入力";
 "contest_already_exists" = "このコンテストはすでに存在します";
 
+// MARK: - ピッカー
+"satellite_picker_title" = "衛星を選択";
+"satellite_not_set" = "未設定";
+"contest_picker_title" = "コンテストを選択";
+"contest_not_set" = "未設定";
+
 // MARK: - 受信バンド
 "rx_band" = "受信バンド";
 

@@ -249,6 +249,12 @@
 "new_contest_placeholder" = "새 콘테스트 ID 입력";
 "contest_already_exists" = "이 콘테스트는 이미 존재합니다";
 
+// MARK: - 피커
+"satellite_picker_title" = "위성 선택";
+"satellite_not_set" = "미설정";
+"contest_picker_title" = "콘테스트 선택";
+"contest_not_set" = "미설정";
+
 // MARK: - 수신 밴드
 "rx_band" = "수신 밴드";
 

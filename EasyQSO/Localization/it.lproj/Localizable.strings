@@ -249,6 +249,12 @@
 "new_contest_placeholder" = "Inserire ID contest";
 "contest_already_exists" = "Questo contest esiste già";
 
+// MARK: - Selettori
+"satellite_picker_title" = "Seleziona satellite";
+"satellite_not_set" = "Non impostato";
+"contest_picker_title" = "Seleziona contest";
+"contest_not_set" = "Non impostato";
+
 // MARK: - RX Band
 "rx_band" = "Banda RX";
 

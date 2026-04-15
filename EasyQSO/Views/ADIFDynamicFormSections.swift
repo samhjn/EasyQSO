@@ -104,7 +104,6 @@ struct ADIFDynamicFieldRows: View {
     var isFieldAutoFilled: ((String) -> Bool)? = nil
 
     private static let dxccFieldIds: Set<String> = ["DXCC", "MY_DXCC"]
-    @ObservedObject private var contestManager = ContestManager.shared
 
     var body: some View {
         let visible = visibilityManager.visibleFields(for: category).filter {
@@ -115,12 +114,7 @@ struct ADIFDynamicFieldRows: View {
             if Self.dxccFieldIds.contains(field.id) {
                 DXCCFieldRow(dxccCode: bindingFor(field.id), label: field.displayName, isAutoFilled: isFieldAutoFilled?(field.id) ?? false)
             } else if field.id == "CONTEST_ID" {
-                Picker(field.displayName, selection: bindingFor(field.id)) {
-                    Text("").tag("")
-                    ForEach(contestManager.pickerItems(current: extendedFields[field.id] ?? "")) { item in
-                        Text(item.displayLabel).tag(item.contestId)
-                    }
-                }
+                ContestFieldRow(selectedContest: bindingFor(field.id), label: field.displayName)
             } else {
                 TextField(field.displayName, text: bindingFor(field.id))
                     .focused($focusedField, equals: field.id)
@@ -174,7 +168,6 @@ struct ADIFCollapsedFieldsSection: View {
     @FocusState.Binding var focusedField: String?
 
     private let dxccFieldIds: Set<String> = ["DXCC", "MY_DXCC"]
-    @ObservedObject private var contestManager = ContestManager.shared
 
     var body: some View {
         let allCollapsed = visibilityManager.allCollapsedFields()
@@ -196,12 +189,7 @@ struct ADIFCollapsedFieldsSection: View {
                                 if dxccFieldIds.contains(field.id) {
                                     DXCCFieldRow(dxccCode: bindingFor(field.id), label: field.displayName)
                                 } else if field.id == "CONTEST_ID" {
-                                    Picker(field.displayName, selection: bindingFor(field.id)) {
-                                        Text("").tag("")
-                                        ForEach(contestManager.pickerItems(current: extendedFields[field.id] ?? "")) { item in
-                                            Text(item.displayLabel).tag(item.contestId)
-                                        }
-                                    }
+                                    ContestFieldRow(selectedContest: bindingFor(field.id), label: field.displayName)
                                 } else {
                                     TextField(field.displayName, text: bindingFor(field.id))
                                         .focused($focusedField, equals: field.id)
