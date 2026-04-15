@@ -542,3 +542,8 @@
 "dxcc_search_prompt" = "按名稱、前綴或代碼搜尋";
 "dxcc_picker_title" = "選擇 DXCC 實體";
 "dxcc_not_set" = "未設定";
+
+// MARK: - ADIF檔案打開匯入
+"adif_import_confirm_title" = "匯入ADIF檔案";
+"adif_import_confirm_message" = "是否要從「%@」中匯入QSO記錄？";
+"import_action" = "匯入";

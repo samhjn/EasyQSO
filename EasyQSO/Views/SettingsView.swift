@@ -24,7 +24,8 @@ import UIKit
 
 struct SettingsView: View {
     @Binding var scrollToGPL: Bool
-    
+    @Binding var pendingImportURL: URL?
+
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \QSORecord.date, ascending: false)],
@@ -66,8 +67,9 @@ struct SettingsView: View {
     @State private var exportFilterCriteria = FilterCriteria()
     @State private var useFilterForExport = false
     
-    init(scrollToGPL: Binding<Bool> = .constant(false)) {
+    init(scrollToGPL: Binding<Bool> = .constant(false), pendingImportURL: Binding<URL?> = .constant(nil)) {
         self._scrollToGPL = scrollToGPL
+        self._pendingImportURL = pendingImportURL
     }
     
     let exportFormats = ["ADIF", "CSV"]
@@ -603,6 +605,31 @@ struct SettingsView: View {
                         }
                         scrollToGPL = false
                     }
+                }
+            }
+            .onChange(of: pendingImportURL) { url in
+                guard let url = url else { return }
+                pendingImportURL = nil
+
+                let accessing = url.startAccessingSecurityScopedResource()
+                defer {
+                    if accessing {
+                        url.stopAccessingSecurityScopedResource()
+                    }
+                }
+
+                do {
+                    let data = try Data(contentsOf: url)
+                    let ext = url.pathExtension.lowercased()
+                    if ext == "csv" {
+                        importCSV(data)
+                    } else {
+                        importADIF(data)
+                    }
+                } catch {
+                    alertTitle = LocalizedStrings.importFailed.localized
+                    alertMessage = error.localizedDescription
+                    showingAlert = true
                 }
             }
         }

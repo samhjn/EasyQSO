@@ -238,6 +238,11 @@ struct LocalizedStrings {
     static let filterContest = "filter_contest"
     static let filterNoFilters = "filter_no_filters"
     
+    // MARK: - ADIF File Open Import
+    static let adifImportConfirmTitle = "adif_import_confirm_title"
+    static let adifImportConfirmMessage = "adif_import_confirm_message"
+    static let importAction = "import_action"
+
     // MARK: - About and License
     static let about = "about"
     static let license = "license"

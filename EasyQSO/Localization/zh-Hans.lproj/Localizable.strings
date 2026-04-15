@@ -545,3 +545,8 @@
 
 // MARK: - ICP备案
 "icp_info" = "浙ICP备2021031153号-6A";
+
+// MARK: - ADIF文件打开导入
+"adif_import_confirm_title" = "导入ADIF文件";
+"adif_import_confirm_message" = "是否要从\"%@\"中导入QSO记录？";
+"import_action" = "导入";

@@ -22,15 +22,22 @@ import CoreData
 @main
 struct EasyQSOApp: App {
     let persistenceController = PersistenceController.shared
-    
+    @State private var pendingImportURL: URL?
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(pendingImportURL: $pendingImportURL)
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .onAppear {
                     setupAppearance()
                     ModeManager.shared.ensureDefaultVisibility()
                     migrateSubmodeRecordsInBackground()
+                }
+                .onOpenURL { url in
+                    let ext = url.pathExtension.lowercased()
+                    if ext == "adi" || ext == "adif" {
+                        pendingImportURL = url
+                    }
                 }
         }
     }
@@ -101,7 +108,7 @@ struct EasyQSOApp: App {
 // 为SwiftUI预览提供预览版本
 struct EasyQSOApp_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        ContentView(pendingImportURL: .constant(nil))
             .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }

@@ -20,11 +20,19 @@ import SwiftUI
 import CoreData
 
 struct ContentView: View {
+    @Binding var pendingImportURL: URL?
     @State private var selectedTab = 0
     @State private var showingGPLAlert = false
     @State private var shouldScrollToGPL = false
+    @State private var showingImportConfirmation = false
+    @State private var confirmedImportURL: URL?
+    @State private var pendingFileName: String = ""
     @Environment(\.managedObjectContext) private var viewContext
-    
+
+    init(pendingImportURL: Binding<URL?> = .constant(nil)) {
+        self._pendingImportURL = pendingImportURL
+    }
+
     var body: some View {
         NavigationView {
             TabView(selection: $selectedTab) {
@@ -33,14 +41,14 @@ struct ContentView: View {
                         Label(LocalizedStrings.recordQSO.localized, systemImage: "antenna.radiowaves.left.and.right")
                     }
                     .tag(0)
-                
+
                 LogQueryView()
                     .tabItem {
                         Label(LocalizedStrings.queryLog.localized, systemImage: "magnifyingglass")
                     }
                     .tag(1)
-                
-                SettingsView(scrollToGPL: $shouldScrollToGPL)
+
+                SettingsView(scrollToGPL: $shouldScrollToGPL, pendingImportURL: $confirmedImportURL)
                     .tabItem {
                         Label(LocalizedStrings.settings.localized, systemImage: "gearshape")
                     }
@@ -57,6 +65,12 @@ struct ContentView: View {
                 }
             }
         }
+        .onChange(of: pendingImportURL) { url in
+            if let url = url {
+                pendingFileName = url.lastPathComponent
+                showingImportConfirmation = true
+            }
+        }
         .alert(LocalizedStrings.welcomeTitle.localized, isPresented: $showingGPLAlert) {
             Button(LocalizedStrings.learnGplLicense.localized) {
                 selectedTab = 2
@@ -69,12 +83,24 @@ struct ContentView: View {
         } message: {
             Text(LocalizedStrings.welcomeGplNotice.localized)
         }
+        .alert(LocalizedStrings.adifImportConfirmTitle.localized, isPresented: $showingImportConfirmation) {
+            Button(LocalizedStrings.importAction.localized) {
+                confirmedImportURL = pendingImportURL
+                pendingImportURL = nil
+                selectedTab = 2
+            }
+            Button(LocalizedStrings.cancel.localized, role: .cancel) {
+                pendingImportURL = nil
+            }
+        } message: {
+            Text(String(format: LocalizedStrings.adifImportConfirmMessage.localized, pendingFileName))
+        }
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        ContentView(pendingImportURL: .constant(nil))
             .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }

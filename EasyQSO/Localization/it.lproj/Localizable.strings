@@ -542,3 +542,8 @@
 "dxcc_search_prompt" = "Cerca per nome, prefisso o codice";
 "dxcc_picker_title" = "Seleziona entità DXCC";
 "dxcc_not_set" = "Non impostato";
+
+// MARK: - Importazione file ADIF
+"adif_import_confirm_title" = "Importa file ADIF";
+"adif_import_confirm_message" = "Vuoi importare i record QSO da \"%@\"?";
+"import_action" = "Importa";
