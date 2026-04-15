@@ -48,8 +48,7 @@ struct QSORecordView: View {
     @State private var showingPullHint = false
     @State private var formResetToken = UUID()
     @State private var formScrollAtTop = true
-    @State private var formScrollInitialY: CGFloat?
-    
+
     // ADIF extended fields
     @State private var extendedFields: [String: String] = [:]
     
@@ -221,16 +220,6 @@ struct QSORecordView: View {
     var body: some View {
         ZStack {
             Form {
-                // Invisible scroll-position tracker
-                GeometryReader { proxy in
-                    Color.clear.preference(
-                        key: FormScrollOffsetKey.self,
-                        value: proxy.frame(in: .named("formContainer")).minY
-                    )
-                }
-                .frame(height: 0)
-                .listRowInsets(EdgeInsets())
-
                 // ═══════════ Basic Info ═══════════
                 Section(header: Text(LocalizedStrings.basicInfo.localized)) {
                     TextField(LocalizedStrings.callsign.localized, text: $callsign)
@@ -241,6 +230,7 @@ struct QSORecordView: View {
                             applyAutoFillForTrigger("CALL")
                         }
                         .floatingLabel(LocalizedStrings.callsign.localized, text: callsign)
+                        .background(ScrollAtTopObserver(isAtTop: $formScrollAtTop))
                     
                     if dateTimeVis == .visible {
                         DatePicker(LocalizedStrings.dateTime.localized, selection: $date)
@@ -341,10 +331,6 @@ struct QSORecordView: View {
                 collapsedSection
             }
             .id(formResetToken)
-            .onPreferenceChange(FormScrollOffsetKey.self) { value in
-                if formScrollInitialY == nil { formScrollInitialY = value }
-                formScrollAtTop = value >= (formScrollInitialY ?? value) - 10
-            }
             .simultaneousGesture(
                 DragGesture(minimumDistance: 12)
                     .onChanged { value in
@@ -430,7 +416,6 @@ struct QSORecordView: View {
             }
             .allowsHitTesting(true)
         }
-        .coordinateSpace(name: "formContainer")
         .navigationTitle(LocalizedStrings.recordQSO.localized)
         .toolbar {
             KeyboardToolbar(focusedField: $focusedField, orderedFields: keyboardOrderedFieldIDs)
@@ -1181,11 +1166,53 @@ enum ADIFDateTimeHelper {
     }
 }
 
-// MARK: - Scroll Offset Tracking
+// MARK: - Scroll Position Observer
 
-private struct FormScrollOffsetKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
+/// Observes the parent UIScrollView's contentOffset via KVO and reports
+/// whether the scroll view is at (or above) its resting top position.
+private struct ScrollAtTopObserver: UIViewRepresentable {
+    @Binding var isAtTop: Bool
+
+    func makeCoordinator() -> Coordinator { Coordinator(isAtTop: $isAtTop) }
+
+    func makeUIView(context: Context) -> UIView {
+        let v = UIView()
+        v.isHidden = true
+        v.frame = .zero
+        return v
+    }
+
+    func updateUIView(_ uiView: UIView, context: Context) {
+        DispatchQueue.main.async {
+            if context.coordinator.observation == nil,
+               let sv = Self.parentScrollView(of: uiView) {
+                context.coordinator.observe(sv)
+            }
+        }
+    }
+
+    private static func parentScrollView(of view: UIView) -> UIScrollView? {
+        var v: UIView? = view.superview
+        while let current = v {
+            if let sv = current as? UIScrollView { return sv }
+            v = current.superview
+        }
+        return nil
+    }
+
+    final class Coordinator {
+        var observation: NSKeyValueObservation?
+        private let isAtTop: Binding<Bool>
+
+        init(isAtTop: Binding<Bool>) { self.isAtTop = isAtTop }
+
+        func observe(_ scrollView: UIScrollView) {
+            observation = scrollView.observe(\.contentOffset, options: .new) { [weak self] sv, _ in
+                let atTop = sv.contentOffset.y <= -sv.adjustedContentInset.top + 5
+                DispatchQueue.main.async {
+                    self?.isAtTop.wrappedValue = atTop
+                }
+            }
+        }
     }
 }
