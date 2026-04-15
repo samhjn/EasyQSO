@@ -11,6 +11,7 @@
 import SwiftUI
 
 /// A searchable contest picker that allows selection by contest ID or description.
+/// Designed to be pushed via NavigationLink (no own NavigationView).
 struct ContestPickerView: View {
     @Binding var selectedContest: String
     @ObservedObject private var contestManager = ContestManager.shared
@@ -40,93 +41,74 @@ struct ContestPickerView: View {
     }
 
     var body: some View {
-        NavigationView {
-            List {
-                // Clear selection option
+        List {
+            // Clear selection option
+            Button(action: {
+                selectedContest = ""
+                presentationMode.wrappedValue.dismiss()
+            }) {
+                HStack {
+                    Text("dxcc_clear_selection".localized)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    if selectedContest.isEmpty {
+                        Image(systemName: "checkmark")
+                            .foregroundColor(.accentColor)
+                    }
+                }
+            }
+
+            ForEach(filteredContests, id: \.id) { item in
                 Button(action: {
-                    selectedContest = ""
+                    selectedContest = item.id
                     presentationMode.wrappedValue.dismiss()
                 }) {
                     HStack {
-                        Text("dxcc_clear_selection".localized)
-                            .foregroundColor(.secondary)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(item.id)
+                                .foregroundColor(.primary)
+                            if let desc = item.description {
+                                Text(desc)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
                         Spacer()
-                        if selectedContest.isEmpty {
+                        if item.id.uppercased() == selectedContest.uppercased() {
                             Image(systemName: "checkmark")
                                 .foregroundColor(.accentColor)
                         }
                     }
                 }
-
-                ForEach(filteredContests, id: \.id) { item in
-                    Button(action: {
-                        selectedContest = item.id
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(item.id)
-                                    .foregroundColor(.primary)
-                                if let desc = item.description {
-                                    Text(desc)
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
-                            }
-                            Spacer()
-                            if item.id.uppercased() == selectedContest.uppercased() {
-                                Image(systemName: "checkmark")
-                                    .foregroundColor(.accentColor)
-                            }
-                        }
-                    }
-                }
             }
-            .searchableCompat(text: $searchText, prompt: "contest_search_placeholder".localized)
-            .navigationTitle("contest_picker_title".localized)
-            .navigationBarItems(trailing: Button(LocalizedStrings.cancel.localized) {
-                presentationMode.wrappedValue.dismiss()
-            })
         }
+        .searchableCompat(text: $searchText, prompt: "contest_search_placeholder".localized)
+        .navigationTitle("contest_picker_title".localized)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 /// Inline contest display row for use in QSO forms.
-/// Shows contest ID/description and allows tapping to pick a different contest.
+/// Uses NavigationLink for lightweight push navigation.
 struct ContestFieldRow: View {
     @Binding var selectedContest: String
-    @State private var showingPicker = false
-
     let label: String
 
     var body: some View {
-        Button(action: { showingPicker = true }) {
+        NavigationLink {
+            ContestPickerView(selectedContest: $selectedContest)
+        } label: {
             HStack {
                 Text(label)
-                    .foregroundColor(.primary)
                 Spacer()
                 if selectedContest.isEmpty {
                     Text("contest_not_set".localized)
                         .foregroundColor(.secondary)
                 } else {
-                    VStack(alignment: .trailing, spacing: 1) {
-                        Text(selectedContest)
-                            .foregroundColor(.secondary)
-                        if let desc = ContestManager.description(for: selectedContest) {
-                            Text(desc)
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    .lineLimit(1)
+                    Text(selectedContest)
+                        .foregroundColor(.secondary)
                 }
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
             }
-        }
-        .sheet(isPresented: $showingPicker) {
-            ContestPickerView(selectedContest: $selectedContest)
         }
     }
 }
