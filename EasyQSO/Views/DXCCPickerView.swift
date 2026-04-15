@@ -11,6 +11,7 @@
 import SwiftUI
 
 /// A searchable DXCC entity picker that allows selection by name, prefix or code.
+/// Designed to be pushed via NavigationLink (no own NavigationView).
 struct DXCCPickerView: View {
     @Binding var selectedCode: String
     @ObservedObject private var dxccManager = DXCCManager.shared
@@ -22,78 +23,74 @@ struct DXCCPickerView: View {
     }
 
     var body: some View {
-        NavigationView {
-            Group {
-                if !dxccManager.isDataAvailable {
-                    VStack(spacing: 16) {
-                        Image(systemName: "globe")
-                            .font(.system(size: 48))
-                            .foregroundColor(.secondary)
-                        Text("dxcc_no_data".localized)
-                            .font(.headline)
-                        Text("dxcc_no_data_hint".localized)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
+        Group {
+            if !dxccManager.isDataAvailable {
+                VStack(spacing: 16) {
+                    Image(systemName: "globe")
+                        .font(.system(size: 48))
+                        .foregroundColor(.secondary)
+                    Text("dxcc_no_data".localized)
+                        .font(.headline)
+                    Text("dxcc_no_data_hint".localized)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                List {
+                    // Clear selection option
+                    Button(action: {
+                        selectedCode = ""
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        HStack {
+                            Text("dxcc_clear_selection".localized)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            if selectedCode.isEmpty {
+                                Image(systemName: "checkmark")
+                                    .foregroundColor(.accentColor)
+                            }
+                        }
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    List {
-                        // Clear selection option
+
+                    ForEach(filteredEntities) { entity in
                         Button(action: {
-                            selectedCode = ""
+                            selectedCode = String(entity.code)
                             presentationMode.wrappedValue.dismiss()
                         }) {
                             HStack {
-                                Text("dxcc_clear_selection".localized)
-                                    .foregroundColor(.secondary)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(entity.name)
+                                        .foregroundColor(.primary)
+                                    HStack(spacing: 8) {
+                                        Text(entity.primaryPrefix)
+                                            .font(.caption)
+                                            .foregroundColor(.accentColor)
+                                        Text("#\(entity.code)")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                        Text(entity.continent)
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
                                 Spacer()
-                                if selectedCode.isEmpty {
+                                if selectedCode == String(entity.code) {
                                     Image(systemName: "checkmark")
                                         .foregroundColor(.accentColor)
                                 }
                             }
                         }
-
-                        ForEach(filteredEntities) { entity in
-                            Button(action: {
-                                selectedCode = String(entity.code)
-                                presentationMode.wrappedValue.dismiss()
-                            }) {
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(entity.name)
-                                            .foregroundColor(.primary)
-                                        HStack(spacing: 8) {
-                                            Text(entity.primaryPrefix)
-                                                .font(.caption)
-                                                .foregroundColor(.accentColor)
-                                            Text("#\(entity.code)")
-                                                .font(.caption)
-                                                .foregroundColor(.secondary)
-                                            Text(entity.continent)
-                                                .font(.caption)
-                                                .foregroundColor(.secondary)
-                                        }
-                                    }
-                                    Spacer()
-                                    if selectedCode == String(entity.code) {
-                                        Image(systemName: "checkmark")
-                                            .foregroundColor(.accentColor)
-                                    }
-                                }
-                            }
-                        }
                     }
-                    .searchableCompat(text: $searchText, prompt: "dxcc_search_prompt".localized)
                 }
+                .searchableCompat(text: $searchText, prompt: "dxcc_search_prompt".localized)
             }
-            .navigationTitle("dxcc_picker_title".localized)
-            .navigationBarItems(trailing: Button(LocalizedStrings.cancel.localized) {
-                presentationMode.wrappedValue.dismiss()
-            })
         }
+        .navigationTitle("dxcc_picker_title".localized)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
@@ -117,21 +114,21 @@ extension View {
 }
 
 /// Inline DXCC display row for use in QSO forms.
-/// Shows entity name and allows tapping to pick a different entity.
+/// Uses NavigationLink for lightweight push navigation.
 struct DXCCFieldRow: View {
     @Binding var dxccCode: String
     @ObservedObject private var dxccManager = DXCCManager.shared
-    @State private var showingPicker = false
 
     let label: String
     var isAutoFilled: Bool = false
 
     var body: some View {
-        Button(action: { showingPicker = true }) {
+        NavigationLink {
+            DXCCPickerView(selectedCode: $dxccCode)
+        } label: {
             HStack {
                 HStack(spacing: 4) {
                     Text(label)
-                        .foregroundColor(.primary)
                     if isAutoFilled {
                         Text("autofill_badge".localized)
                             .font(.system(size: 9, weight: .medium))
@@ -151,7 +148,6 @@ struct DXCCFieldRow: View {
                         .foregroundColor(.secondary)
                         .lineLimit(1)
                 } else if dxccManager.isDataAvailable {
-                    // Data loaded but code is invalid
                     HStack(spacing: 4) {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.caption2)
@@ -163,13 +159,7 @@ struct DXCCFieldRow: View {
                     Text("#\(dxccCode)")
                         .foregroundColor(.secondary)
                 }
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
             }
-        }
-        .sheet(isPresented: $showingPicker) {
-            DXCCPickerView(selectedCode: $dxccCode)
         }
     }
 }
