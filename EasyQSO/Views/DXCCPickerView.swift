@@ -43,6 +43,7 @@ struct DXCCPickerView: View {
                     // Clear selection option
                     Button(action: {
                         selectedCode = ""
+                        searchText = ""
                         presentationMode.wrappedValue.dismiss()
                     }) {
                         HStack {
@@ -59,6 +60,7 @@ struct DXCCPickerView: View {
                     ForEach(filteredEntities) { entity in
                         Button(action: {
                             selectedCode = String(entity.code)
+                            searchText = ""
                             presentationMode.wrappedValue.dismiss()
                         }) {
                             HStack {

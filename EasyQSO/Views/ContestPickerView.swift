@@ -45,6 +45,7 @@ struct ContestPickerView: View {
             // Clear selection option
             Button(action: {
                 selectedContest = ""
+                searchText = ""
                 presentationMode.wrappedValue.dismiss()
             }) {
                 HStack {
@@ -61,6 +62,7 @@ struct ContestPickerView: View {
             ForEach(filteredContests, id: \.id) { item in
                 Button(action: {
                     selectedContest = item.id
+                    searchText = ""
                     presentationMode.wrappedValue.dismiss()
                 }) {
                     HStack {
