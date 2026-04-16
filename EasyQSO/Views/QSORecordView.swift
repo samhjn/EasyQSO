@@ -141,14 +141,20 @@ struct QSORecordView: View {
     }
 
     private var formStateSnapshot: QSOFormState {
-        QSOFormState(
+        let afFields = Set(
+            autoFillEngine.fieldSources
+                .filter { $0.value == .autofilled }
+                .map { $0.key }
+        )
+        return QSOFormState(
             callsign: callsign, rstSent: rstSent, rstReceived: rstReceived,
             name: name, qth: qth, gridSquare: gridSquare,
             cqZone: cqZone, ituZone: ituZone, satellite: satellite,
             remarks: remarks, extendedFields: extendedFields,
             band: band, mode: mode, submode: submode,
             frequency: frequency, rxFrequency: rxFrequency,
-            rxBand: rxBand, txPower: txPower
+            rxBand: rxBand, txPower: txPower,
+            autoFilledFields: afFields
         )
     }
     

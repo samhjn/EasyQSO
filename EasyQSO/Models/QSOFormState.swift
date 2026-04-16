@@ -5,7 +5,7 @@ import Foundation
 /// and `clearTransient()` can be unit-tested without a live SwiftUI view.
 struct QSOFormState {
 
-    // MARK: - User-input fields (checked by hasUserInput)
+    // MARK: - Contact fields (always count as user input when non-empty)
 
     var callsign: String = ""
     var rstSent: String = ""
@@ -29,15 +29,36 @@ struct QSOFormState {
     var rxBand: String = ""
     var txPower: String = ""
 
+    // MARK: - Autofill tracking
+
+    /// ADIF field IDs whose current values were set by the autofill engine.
+    /// Fields in this set are excluded from the radio-field user-input check.
+    var autoFilledFields: Set<String> = []
+
     // MARK: - Computed
 
     /// Whether the form contains any user-entered data that warrants
     /// showing the "reset form?" confirmation dialog on pull-to-refresh.
+    ///
+    /// Contact fields (callsign, RST, name, etc.) always count when non-empty.
+    /// Radio fields (band, mode, freq, etc.) only count when they differ from
+    /// their defaults AND were not set by autofill.
     var hasUserInput: Bool {
         !callsign.isEmpty || !rstSent.isEmpty || !rstReceived.isEmpty ||
         !name.isEmpty || !qth.isEmpty || !gridSquare.isEmpty ||
         !cqZone.isEmpty || !ituZone.isEmpty || !satellite.isEmpty ||
-        !remarks.isEmpty || !extendedFields.isEmpty
+        !remarks.isEmpty || !extendedFields.isEmpty ||
+        isManualEdit("BAND", value: band, defaultValue: "20m") ||
+        isManualEdit("MODE", value: mode, defaultValue: "SSB") ||
+        isManualEdit("SUBMODE", value: submode) ||
+        isManualEdit("FREQ", value: frequency) ||
+        isManualEdit("RX_FREQ", value: rxFrequency) ||
+        isManualEdit("TX_PWR", value: txPower)
+    }
+
+    /// Returns true when the field was changed from its default AND not by autofill.
+    private func isManualEdit(_ fieldId: String, value: String, defaultValue: String = "") -> Bool {
+        value != defaultValue && !autoFilledFields.contains(fieldId)
     }
 
     // MARK: - Reset

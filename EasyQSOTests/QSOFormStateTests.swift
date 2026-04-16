@@ -10,7 +10,7 @@ final class QSOFormStateTests: XCTestCase {
         XCTAssertFalse(state.hasUserInput)
     }
 
-    // MARK: - hasUserInput: each individual field triggers detection
+    // MARK: - hasUserInput: each contact field triggers detection
 
     func testCallsign_DetectedAsUserInput() {
         let state = QSOFormState(callsign: "BG5ABC")
@@ -93,22 +93,89 @@ final class QSOFormStateTests: XCTestCase {
         XCTAssertTrue(state.hasUserInput)
     }
 
-    // MARK: - hasUserInput: radio-only fields do NOT count
+    // MARK: - hasUserInput: radio fields — user-edited vs autofilled
 
-    func testBandAlone_NotUserInput() {
+    func testBandManuallyChanged_IsUserInput() {
         let state = QSOFormState(band: "40m")
-        XCTAssertFalse(state.hasUserInput,
-                        "Changing band alone should not trigger the reset dialog")
+        XCTAssertTrue(state.hasUserInput,
+                       "User manually changing band from default should count as input")
     }
 
-    func testModeAlone_NotUserInput() {
+    func testModeManuallyChanged_IsUserInput() {
         let state = QSOFormState(mode: "CW")
+        XCTAssertTrue(state.hasUserInput,
+                       "User manually changing mode from default should count as input")
+    }
+
+    func testFrequencyManuallyEntered_IsUserInput() {
+        let state = QSOFormState(frequency: "14.200")
+        XCTAssertTrue(state.hasUserInput,
+                       "User manually typing a frequency should count as input")
+    }
+
+    func testSubmodeManuallyChanged_IsUserInput() {
+        let state = QSOFormState(submode: "USB")
+        XCTAssertTrue(state.hasUserInput)
+    }
+
+    func testTxPowerManuallyEntered_IsUserInput() {
+        let state = QSOFormState(txPower: "100")
+        XCTAssertTrue(state.hasUserInput)
+    }
+
+    func testBandAutoFilled_NotUserInput() {
+        let state = QSOFormState(band: "40m", autoFilledFields: ["BAND"])
+        XCTAssertFalse(state.hasUserInput,
+                        "Band set by autofill should not count as user input")
+    }
+
+    func testModeAutoFilled_NotUserInput() {
+        let state = QSOFormState(mode: "CW", autoFilledFields: ["MODE"])
         XCTAssertFalse(state.hasUserInput)
     }
 
-    func testFrequencyAlone_NotUserInput() {
-        let state = QSOFormState(frequency: "14.200")
+    func testFrequencyAutoFilled_NotUserInput() {
+        let state = QSOFormState(frequency: "14.200", autoFilledFields: ["FREQ"])
         XCTAssertFalse(state.hasUserInput)
+    }
+
+    func testSubmodeAutoFilled_NotUserInput() {
+        let state = QSOFormState(submode: "USB", autoFilledFields: ["SUBMODE"])
+        XCTAssertFalse(state.hasUserInput)
+    }
+
+    func testTxPowerAutoFilled_NotUserInput() {
+        let state = QSOFormState(txPower: "100", autoFilledFields: ["TX_PWR"])
+        XCTAssertFalse(state.hasUserInput)
+    }
+
+    func testBandStillAtDefault_NotUserInput() {
+        // Even without autofill flag, default value doesn't count
+        let state = QSOFormState(band: "20m")
+        XCTAssertFalse(state.hasUserInput)
+    }
+
+    func testModeStillAtDefault_NotUserInput() {
+        let state = QSOFormState(mode: "SSB")
+        XCTAssertFalse(state.hasUserInput)
+    }
+
+    func testAllRadioFieldsAutoFilled_NotUserInput() {
+        let state = QSOFormState(
+            band: "40m", mode: "CW", submode: "PCW",
+            frequency: "7.010", rxFrequency: "7.020", txPower: "100",
+            autoFilledFields: ["BAND", "MODE", "SUBMODE", "FREQ", "RX_FREQ", "TX_PWR"]
+        )
+        XCTAssertFalse(state.hasUserInput,
+                        "Fully autofilled radio settings should not count as user input")
+    }
+
+    func testMixedAutoFillAndManual_OnlyManualCounts() {
+        // Band autofilled, but frequency manually entered
+        let state = QSOFormState(band: "40m", frequency: "7.010",
+                                  autoFilledFields: ["BAND"])
+        XCTAssertTrue(state.hasUserInput,
+                       "Manual frequency entry should count even when band is autofilled")
     }
 
     // MARK: - hasUserInput: multiple fields
