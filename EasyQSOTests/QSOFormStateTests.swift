@@ -364,7 +364,7 @@ final class QSOFormStateTests: XCTestCase {
     // MARK: - resetAll vs clearTransient: satellite behavior difference
 
     func testResetAll_ClearsSatellite_ClearTransient_PreservesIt() {
-        var full = QSOFormState(satellite: "ISS", callsign: "BG5ABC")
+        var full = QSOFormState(callsign: "BG5ABC", satellite: "ISS")
         var transient = full
 
         full.resetAll()
