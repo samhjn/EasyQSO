@@ -53,8 +53,8 @@ final class StoreCompatibilityTests: XCTestCase {
     func testDiagnoseLoadFailure_IncompatibleSchema() {
         let storeURL = tempDir.appendingPathComponent("old_schema.sqlite")
 
-        // Create store with a different model (simulating old schema)
-        let oldModel = createDifferentModel()
+        // Create store with an incompatible model (same entity, different attribute type)
+        let oldModel = createIncompatibleModel()
         createValidStore(at: storeURL, model: oldModel)
 
         let dummyError = NSError(domain: "CoreData", code: 134130, userInfo: nil)
@@ -141,8 +141,11 @@ final class StoreCompatibilityTests: XCTestCase {
     func testIncompatibleStoreDoesNotCrash() {
         let storeURL = tempDir.appendingPathComponent("incompat_integration.sqlite")
 
-        // Create a store with a different (incompatible) model
-        let oldModel = createDifferentModel()
+        // Create a store with an incompatible model:
+        // Same entity name "QSORecord" but callsign is Int64 instead of String.
+        // Lightweight migration cannot handle attribute type changes,
+        // so this guarantees a load failure.
+        let oldModel = createIncompatibleModel()
         createValidStore(at: storeURL, model: oldModel)
 
         // Now try to load with the current model + lightweight migration
@@ -163,9 +166,11 @@ final class StoreCompatibilityTests: XCTestCase {
         // The load should fail (incompatible schema) but NOT crash
         XCTAssertNotNil(loadError, "Loading incompatible store should produce an error, not crash")
 
+        guard let error = loadError else { return }
+
         // Diagnose should identify it as incompatible
         let state = StoreCompatibilityCheck.diagnoseLoadFailure(
-            loadError: loadError!,
+            loadError: error,
             model: EasyQSOModel.shared,
             storeURL: storeURL
         )
@@ -194,20 +199,32 @@ final class StoreCompatibilityTests: XCTestCase {
         }
     }
 
-    /// Creates a model that is incompatible with the current EasyQSOModel
-    /// (different entity name and attributes)
-    private func createDifferentModel() -> NSManagedObjectModel {
+    /// Creates a model that is incompatible with the current EasyQSOModel.
+    ///
+    /// Uses the same entity name "QSORecord" but changes `callsign` from
+    /// String to Int64. Lightweight migration cannot handle type changes,
+    /// so this guarantees an incompatibility that cannot be auto-resolved.
+    private func createIncompatibleModel() -> NSManagedObjectModel {
         let model = NSManagedObjectModel()
         let entity = NSEntityDescription()
-        entity.name = "DifferentEntity"
+        entity.name = "QSORecord"
         entity.managedObjectClassName = NSManagedObject.self.description()
 
-        let attr = NSAttributeDescription()
-        attr.name = "someField"
-        attr.attributeType = .stringAttributeType
-        attr.isOptional = true
-        entity.properties = [attr]
+        // callsign as Int64 (real model uses String) — type change is not migratable
+        let callsignAttr = NSAttributeDescription()
+        callsignAttr.name = "callsign"
+        callsignAttr.attributeType = .integer64AttributeType
+        callsignAttr.isOptional = false
+        callsignAttr.defaultValue = 0
 
+        // date as String (real model uses Date) — another type mismatch
+        let dateAttr = NSAttributeDescription()
+        dateAttr.name = "date"
+        dateAttr.attributeType = .stringAttributeType
+        dateAttr.isOptional = false
+        dateAttr.defaultValue = ""
+
+        entity.properties = [callsignAttr, dateAttr]
         model.entities = [entity]
         return model
     }
