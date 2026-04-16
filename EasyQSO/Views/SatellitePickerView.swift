@@ -45,6 +45,7 @@ struct SatellitePickerView: View {
             // Clear selection option
             Button(action: {
                 selectedSatellite = ""
+                searchText = ""
                 presentationMode.wrappedValue.dismiss()
             }) {
                 HStack {
@@ -61,6 +62,7 @@ struct SatellitePickerView: View {
             ForEach(filteredSatellites, id: \.name) { item in
                 Button(action: {
                     selectedSatellite = item.name
+                    searchText = ""
                     presentationMode.wrappedValue.dismiss()
                 }) {
                     HStack {
