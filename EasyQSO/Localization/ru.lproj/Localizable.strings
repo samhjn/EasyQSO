@@ -549,6 +549,9 @@
 "dxcc_picker_title" = "Выбрать территорию DXCC";
 "dxcc_not_set" = "Не задано";
 
+// MARK: - ICP Filing
+"icp_info" = "";
+
 // MARK: - Импорт файла ADIF
 "adif_import_confirm_title" = "Импорт файла ADIF";
 "adif_import_confirm_message" = "Хотите импортировать записи QSO из \"%@\"?";
