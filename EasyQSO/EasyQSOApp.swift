@@ -26,19 +26,26 @@ struct EasyQSOApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView(pendingImportURL: $pendingImportURL)
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                .onAppear {
-                    setupAppearance()
-                    ModeManager.shared.ensureDefaultVisibility()
-                    migrateSubmodeRecordsInBackground()
-                }
-                .onOpenURL { url in
-                    let ext = url.pathExtension.lowercased()
-                    if ext == "adi" || ext == "adif" {
-                        pendingImportURL = url
+            if persistenceController.isStoreReady {
+                ContentView(pendingImportURL: $pendingImportURL)
+                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                    .onAppear {
+                        setupAppearance()
+                        ModeManager.shared.ensureDefaultVisibility()
+                        migrateSubmodeRecordsInBackground()
                     }
-                }
+                    .onOpenURL { url in
+                        let ext = url.pathExtension.lowercased()
+                        if ext == "adi" || ext == "adif" {
+                            pendingImportURL = url
+                        }
+                    }
+            } else {
+                StoreIncompatibleView(storeState: persistenceController.storeState)
+                    .onAppear {
+                        setupAppearance()
+                    }
+            }
         }
     }
     

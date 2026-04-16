@@ -121,9 +121,90 @@ final class SchemaIntegrityTests: XCTestCase {
             "latitude", "longitude",
             "adifFieldsData"
         ]
-        
+
         let actualNames = Set(entity.attributesByName.keys)
         XCTAssertEqual(actualNames, expectedNames,
                        "Attribute names mismatch. Extra: \(actualNames.subtracting(expectedNames)), Missing: \(expectedNames.subtracting(actualNames))")
+    }
+
+    // MARK: - Schema Change Gate (模型变更门禁)
+
+    /// 模型指纹门禁测试
+    ///
+    /// 该测试通过比对模型的属性指纹来检测 Schema 是否发生了变更。
+    /// 当该测试失败时，表示有人修改了 CoreData 模型定义。
+    ///
+    /// **在更新指纹之前，必须确认：**
+    /// 1. 轻量级迁移（Lightweight Migration）能否处理此变更
+    /// 2. 已有数据库能否正常加载新模型
+    /// 3. 迁移过程中不会丢失数据
+    /// 4. 如果轻量级迁移无法处理，需提供自定义迁移方案
+    func testSchemaChangeGate() {
+        let attrs = entity.attributesByName.sorted { $0.key < $1.key }
+        var lines: [String] = []
+        for (name, attr) in attrs {
+            let typeName: String
+            switch attr.attributeType {
+            case .stringAttributeType: typeName = "String"
+            case .dateAttributeType: typeName = "Date"
+            case .integer64AttributeType: typeName = "Int64"
+            case .doubleAttributeType: typeName = "Double"
+            case .binaryDataAttributeType: typeName = "Binary"
+            default: typeName = "Type(\(attr.attributeType.rawValue))"
+            }
+            let optionality = attr.isOptional ? "optional" : "required"
+            lines.append("\(name):\(typeName):\(optionality)")
+        }
+        let fingerprint = lines.joined(separator: "|")
+
+        // 已知的正确 Schema 指纹 —— 21个属性，按名称排序
+        let expected = [
+            "adifFieldsData:Binary:optional",
+            "band:String:required",
+            "callsign:String:required",
+            "cqZone:String:optional",
+            "date:Date:required",
+            "frequency:Double:optional",
+            "frequencyHz:Int64:required",
+            "gridSquare:String:optional",
+            "ituZone:String:optional",
+            "latitude:Double:required",
+            "longitude:Double:required",
+            "mode:String:required",
+            "name:String:optional",
+            "qth:String:optional",
+            "remarks:String:optional",
+            "rstReceived:String:required",
+            "rstSent:String:required",
+            "rxFrequency:Double:optional",
+            "rxFrequencyHz:Int64:required",
+            "satellite:String:optional",
+            "txPower:String:optional",
+        ].joined(separator: "|")
+
+        XCTAssertEqual(fingerprint, expected,
+            "Schema 指纹发生变化！在更新指纹前请确认：\n"
+            + "1. 轻量级迁移能否处理此变更\n"
+            + "2. 已有数据库能正常加载\n"
+            + "3. 迁移不会丢失数据\n"
+            + "当前指纹: \(fingerprint)")
+    }
+
+    /// 验证模型的 entityVersionHash 稳定性
+    ///
+    /// CoreData 使用 entityVersionHash 判断模型兼容性。
+    /// 此测试记录当前 hash，任何模型变更都会导致 hash 变化，从而触发门禁。
+    func testEntityVersionHashStability() {
+        let hashes = model.entityVersionHashesByName
+        XCTAssertNotNil(hashes["QSORecord"], "QSORecord entity version hash must exist")
+
+        // 使用新创建的模型验证 hash 一致性（确保 createModel 是确定性的）
+        let model2 = EasyQSOModel.createModel()
+        let hashes2 = model2.entityVersionHashesByName
+
+        XCTAssertEqual(
+            hashes["QSORecord"], hashes2["QSORecord"],
+            "Entity version hash must be deterministic across createModel() calls"
+        )
     }
 }

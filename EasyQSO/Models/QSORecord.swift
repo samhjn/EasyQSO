@@ -39,23 +39,62 @@ import CoreData
 
 class PersistenceController {
     static let shared = PersistenceController()
-    
+
     let container: NSPersistentContainer
-    
+
+    /// 数据库加载状态，用于在模型不兼容时提供受控的错误处理
+    private(set) var storeState: StoreLoadState = .ready
+
+    /// 数据库是否可正常使用
+    var isStoreReady: Bool { storeState.isReady }
+
     init() {
         // 使用我们的自定义模型创建容器
         container = PersistenceController.createContainer()
-        
-        container.loadPersistentStores { description, error in
-            if let error = error {
-                fatalError("Error loading Core Data stores: \(error)")
-            }
+
+        let storeURL = StoreCompatibilityCheck.defaultStoreURL()
+
+        // Phase 1: 检查数据库文件是否可读
+        if let fileError = StoreCompatibilityCheck.checkStoreFileReadable(storeURL: storeURL) {
+            storeState = fileError
+            return
         }
-        
+
+        // Phase 2: 配置轻量级迁移，支持安全的模型演进（如新增可选字段）
+        let storeDescription = NSPersistentStoreDescription(url: storeURL)
+        storeDescription.setOption(
+            true as NSNumber,
+            forKey: NSMigratePersistentStoresAutomaticallyOption
+        )
+        storeDescription.setOption(
+            true as NSNumber,
+            forKey: NSInferMappingModelAutomaticallyOption
+        )
+        container.persistentStoreDescriptions = [storeDescription]
+
+        // Phase 3: 尝试加载数据库
+        var loadError: Error?
+        container.loadPersistentStores { _, error in
+            loadError = error
+        }
+
+        if let error = loadError {
+            // 加载失败 - 诊断原因（区分模型不兼容 vs 其他错误）
+            storeState = StoreCompatibilityCheck.diagnoseLoadFailure(
+                loadError: error,
+                model: EasyQSOModel.shared,
+                storeURL: storeURL
+            )
+            return
+        }
+
+        // Phase 4: 加载成功，配置上下文并执行数据迁移
+        storeState = .ready
+
         // 启用自动合并策略
         container.viewContext.automaticallyMergesChangesFromParent = true
         container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-        
+
         // 执行数据迁移（如果需要）
         migrateFrequencyDataIfNeeded()
     }
