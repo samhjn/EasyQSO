@@ -139,8 +139,8 @@ struct QSORecordView: View {
     private var hasUserInput: Bool {
         !callsign.isEmpty || !rstSent.isEmpty || !rstReceived.isEmpty ||
         !name.isEmpty || !qth.isEmpty || !gridSquare.isEmpty ||
-        !cqZone.isEmpty || !ituZone.isEmpty || !remarks.isEmpty ||
-        !extendedFields.isEmpty
+        !cqZone.isEmpty || !ituZone.isEmpty || !satellite.isEmpty ||
+        !remarks.isEmpty || !extendedFields.isEmpty
     }
     
     private var shouldShowPullHint: Bool {
