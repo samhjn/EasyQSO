@@ -137,10 +137,25 @@ struct QSORecordView: View {
     // MARK: - User input detection
     
     private var hasUserInput: Bool {
-        !callsign.isEmpty || !rstSent.isEmpty || !rstReceived.isEmpty ||
-        !name.isEmpty || !qth.isEmpty || !gridSquare.isEmpty ||
-        !cqZone.isEmpty || !ituZone.isEmpty || !remarks.isEmpty ||
-        !extendedFields.isEmpty
+        formStateSnapshot.hasUserInput
+    }
+
+    private var formStateSnapshot: QSOFormState {
+        let afFields = Set(
+            autoFillEngine.fieldSources
+                .filter { $0.value == .autofilled }
+                .map { $0.key }
+        )
+        return QSOFormState(
+            callsign: callsign, rstSent: rstSent, rstReceived: rstReceived,
+            name: name, qth: qth, gridSquare: gridSquare,
+            cqZone: cqZone, ituZone: ituZone, satellite: satellite,
+            remarks: remarks, extendedFields: extendedFields,
+            band: band, mode: mode, submode: submode,
+            frequency: frequency, rxFrequency: rxFrequency,
+            rxBand: rxBand, txPower: txPower,
+            autoFilledFields: afFields
+        )
     }
     
     private var shouldShowPullHint: Bool {
@@ -1039,71 +1054,46 @@ struct QSORecordView: View {
     
     private func resetForm() {
         autoFillEngine.resetAllSources()
-        callsign = ""
+        var state = formStateSnapshot
+        state.resetAll()
+        applyFormState(state)
         date = Date()
         endDate = Date()
-        band = "20m"
-        mode = "SSB"
-        submode = ""
-        frequency = ""
-        rxFrequency = ""
-        rxBand = ""
-        txPower = ""
-        rstSent = ""
-        rstReceived = ""
-        name = ""
-        qth = ""
-        gridSquare = ""
-        cqZone = ""
-        ituZone = ""
-        satellite = ""
-        remarks = ""
         selectedLocation = nil
-        extendedFields = [:]
         if autoFillManager.autoFillFrequencyAndMode {
             loadLatestQSOSettings()
         }
         applyAutoFillForTrigger("BAND")
     }
-    
+
     private func clearFields() {
-        // Preserve autofill sources for fields we're keeping
-        let currentFrequency = frequency
-        let currentBand = band
-        let currentMode = mode
-        let currentSubmode = submode
-        let currentRxFrequency = rxFrequency
-        let currentTxPower = txPower
-        let currentSatellite = satellite
-
-        let ownStationKeys: Set<String> = [
-            "STATION_CALLSIGN", "OPERATOR", "MY_RIG", "MY_ANTENNA",
-            "MY_POTA_REF", "MY_SOTA_REF", "MY_WWFF_REF",
-            "MY_SIG", "MY_SIG_INFO", "MY_CITY", "MY_GRIDSQUARE",
-            "MY_CQ_ZONE", "MY_ITU_ZONE", "MY_LAT", "MY_LON"
-        ]
-        let preservedExtended = extendedFields.filter { ownStationKeys.contains($0.key) }
-
-        callsign = ""
+        var state = formStateSnapshot
+        state.clearTransient()
+        applyFormState(state)
         date = Date()
         endDate = Date()
-        band = currentBand
-        mode = currentMode
-        submode = currentSubmode
-        frequency = currentFrequency
-        rxFrequency = currentRxFrequency
-        txPower = currentTxPower
-        satellite = currentSatellite
-        rstSent = ""
-        rstReceived = ""
-        name = ""
-        qth = ""
-        gridSquare = ""
-        cqZone = ""
-        ituZone = ""
         selectedLocation = nil
-        remarks = ""
-        extendedFields = preservedExtended
+    }
+
+    private func applyFormState(_ state: QSOFormState) {
+        callsign = state.callsign
+        band = state.band
+        mode = state.mode
+        submode = state.submode
+        frequency = state.frequency
+        rxFrequency = state.rxFrequency
+        rxBand = state.rxBand
+        txPower = state.txPower
+        rstSent = state.rstSent
+        rstReceived = state.rstReceived
+        name = state.name
+        qth = state.qth
+        gridSquare = state.gridSquare
+        cqZone = state.cqZone
+        ituZone = state.ituZone
+        satellite = state.satellite
+        remarks = state.remarks
+        extendedFields = state.extendedFields
     }
     
     private func formatGridSquare(_ input: String) -> String {
