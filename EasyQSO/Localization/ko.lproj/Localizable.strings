@@ -549,6 +549,9 @@
 "dxcc_picker_title" = "DXCC 엔티티 선택";
 "dxcc_not_set" = "설정되지 않음";
 
+// MARK: - ICP Filing
+"icp_info" = "";
+
 // MARK: - ADIF 파일 가져오기
 "adif_import_confirm_title" = "ADIF 파일 가져오기";
 "adif_import_confirm_message" = "\"%@\"에서 QSO 기록을 가져오시겠습니까?";

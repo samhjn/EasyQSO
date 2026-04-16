@@ -549,6 +549,9 @@
 "dxcc_picker_title" = "DXCC-Entität auswählen";
 "dxcc_not_set" = "Nicht festgelegt";
 
+// MARK: - ICP Filing
+"icp_info" = "";
+
 // MARK: - ADIF-Datei importieren
 "adif_import_confirm_title" = "ADIF-Datei importieren";
 "adif_import_confirm_message" = "Möchten Sie die QSO-Einträge aus \"%@\" importieren?";
