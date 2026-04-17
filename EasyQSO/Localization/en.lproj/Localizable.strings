@@ -254,6 +254,8 @@
 "satellite_not_set" = "Not Set";
 "contest_picker_title" = "Select Contest";
 "contest_not_set" = "Not Set";
+"picker_current_selection_header" = "Current Selection";
+"picker_orphan_not_in_list" = "Not in current list — imported or removed";
 
 // MARK: - RX Band
 "rx_band" = "RX Band";

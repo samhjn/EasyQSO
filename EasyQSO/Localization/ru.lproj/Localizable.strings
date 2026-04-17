@@ -254,6 +254,8 @@
 "satellite_not_set" = "Не задан";
 "contest_picker_title" = "Выбрать соревнование";
 "contest_not_set" = "Не задано";
+"picker_current_selection_header" = "Текущий выбор";
+"picker_orphan_not_in_list" = "Отсутствует в списке — импортировано или удалено";
 
 // MARK: - RX Band
 "rx_band" = "Диапазон приёма";
