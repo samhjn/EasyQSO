@@ -18,24 +18,7 @@ struct SatellitePickerView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var searchText = ""
 
-    /// Items sourced from the manager's enabled list. Does NOT include the
-    /// orphan current-selection path.
-    private var knownItems: [(name: String, description: String?)] {
-        let enabled = satelliteManager.enabledSatellites
-        let items = enabled.map { name in
-            (name: name, description: SatelliteManager.description(for: name))
-        }
-        if searchText.isEmpty { return items }
-        let query = searchText.uppercased()
-        return items.filter { item in
-            if item.name.uppercased().contains(query) { return true }
-            if let desc = item.description, desc.uppercased().contains(query) { return true }
-            return false
-        }
-    }
-
-    /// True when `selectedSatellite` is set but not in any known list —
-    /// either a deleted custom entry or an externally imported value.
+    /// True orphan: not in any known list (deleted custom or imported).
     private var isCurrentSelectionOrphan: Bool {
         PickerOrphanDetector.isOrphan(
             value: selectedSatellite,
@@ -48,13 +31,34 @@ struct SatellitePickerView: View {
         PickerOrphanDetector.matchesSearch(value: selectedSatellite, searchText: searchText)
     }
 
+    /// Enabled items plus the current selection if it's known but hidden.
+    /// True orphans are NOT appended here — they go in the orphan section.
+    private var knownItems: [(name: String, description: String?)] {
+        let enabled = satelliteManager.enabledSatellites
+        var items: [(name: String, description: String?)] = enabled.map { name in
+            (name: name, description: SatelliteManager.description(for: name))
+        }
+
+        // Include current value if it's known but hidden (disabled).
+        if !selectedSatellite.isEmpty && !isCurrentSelectionOrphan &&
+           !items.contains(where: { $0.name.uppercased() == selectedSatellite.uppercased() }) {
+            items.insert((name: selectedSatellite, description: SatelliteManager.description(for: selectedSatellite)), at: 0)
+        }
+
+        if searchText.isEmpty { return items }
+        let query = searchText.uppercased()
+        return items.filter { item in
+            if item.name.uppercased().contains(query) { return true }
+            if let desc = item.description, desc.uppercased().contains(query) { return true }
+            return false
+        }
+    }
+
     var body: some View {
         List {
-            // Current orphan selection — pinned at top, clearly labeled.
             if shouldShowOrphanSection {
                 Section {
                     Button(action: {
-                        // Keep the orphan value as-is and return.
                         searchText = ""
                         presentationMode.wrappedValue.dismiss()
                     }) {
@@ -77,7 +81,6 @@ struct SatellitePickerView: View {
             }
 
             Section {
-                // Clear selection option
                 Button(action: {
                     selectedSatellite = ""
                     searchText = ""
@@ -128,15 +131,17 @@ struct SatellitePickerView: View {
 
 /// Inline satellite display row for use in QSO forms.
 /// Uses NavigationLink for lightweight push navigation.
+///
+/// No @ObservedObject here — adding one can cause NavigationLink instability
+/// when the parent re-renders during a pushed picker session.
 struct SatelliteFieldRow: View {
     @Binding var selectedSatellite: String
-    @ObservedObject private var satelliteManager = SatelliteManager.shared
     let label: String
 
     private var isOrphan: Bool {
         PickerOrphanDetector.isOrphan(
             value: selectedSatellite,
-            knownItems: satelliteManager.allKnownSatellites
+            knownItems: SatelliteManager.shared.allKnownSatellites
         )
     }
 
