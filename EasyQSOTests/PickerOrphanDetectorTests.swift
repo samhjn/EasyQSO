@@ -97,4 +97,76 @@ final class PickerOrphanDetectorTests: XCTestCase {
         XCTAssertFalse(shouldShow,
                         "When searching for something that doesn't match, the orphan row should hide")
     }
+
+    // MARK: - isHiddenButKnown
+
+    func testHiddenButKnown_EmptyValue_False() {
+        XCTAssertFalse(PickerOrphanDetector.isHiddenButKnown(
+            value: "", enabledItems: ["ISS"], allKnownItems: ["ISS", "AO-91"]))
+    }
+
+    func testHiddenButKnown_InEnabledList_False() {
+        XCTAssertFalse(PickerOrphanDetector.isHiddenButKnown(
+            value: "ISS", enabledItems: ["ISS", "AO-91"], allKnownItems: ["ISS", "AO-91"]))
+    }
+
+    func testHiddenButKnown_NotInAnyList_False() {
+        // True orphan, not "hidden but known"
+        XCTAssertFalse(PickerOrphanDetector.isHiddenButKnown(
+            value: "UNKNOWN-SAT", enabledItems: ["ISS"], allKnownItems: ["ISS", "AO-91"]))
+    }
+
+    func testHiddenButKnown_KnownButDisabled_True() {
+        // AO-91 is known but the user disabled it
+        XCTAssertTrue(PickerOrphanDetector.isHiddenButKnown(
+            value: "AO-91", enabledItems: ["ISS"], allKnownItems: ["ISS", "AO-91"]),
+            "A known-but-disabled item must be detected so the picker can surface it")
+    }
+
+    func testHiddenButKnown_CaseInsensitive() {
+        XCTAssertTrue(PickerOrphanDetector.isHiddenButKnown(
+            value: "ao-91", enabledItems: ["ISS"], allKnownItems: ["ISS", "AO-91"]))
+        XCTAssertFalse(PickerOrphanDetector.isHiddenButKnown(
+            value: "iss", enabledItems: ["ISS"], allKnownItems: ["ISS", "AO-91"]))
+    }
+
+    // MARK: - Picker item list integration scenarios
+
+    func testPickerItemList_OrphanGoesToOrphanSection_NotKnownItems() {
+        let value = "DELETED-CUSTOM"
+        let enabled = ["ISS", "AO-91"]
+        let allKnown = ["ISS", "AO-91"]
+
+        let isOrphan = PickerOrphanDetector.isOrphan(value: value, knownItems: allKnown)
+        let isHidden = PickerOrphanDetector.isHiddenButKnown(value: value, enabledItems: enabled, allKnownItems: allKnown)
+
+        XCTAssertTrue(isOrphan, "Deleted custom should be orphan")
+        XCTAssertFalse(isHidden, "Deleted custom should NOT be hidden-but-known")
+    }
+
+    func testPickerItemList_HiddenGoesToKnownItems_NotOrphanSection() {
+        let value = "AO-91"
+        let enabled = ["ISS"]            // AO-91 is disabled
+        let allKnown = ["ISS", "AO-91"]  // but still known
+
+        let isOrphan = PickerOrphanDetector.isOrphan(value: value, knownItems: allKnown)
+        let isHidden = PickerOrphanDetector.isHiddenButKnown(value: value, enabledItems: enabled, allKnownItems: allKnown)
+
+        XCTAssertFalse(isOrphan, "Hidden item should NOT be orphan")
+        XCTAssertTrue(isHidden, "Hidden item should be surfaced in known items list")
+    }
+
+    func testPickerItemList_EnabledItem_NeitherOrphanNorHidden() {
+        let value = "ISS"
+        let enabled = ["ISS", "AO-91"]
+        let allKnown = ["ISS", "AO-91"]
+
+        XCTAssertFalse(PickerOrphanDetector.isOrphan(value: value, knownItems: allKnown))
+        XCTAssertFalse(PickerOrphanDetector.isHiddenButKnown(value: value, enabledItems: enabled, allKnownItems: allKnown))
+    }
+
+    func testPickerItemList_EmptySelection_NeitherOrphanNorHidden() {
+        XCTAssertFalse(PickerOrphanDetector.isOrphan(value: "", knownItems: ["ISS"]))
+        XCTAssertFalse(PickerOrphanDetector.isHiddenButKnown(value: "", enabledItems: ["ISS"], allKnownItems: ["ISS"]))
+    }
 }

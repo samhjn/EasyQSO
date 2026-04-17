@@ -18,24 +18,7 @@ struct ContestPickerView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var searchText = ""
 
-    /// Items sourced from the manager's enabled list. Does NOT include the
-    /// orphan current-selection path.
-    private var knownItems: [(id: String, description: String?)] {
-        let enabled = contestManager.enabledContests
-        let items = enabled.map { id in
-            (id: id, description: ContestManager.description(for: id))
-        }
-        if searchText.isEmpty { return items }
-        let query = searchText.uppercased()
-        return items.filter { item in
-            if item.id.uppercased().contains(query) { return true }
-            if let desc = item.description, desc.uppercased().contains(query) { return true }
-            return false
-        }
-    }
-
-    /// True when `selectedContest` is set but not in any known list —
-    /// either a deleted custom entry or an externally imported value.
+    /// True orphan: not in any known list (deleted custom or imported).
     private var isCurrentSelectionOrphan: Bool {
         PickerOrphanDetector.isOrphan(
             value: selectedContest,
@@ -48,9 +31,33 @@ struct ContestPickerView: View {
         PickerOrphanDetector.matchesSearch(value: selectedContest, searchText: searchText)
     }
 
+    /// Enabled items plus the current selection if it's known but hidden.
+    /// True orphans are NOT appended here — they go in the orphan section.
+    private var knownItems: [(id: String, description: String?)] {
+        let enabled = contestManager.enabledContests
+        var items: [(id: String, description: String?)] = enabled.map { id in
+            (id: id, description: ContestManager.description(for: id))
+        }
+
+        if PickerOrphanDetector.isHiddenButKnown(
+            value: selectedContest,
+            enabledItems: enabled,
+            allKnownItems: contestManager.allKnownContests
+        ) {
+            items.insert((id: selectedContest, description: ContestManager.description(for: selectedContest)), at: 0)
+        }
+
+        if searchText.isEmpty { return items }
+        let query = searchText.uppercased()
+        return items.filter { item in
+            if item.id.uppercased().contains(query) { return true }
+            if let desc = item.description, desc.uppercased().contains(query) { return true }
+            return false
+        }
+    }
+
     var body: some View {
         List {
-            // Current orphan selection — pinned at top, clearly labeled.
             if shouldShowOrphanSection {
                 Section {
                     Button(action: {
@@ -76,7 +83,6 @@ struct ContestPickerView: View {
             }
 
             Section {
-                // Clear selection option
                 Button(action: {
                     selectedContest = ""
                     searchText = ""
@@ -127,15 +133,17 @@ struct ContestPickerView: View {
 
 /// Inline contest display row for use in QSO forms.
 /// Uses NavigationLink for lightweight push navigation.
+///
+/// No @ObservedObject here — adding one can cause NavigationLink instability
+/// when the parent re-renders during a pushed picker session.
 struct ContestFieldRow: View {
     @Binding var selectedContest: String
-    @ObservedObject private var contestManager = ContestManager.shared
     let label: String
 
     private var isOrphan: Bool {
         PickerOrphanDetector.isOrphan(
             value: selectedContest,
-            knownItems: contestManager.allKnownContests
+            knownItems: ContestManager.shared.allKnownContests
         )
     }
 
