@@ -72,38 +72,12 @@ struct EditQSOView: View {
     @State private var isRxBandChangedByFrequency = false
     
     // Unsaved changes detection
-    @State private var savedSnapshot: FormSnapshot
+    @State private var savedSnapshot: EditQSOSnapshot
+    @State private var didPrimeBaseline = false
     @State private var showingUnsavedAlert = false
-    
-    private struct FormSnapshot: Equatable {
-        var callsign: String
-        var date: Date
-        var endDate: Date
-        var band: String
-        var mode: String
-        var submode: String
-        var frequency: String
-        var rxFrequency: String
-        var txPower: String
-        var rstSent: String
-        var rstReceived: String
-        var name: String
-        var qth: String
-        var gridSquare: String
-        var cqZone: String
-        var ituZone: String
-        var satellite: String
-        var remarks: String
-        var extendedFields: [String: String]
-        var rxBand: String
-        var ownQTH: String
-        var ownGridSquare: String
-        var ownCQZone: String
-        var ownITUZone: String
-    }
-    
-    private var currentSnapshot: FormSnapshot {
-        FormSnapshot(
+
+    private var currentSnapshot: EditQSOSnapshot {
+        EditQSOSnapshot(
             callsign: callsign, date: date, endDate: endDate,
             band: band, mode: mode, submode: submode, frequency: frequency,
             rxFrequency: rxFrequency, txPower: txPower,
@@ -317,7 +291,7 @@ struct EditQSOView: View {
         }
         _endDate = State(initialValue: endDateVal)
         
-        _savedSnapshot = State(initialValue: FormSnapshot(
+        _savedSnapshot = State(initialValue: EditQSOSnapshot(
             callsign: record.callsign, date: record.date, endDate: endDateVal,
             band: record.band, mode: record.mode, submode: adif["SUBMODE"] ?? "",
             frequency: record.frequencyMHz > 0 ? String(record.frequencyMHz) : "",
@@ -541,6 +515,12 @@ struct EditQSOView: View {
             .onDisappear { isMapPickerActive = false }
         }
         .onAppear {
+            // Prime the baseline once, on the initial appearance only. Without this
+            // guard, returning from a pushed NavigationLink (e.g., a picker) fires
+            // onAppear again and silently overwrites the baseline with the just-
+            // edited values, causing hasUnsavedChanges to miss the edit.
+            guard !didPrimeBaseline else { return }
+            didPrimeBaseline = true
             DispatchQueue.main.async {
                 savedSnapshot = currentSnapshot
             }
