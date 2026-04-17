@@ -254,6 +254,8 @@
 "satellite_not_set" = "미설정";
 "contest_picker_title" = "콘테스트 선택";
 "contest_not_set" = "미설정";
+"picker_current_selection_header" = "현재 선택";
+"picker_orphan_not_in_list" = "현재 목록에 없음 — 가져오거나 제거됨";
 
 // MARK: - 수신 밴드
 "rx_band" = "수신 밴드";

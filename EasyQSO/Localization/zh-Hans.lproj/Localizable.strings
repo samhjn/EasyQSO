@@ -254,6 +254,8 @@
 "satellite_not_set" = "未设置";
 "contest_picker_title" = "选择竞赛";
 "contest_not_set" = "未设置";
+"picker_current_selection_header" = "当前选择";
+"picker_orphan_not_in_list" = "不在当前列表中 — 来自导入或已被移除";
 
 // MARK: - 接收波段
 "rx_band" = "接收波段";

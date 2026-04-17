@@ -18,20 +18,14 @@ struct ContestPickerView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var searchText = ""
 
-    private var filteredContests: [(id: String, description: String?)] {
+    /// Items sourced from the manager's enabled list. Does NOT include the
+    /// orphan current-selection path.
+    private var knownItems: [(id: String, description: String?)] {
         let enabled = contestManager.enabledContests
-        var items: [(id: String, description: String?)] = enabled.map { id in
+        let items = enabled.map { id in
             (id: id, description: ContestManager.description(for: id))
         }
-
-        // Ensure current value is in the list even if hidden
-        if !selectedContest.isEmpty &&
-           !items.contains(where: { $0.id.uppercased() == selectedContest.uppercased() }) {
-            items.append((id: selectedContest, description: ContestManager.description(for: selectedContest)))
-        }
-
         if searchText.isEmpty { return items }
-
         let query = searchText.uppercased()
         return items.filter { item in
             if item.id.uppercased().contains(query) { return true }
@@ -40,45 +34,86 @@ struct ContestPickerView: View {
         }
     }
 
+    /// True when `selectedContest` is set but not in any known list —
+    /// either a deleted custom entry or an externally imported value.
+    private var isCurrentSelectionOrphan: Bool {
+        PickerOrphanDetector.isOrphan(
+            value: selectedContest,
+            knownItems: contestManager.allKnownContests
+        )
+    }
+
+    private var shouldShowOrphanSection: Bool {
+        isCurrentSelectionOrphan &&
+        PickerOrphanDetector.matchesSearch(value: selectedContest, searchText: searchText)
+    }
+
     var body: some View {
         List {
-            // Clear selection option
-            Button(action: {
-                selectedContest = ""
-                searchText = ""
-                presentationMode.wrappedValue.dismiss()
-            }) {
-                HStack {
-                    Text("dxcc_clear_selection".localized)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    if selectedContest.isEmpty {
-                        Image(systemName: "checkmark")
-                            .foregroundColor(.accentColor)
+            // Current orphan selection — pinned at top, clearly labeled.
+            if shouldShowOrphanSection {
+                Section {
+                    Button(action: {
+                        searchText = ""
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(selectedContest)
+                                    .foregroundColor(.primary)
+                                Text("picker_orphan_not_in_list".localized)
+                                    .font(.caption)
+                                    .foregroundColor(.orange)
+                            }
+                            Spacer()
+                            Image(systemName: "checkmark")
+                                .foregroundColor(.accentColor)
+                        }
                     }
+                } header: {
+                    Text("picker_current_selection_header".localized)
                 }
             }
 
-            ForEach(filteredContests, id: \.id) { item in
+            Section {
+                // Clear selection option
                 Button(action: {
-                    selectedContest = item.id
+                    selectedContest = ""
                     searchText = ""
                     presentationMode.wrappedValue.dismiss()
                 }) {
                     HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(item.id)
-                                .foregroundColor(.primary)
-                            if let desc = item.description {
-                                Text(desc)
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
+                        Text("dxcc_clear_selection".localized)
+                            .foregroundColor(.secondary)
                         Spacer()
-                        if item.id.uppercased() == selectedContest.uppercased() {
+                        if selectedContest.isEmpty {
                             Image(systemName: "checkmark")
                                 .foregroundColor(.accentColor)
+                        }
+                    }
+                }
+
+                ForEach(knownItems, id: \.id) { item in
+                    Button(action: {
+                        selectedContest = item.id
+                        searchText = ""
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(item.id)
+                                    .foregroundColor(.primary)
+                                if let desc = item.description {
+                                    Text(desc)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            Spacer()
+                            if item.id.uppercased() == selectedContest.uppercased() {
+                                Image(systemName: "checkmark")
+                                    .foregroundColor(.accentColor)
+                            }
                         }
                     }
                 }
@@ -94,7 +129,15 @@ struct ContestPickerView: View {
 /// Uses NavigationLink for lightweight push navigation.
 struct ContestFieldRow: View {
     @Binding var selectedContest: String
+    @ObservedObject private var contestManager = ContestManager.shared
     let label: String
+
+    private var isOrphan: Bool {
+        PickerOrphanDetector.isOrphan(
+            value: selectedContest,
+            knownItems: contestManager.allKnownContests
+        )
+    }
 
     var body: some View {
         NavigationLink {
@@ -107,8 +150,15 @@ struct ContestFieldRow: View {
                     Text("contest_not_set".localized)
                         .foregroundColor(.secondary)
                 } else {
-                    Text(selectedContest)
-                        .foregroundColor(.secondary)
+                    HStack(spacing: 4) {
+                        if isOrphan {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.caption2)
+                                .foregroundColor(.orange)
+                        }
+                        Text(selectedContest)
+                            .foregroundColor(.secondary)
+                    }
                 }
             }
         }

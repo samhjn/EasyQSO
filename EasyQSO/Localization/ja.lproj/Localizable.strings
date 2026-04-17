@@ -254,6 +254,8 @@
 "satellite_not_set" = "未設定";
 "contest_picker_title" = "コンテストを選択";
 "contest_not_set" = "未設定";
+"picker_current_selection_header" = "現在の選択";
+"picker_orphan_not_in_list" = "現在のリストにありません — インポートまたは削除済み";
 
 // MARK: - 受信バンド
 "rx_band" = "受信バンド";

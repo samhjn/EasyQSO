@@ -18,20 +18,14 @@ struct SatellitePickerView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var searchText = ""
 
-    private var filteredSatellites: [(name: String, description: String?)] {
+    /// Items sourced from the manager's enabled list. Does NOT include the
+    /// orphan current-selection path.
+    private var knownItems: [(name: String, description: String?)] {
         let enabled = satelliteManager.enabledSatellites
-        var items: [(name: String, description: String?)] = enabled.map { name in
+        let items = enabled.map { name in
             (name: name, description: SatelliteManager.description(for: name))
         }
-
-        // Ensure current value is in the list even if hidden
-        if !selectedSatellite.isEmpty &&
-           !items.contains(where: { $0.name.uppercased() == selectedSatellite.uppercased() }) {
-            items.append((name: selectedSatellite, description: SatelliteManager.description(for: selectedSatellite)))
-        }
-
         if searchText.isEmpty { return items }
-
         let query = searchText.uppercased()
         return items.filter { item in
             if item.name.uppercased().contains(query) { return true }
@@ -40,45 +34,87 @@ struct SatellitePickerView: View {
         }
     }
 
+    /// True when `selectedSatellite` is set but not in any known list —
+    /// either a deleted custom entry or an externally imported value.
+    private var isCurrentSelectionOrphan: Bool {
+        PickerOrphanDetector.isOrphan(
+            value: selectedSatellite,
+            knownItems: satelliteManager.allKnownSatellites
+        )
+    }
+
+    private var shouldShowOrphanSection: Bool {
+        isCurrentSelectionOrphan &&
+        PickerOrphanDetector.matchesSearch(value: selectedSatellite, searchText: searchText)
+    }
+
     var body: some View {
         List {
-            // Clear selection option
-            Button(action: {
-                selectedSatellite = ""
-                searchText = ""
-                presentationMode.wrappedValue.dismiss()
-            }) {
-                HStack {
-                    Text("dxcc_clear_selection".localized)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    if selectedSatellite.isEmpty {
-                        Image(systemName: "checkmark")
-                            .foregroundColor(.accentColor)
+            // Current orphan selection — pinned at top, clearly labeled.
+            if shouldShowOrphanSection {
+                Section {
+                    Button(action: {
+                        // Keep the orphan value as-is and return.
+                        searchText = ""
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(selectedSatellite)
+                                    .foregroundColor(.primary)
+                                Text("picker_orphan_not_in_list".localized)
+                                    .font(.caption)
+                                    .foregroundColor(.orange)
+                            }
+                            Spacer()
+                            Image(systemName: "checkmark")
+                                .foregroundColor(.accentColor)
+                        }
                     }
+                } header: {
+                    Text("picker_current_selection_header".localized)
                 }
             }
 
-            ForEach(filteredSatellites, id: \.name) { item in
+            Section {
+                // Clear selection option
                 Button(action: {
-                    selectedSatellite = item.name
+                    selectedSatellite = ""
                     searchText = ""
                     presentationMode.wrappedValue.dismiss()
                 }) {
                     HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(item.name)
-                                .foregroundColor(.primary)
-                            if let desc = item.description {
-                                Text(desc)
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
+                        Text("dxcc_clear_selection".localized)
+                            .foregroundColor(.secondary)
                         Spacer()
-                        if item.name.uppercased() == selectedSatellite.uppercased() {
+                        if selectedSatellite.isEmpty {
                             Image(systemName: "checkmark")
                                 .foregroundColor(.accentColor)
+                        }
+                    }
+                }
+
+                ForEach(knownItems, id: \.name) { item in
+                    Button(action: {
+                        selectedSatellite = item.name
+                        searchText = ""
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(item.name)
+                                    .foregroundColor(.primary)
+                                if let desc = item.description {
+                                    Text(desc)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            Spacer()
+                            if item.name.uppercased() == selectedSatellite.uppercased() {
+                                Image(systemName: "checkmark")
+                                    .foregroundColor(.accentColor)
+                            }
                         }
                     }
                 }
@@ -94,7 +130,15 @@ struct SatellitePickerView: View {
 /// Uses NavigationLink for lightweight push navigation.
 struct SatelliteFieldRow: View {
     @Binding var selectedSatellite: String
+    @ObservedObject private var satelliteManager = SatelliteManager.shared
     let label: String
+
+    private var isOrphan: Bool {
+        PickerOrphanDetector.isOrphan(
+            value: selectedSatellite,
+            knownItems: satelliteManager.allKnownSatellites
+        )
+    }
 
     var body: some View {
         NavigationLink {
@@ -107,8 +151,15 @@ struct SatelliteFieldRow: View {
                     Text("satellite_not_set".localized)
                         .foregroundColor(.secondary)
                 } else {
-                    Text(selectedSatellite)
-                        .foregroundColor(.secondary)
+                    HStack(spacing: 4) {
+                        if isOrphan {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.caption2)
+                                .foregroundColor(.orange)
+                        }
+                        Text(selectedSatellite)
+                            .foregroundColor(.secondary)
+                    }
                 }
             }
         }
