@@ -56,14 +56,19 @@ struct ContestPickerView: View {
         }
     }
 
+    private func selectAndDismiss(_ value: String) {
+        selectedContest = value
+        searchText = ""
+        DispatchQueue.main.async {
+            presentationMode.wrappedValue.dismiss()
+        }
+    }
+
     var body: some View {
         List {
             if shouldShowOrphanSection {
                 Section {
-                    Button(action: {
-                        searchText = ""
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
+                    Button(action: { selectAndDismiss(selectedContest) }) {
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(selectedContest)
@@ -83,11 +88,7 @@ struct ContestPickerView: View {
             }
 
             Section {
-                Button(action: {
-                    selectedContest = ""
-                    searchText = ""
-                    presentationMode.wrappedValue.dismiss()
-                }) {
+                Button(action: { selectAndDismiss("") }) {
                     HStack {
                         Text("dxcc_clear_selection".localized)
                             .foregroundColor(.secondary)
@@ -100,11 +101,7 @@ struct ContestPickerView: View {
                 }
 
                 ForEach(knownItems, id: \.id) { item in
-                    Button(action: {
-                        selectedContest = item.id
-                        searchText = ""
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
+                    Button(action: { selectAndDismiss(item.id) }) {
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(item.id)

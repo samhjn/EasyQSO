@@ -56,14 +56,19 @@ struct SatellitePickerView: View {
         }
     }
 
+    private func selectAndDismiss(_ value: String) {
+        selectedSatellite = value
+        searchText = ""
+        DispatchQueue.main.async {
+            presentationMode.wrappedValue.dismiss()
+        }
+    }
+
     var body: some View {
         List {
             if shouldShowOrphanSection {
                 Section {
-                    Button(action: {
-                        searchText = ""
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
+                    Button(action: { selectAndDismiss(selectedSatellite) }) {
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(selectedSatellite)
@@ -83,11 +88,7 @@ struct SatellitePickerView: View {
             }
 
             Section {
-                Button(action: {
-                    selectedSatellite = ""
-                    searchText = ""
-                    presentationMode.wrappedValue.dismiss()
-                }) {
+                Button(action: { selectAndDismiss("") }) {
                     HStack {
                         Text("dxcc_clear_selection".localized)
                             .foregroundColor(.secondary)
@@ -100,11 +101,7 @@ struct SatellitePickerView: View {
                 }
 
                 ForEach(knownItems, id: \.name) { item in
-                    Button(action: {
-                        selectedSatellite = item.name
-                        searchText = ""
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
+                    Button(action: { selectAndDismiss(item.name) }) {
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(item.name)
