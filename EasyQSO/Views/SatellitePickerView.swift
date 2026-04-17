@@ -39,9 +39,11 @@ struct SatellitePickerView: View {
             (name: name, description: SatelliteManager.description(for: name))
         }
 
-        // Include current value if it's known but hidden (disabled).
-        if !selectedSatellite.isEmpty && !isCurrentSelectionOrphan &&
-           !items.contains(where: { $0.name.uppercased() == selectedSatellite.uppercased() }) {
+        if PickerOrphanDetector.isHiddenButKnown(
+            value: selectedSatellite,
+            enabledItems: enabled,
+            allKnownItems: satelliteManager.allKnownSatellites
+        ) {
             items.insert((name: selectedSatellite, description: SatelliteManager.description(for: selectedSatellite)), at: 0)
         }
 

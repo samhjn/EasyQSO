@@ -39,9 +39,11 @@ struct ContestPickerView: View {
             (id: id, description: ContestManager.description(for: id))
         }
 
-        // Include current value if it's known but hidden (disabled).
-        if !selectedContest.isEmpty && !isCurrentSelectionOrphan &&
-           !items.contains(where: { $0.id.uppercased() == selectedContest.uppercased() }) {
+        if PickerOrphanDetector.isHiddenButKnown(
+            value: selectedContest,
+            enabledItems: enabled,
+            allKnownItems: contestManager.allKnownContests
+        ) {
             items.insert((id: selectedContest, description: ContestManager.description(for: selectedContest)), at: 0)
         }
 
