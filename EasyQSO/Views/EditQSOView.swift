@@ -274,7 +274,10 @@ struct EditQSOView: View {
         _ituZone = State(initialValue: record.ituZone ?? "")
         _satellite = State(initialValue: record.satellite ?? "")
         _remarks = State(initialValue: record.remarks ?? "")
-        _extendedFields = State(initialValue: record.adifFields)
+        // Strip core-field tags — they have dedicated @State properties and
+        // must not linger in extendedFields where they'd go stale.
+        let loadedAdif = record.adifFields.filter { !ADIFFields.coreFieldIds.contains($0.key) }
+        _extendedFields = State(initialValue: loadedAdif)
         _rxBand = State(initialValue: record.adifFields["BAND_RX"] ?? "")
         
         let adif = record.adifFields
@@ -1078,8 +1081,8 @@ struct EditQSOView: View {
         record.remarks = remarks
         record.setCoordinate(selectedLocation)
         
-        var fields = extendedFields
-        
+        var fields = extendedFields.filter { !ADIFFields.coreFieldIds.contains($0.key) }
+
         if !rxBand.isEmpty {
             fields["BAND_RX"] = rxBand
         } else {
