@@ -347,6 +347,7 @@ struct ADIFFields {
     }()
     
     static let coreFields: [ADIFFieldDef] = all.filter { $0.isCore }
+    static let coreFieldIds: Set<String> = Set(coreFields.map(\.id))
     static let extendedFields: [ADIFFieldDef] = all.filter { $0.isExtended }
     static let requiredFields: [ADIFFieldDef] = all.filter { $0.isRequired }
     static let defaultVisibleFields: [ADIFFieldDef] = all.filter { $0.defaultVisible }

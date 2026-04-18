@@ -1009,8 +1009,8 @@ struct QSORecordView: View {
             extendedFields.removeValue(forKey: "SUBMODE")
         }
 
-        newQSO.adifFields = extendedFields
-        
+        newQSO.adifFields = extendedFields.filter { !ADIFFields.coreFieldIds.contains($0.key) }
+
         var fields = newQSO.adifFields
         
         if endDateTimeVis != .hidden {

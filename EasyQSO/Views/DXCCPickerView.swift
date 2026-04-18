@@ -22,6 +22,14 @@ struct DXCCPickerView: View {
         dxccManager.searchEntities(searchText)
     }
 
+    private func selectAndDismiss(_ value: String) {
+        selectedCode = value
+        searchText = ""
+        DispatchQueue.main.async {
+            presentationMode.wrappedValue.dismiss()
+        }
+    }
+
     var body: some View {
         Group {
             if !dxccManager.isDataAvailable {
@@ -41,11 +49,7 @@ struct DXCCPickerView: View {
             } else {
                 List {
                     // Clear selection option
-                    Button(action: {
-                        selectedCode = ""
-                        searchText = ""
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
+                    Button(action: { selectAndDismiss("") }) {
                         HStack {
                             Text("dxcc_clear_selection".localized)
                                 .foregroundColor(.secondary)
@@ -58,11 +62,7 @@ struct DXCCPickerView: View {
                     }
 
                     ForEach(filteredEntities) { entity in
-                        Button(action: {
-                            selectedCode = String(entity.code)
-                            searchText = ""
-                            presentationMode.wrappedValue.dismiss()
-                        }) {
+                        Button(action: { selectAndDismiss(String(entity.code)) }) {
                             HStack {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(entity.name)
