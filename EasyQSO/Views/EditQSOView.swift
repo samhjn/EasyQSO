@@ -1162,7 +1162,6 @@ struct EditQSOView: View {
             context.coordinator.parent = self
             DispatchQueue.main.async {
                 guard let nav = uiView.findNavigationController() else { return }
-                guard nav.transitionCoordinator == nil else { return }
                 nav.interactivePopGestureRecognizer?.isEnabled = true
                 nav.interactivePopGestureRecognizer?.delegate = context.coordinator
             }
