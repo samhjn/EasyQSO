@@ -24,6 +24,18 @@
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
+			<string>ADX File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.hamradio.adx</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
 			<string>CSV File</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
@@ -118,6 +130,27 @@
 				<key>public.mime-type</key>
 				<array>
 					<string>application/adif</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.xml</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>ADIF XML (ADX)</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.hamradio.adx</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>adx</string>
+				</array>
+				<key>public.mime-type</key>
+				<array>
+					<string>application/x-adx+xml</string>
 				</array>
 			</dict>
 		</dict>

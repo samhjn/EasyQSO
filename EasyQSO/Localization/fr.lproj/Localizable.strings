@@ -57,6 +57,7 @@
 "save_changes" = "Enregistrer les modifications";
 "export_all" = "Exporter tous les enregistrements";
 "import_from_adif" = "Importer depuis un fichier ADIF";
+"import_from_adx" = "Importer depuis un fichier ADX";
 "import_from_csv" = "Importer depuis un fichier CSV";
 "delete" = "Supprimer";
 "cancel" = "Annuler";

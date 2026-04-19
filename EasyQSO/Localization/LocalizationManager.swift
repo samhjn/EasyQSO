@@ -104,6 +104,7 @@ struct LocalizedStrings {
     static let saveChanges = "save_changes"
     static let exportAll = "export_all"
     static let importFromADIF = "import_from_adif"
+    static let importFromADX = "import_from_adx"
     static let importFromCSV = "import_from_csv"
     static let delete = "delete"
     static let cancel = "cancel"

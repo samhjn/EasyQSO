@@ -72,7 +72,7 @@ struct SettingsView: View {
         self._pendingImportURL = pendingImportURL
     }
     
-    let exportFormats = ["ADIF", "CSV"]
+    let exportFormats = ["ADIF", "ADX", "CSV"]
     
     private var isDXCCEnabled: Bool {
         fieldVisibility.visibility(for: "DXCC") != .hidden
@@ -285,8 +285,8 @@ struct SettingsView: View {
                             }
                         }
                         
-                        // 对ADIF格式显示UTC说明
-                        if exportFormat == "ADIF" {
+                        // 对ADIF/ADX格式显示UTC说明（两者都使用UTC）
+                        if exportFormat == "ADIF" || exportFormat == "ADX" {
                             Text(LocalizedStrings.adifUsesUtc.localized)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
@@ -365,7 +365,15 @@ struct SettingsView: View {
                                 presentLegacyDocumentPicker(fileType: "adi")
                             }
                         }
-                        
+
+                        Button(LocalizedStrings.importFromADX.localized) {
+                            if #available(iOS 15.0, *) {
+                                showingImportPicker = true
+                            } else {
+                                presentLegacyDocumentPicker(fileType: "adx")
+                            }
+                        }
+
                         Button(LocalizedStrings.importFromCSV.localized) {
                             if #available(iOS 15.0, *) {
                                 showingImportPicker = true
@@ -503,13 +511,13 @@ struct SettingsView: View {
             }
             .fileImporter(
                 isPresented: $showingImportPicker,
-                allowedContentTypes: [.adifType, .csvType],
+                allowedContentTypes: [.adifType, .adxType, .csvType],
                 allowsMultipleSelection: false
             ) { result in
                 switch result {
                 case .success(let urls):
                     guard let url = urls.first else { return }
-                    
+
                     // 获取安全作用域资源的访问权限
                     let accessing = url.startAccessingSecurityScopedResource()
                     defer {
@@ -517,17 +525,11 @@ struct SettingsView: View {
                             url.stopAccessingSecurityScopedResource()
                         }
                     }
-                    
+
                     do {
                         let data = try Data(contentsOf: url)
                         importedData = data
-                        let ext = url.pathExtension.lowercased()
-                        if ext == "csv" {
-                            importCSV(data)
-                        } else {
-                            // adi、adif 以及其他扩展名（含无扩展名）都按 ADIF 尝试解析
-                            importADIF(data)
-                        }
+                        importDataByExtension(data, ext: url.pathExtension.lowercased())
                     } catch {
                         alertTitle = LocalizedStrings.importFailed.localized
                         alertMessage = error.localizedDescription
@@ -580,12 +582,7 @@ struct SettingsView: View {
                 documentPickerDelegate.viewContext = viewContext
                 documentPickerDelegate.importHandler = { data in
                     if let url = documentPickerDelegate.importedFileURL {
-                        let ext = url.pathExtension.lowercased()
-                        if ext == "csv" {
-                            importCSV(data)
-                        } else {
-                            importADIF(data)
-                        }
+                        importDataByExtension(data, ext: url.pathExtension.lowercased())
                     }
                 }
                 if scrollToGPL {
@@ -620,12 +617,7 @@ struct SettingsView: View {
 
                 do {
                     let data = try Data(contentsOf: url)
-                    let ext = url.pathExtension.lowercased()
-                    if ext == "csv" {
-                        importCSV(data)
-                    } else {
-                        importADIF(data)
-                    }
+                    importDataByExtension(data, ext: url.pathExtension.lowercased())
                 } catch {
                     alertTitle = LocalizedStrings.importFailed.localized
                     alertMessage = error.localizedDescription
@@ -637,9 +629,20 @@ struct SettingsView: View {
     
     private func exportLogs() {
         let fileName = "HamLog_\(formattedDate())"
-        let fileExtension = exportFormat == "ADIF" ? "adi" : "csv"
-        let fileData = exportFormat == "ADIF" ? generateADIF(from: filteredExportRecords) : generateCSV(from: filteredExportRecords)
-        
+        let fileExtension: String
+        let fileData: Data
+        switch exportFormat {
+        case "ADX":
+            fileExtension = "adx"
+            fileData = ADXHelper.generateADX(from: filteredExportRecords)
+        case "ADIF":
+            fileExtension = "adi"
+            fileData = generateADIF(from: filteredExportRecords)
+        default:
+            fileExtension = "csv"
+            fileData = generateCSV(from: filteredExportRecords)
+        }
+
         let tempDir = FileManager.default.temporaryDirectory
         let fileURL = tempDir.appendingPathComponent("\(fileName).\(fileExtension)")
         
@@ -693,16 +696,19 @@ struct SettingsView: View {
     private func presentLegacyDocumentPicker(fileType: String) {
         DispatchQueue.main.async {
             let contentTypes: [UTType]
-            if fileType == "adi" {
+            switch fileType {
+            case "adi":
                 contentTypes = [UTType("com.hamradio.adif") ?? .text, .text]
-            } else {
+            case "adx":
+                contentTypes = [UTType("com.hamradio.adx") ?? .xml, .xml]
+            default:
                 contentTypes = [.commaSeparatedText, .text]
             }
-            
+
             let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: contentTypes)
             documentPicker.delegate = documentPickerDelegate
             documentPicker.allowsMultipleSelection = false
-            
+
             // 获取当前的UIViewController
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                let rootViewController = windowScene.windows.first?.rootViewController {
@@ -710,10 +716,31 @@ struct SettingsView: View {
             }
         }
     }
+
+    /// Routes imported file data to the appropriate parser based on file
+    /// extension. ADX files are converted to ADI text in-memory and reuse the
+    /// existing ADIF import pipeline.
+    private func importDataByExtension(_ data: Data, ext: String) {
+        switch ext {
+        case "csv":
+            importCSV(data)
+        case "adx":
+            if let adiData = ADXHelper.convertADXToADI(data) {
+                importADIF(adiData)
+            } else {
+                alertTitle = LocalizedStrings.importFailed.localized
+                alertMessage = LocalizedStrings.cannotReadFile.localized
+                showingAlert = true
+            }
+        default:
+            // adi、adif 以及其他扩展名（含无扩展名）都按 ADIF 尝试解析
+            importADIF(data)
+        }
+    }
     
     private func generateADIF(from records: [QSORecord]) -> Data {
         var adif = "<ADIF_VERS:5>3.1.7"
-        adif += "<PROGRAMID:6>EasQSO"
+        adif += "<PROGRAMID:7>EasyQSO"
         let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
         adif += "<PROGRAMVERSION:\(appVersion.count)>\(appVersion)"
         adif += "<EOH>\n"
