@@ -83,7 +83,7 @@ enum ADIFHelper {
     
     static func generateADIF(from records: [QSORecord]) -> Data {
         var adif = "<ADIF_VERS:5>3.1.7"
-        adif += "<PROGRAMID:6>EasQSO"
+        adif += "<PROGRAMID:7>EasyQSO"
         let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
         adif += "<PROGRAMVERSION:\(appVersion.count)>\(appVersion)"
         adif += "<EOH>\n"

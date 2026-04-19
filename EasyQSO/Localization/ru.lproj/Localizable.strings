@@ -57,6 +57,7 @@
 "save_changes" = "Сохранить изменения";
 "export_all" = "Экспортировать все записи";
 "import_from_adif" = "Импорт из файла ADIF";
+"import_from_adx" = "Импорт из файла ADX";
 "import_from_csv" = "Импорт из файла CSV";
 "delete" = "Удалить";
 "cancel" = "Отмена";

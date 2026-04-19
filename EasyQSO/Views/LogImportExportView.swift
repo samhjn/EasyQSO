@@ -607,6 +607,9 @@ extension UTType {
     static var adifType: UTType {
         UTType(exportedAs: "com.hamradio.adif")
     }
+    static var adxType: UTType {
+        UTType(exportedAs: "com.hamradio.adx")
+    }
     static var csvType: UTType {
         UTType(importedAs: "public.comma-separated-values-text")
     }

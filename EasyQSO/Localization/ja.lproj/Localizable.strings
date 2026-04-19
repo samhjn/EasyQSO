@@ -57,6 +57,7 @@
 "save_changes" = "変更を保存";
 "export_all" = "全記録をエクスポート";
 "import_from_adif" = "ADIFファイルからインポート";
+"import_from_adx" = "ADXファイルからインポート";
 "import_from_csv" = "CSVファイルからインポート";
 "delete" = "削除";
 "cancel" = "キャンセル";

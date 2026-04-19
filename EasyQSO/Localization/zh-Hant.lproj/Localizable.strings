@@ -57,6 +57,7 @@
 "save_changes" = "儲存變更";
 "export_all" = "匯出所有記錄";
 "import_from_adif" = "從ADIF檔案匯入";
+"import_from_adx" = "從ADX檔案匯入";
 "import_from_csv" = "從CSV檔案匯入";
 "delete" = "刪除";
 "cancel" = "取消";
