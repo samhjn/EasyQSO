@@ -22,35 +22,64 @@ import UIKit
 struct KeyboardToolbar: ToolbarContent {
     @FocusState.Binding var focusedField: String?
     let orderedFields: [String]
-    
-    init(focusedField: FocusState<String?>.Binding, orderedFields: [String]) {
+    let digitRowFieldIDs: Set<String>
+
+    init(
+        focusedField: FocusState<String?>.Binding,
+        orderedFields: [String],
+        digitRowFieldIDs: Set<String> = ["CALL"]
+    ) {
         self._focusedField = focusedField
         self.orderedFields = orderedFields
+        self.digitRowFieldIDs = digitRowFieldIDs
     }
-    
+
     var body: some ToolbarContent {
         ToolbarItem(placement: .keyboard) {
-            HStack {
-                Button(LocalizedStrings.previous.localized) {
-                    focusPreviousField()
+            VStack(spacing: 6) {
+                if shouldShowDigitRow {
+                    HStack(spacing: 4) {
+                        ForEach(0..<10, id: \.self) { digit in
+                            Button("\(digit)") {
+                                insertText("\(digit)")
+                            }
+                            .buttonStyle(.bordered)
+                            .frame(maxWidth: .infinity, minHeight: 36)
+                        }
+                    }
                 }
-                .disabled(!canFocusPrevious())
-                
-                Spacer()
-                
-                Button(LocalizedStrings.next.localized) {
-                    focusNextField()
+                HStack {
+                    Button(LocalizedStrings.previous.localized) {
+                        focusPreviousField()
+                    }
+                    .disabled(!canFocusPrevious())
+
+                    Spacer()
+
+                    Button(LocalizedStrings.next.localized) {
+                        focusNextField()
+                    }
+                    .disabled(!canFocusNext())
+
+                    Spacer()
+
+                    Button(LocalizedStrings.done.localized) {
+                        dismissKeyboard()
+                    }
+                    .font(.system(size: 17, weight: .bold))
                 }
-                .disabled(!canFocusNext())
-                
-                Spacer()
-                
-                Button(LocalizedStrings.done.localized) {
-                    dismissKeyboard()
-                }
-                .font(.system(size: 17, weight: .bold))
             }
         }
+    }
+
+    private var shouldShowDigitRow: Bool {
+        guard let current = focusedField else { return false }
+        return digitRowFieldIDs.contains(current)
+    }
+
+    private func insertText(_ text: String) {
+        guard let responder = UIResponder.currentFirstResponder as? UIKeyInput else { return }
+        responder.insertText(text)
     }
     
     private func dismissKeyboard() {
@@ -92,5 +121,25 @@ struct KeyboardToolbar: ToolbarContent {
         guard let current = focusedField,
               let idx = orderedFields.firstIndex(of: current) else { return false }
         return idx < orderedFields.count - 1
+    }
+}
+
+private final class FirstResponderBox {
+    static let shared = FirstResponderBox()
+    weak var responder: UIResponder?
+}
+
+extension UIResponder {
+    fileprivate static var currentFirstResponder: UIResponder? {
+        FirstResponderBox.shared.responder = nil
+        UIApplication.shared.sendAction(
+            #selector(UIResponder._keyboardToolbarFindFirstResponder(_:)),
+            to: nil, from: nil, for: nil
+        )
+        return FirstResponderBox.shared.responder
+    }
+
+    @objc fileprivate func _keyboardToolbarFindFirstResponder(_ sender: Any) {
+        FirstResponderBox.shared.responder = self
     }
 }
