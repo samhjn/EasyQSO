@@ -121,109 +121,148 @@ class QTHManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
     
     // MARK: - 网格坐标计算
-    
-    // 从坐标计算网格坐标
-    static func calculateGridSquare(from coordinate: CLLocationCoordinate2D) -> String {
-        let longitude = coordinate.longitude + 180
-        let latitude = coordinate.latitude + 90
-        
-        let field1 = Int(longitude / 20)
-        let field2 = Int(latitude / 10)
-        let square1 = Int((longitude.truncatingRemainder(dividingBy: 20)) / 2)
-        let square2 = Int((latitude.truncatingRemainder(dividingBy: 10)) / 1)
-        
-        let subsquare1 = Int(((longitude.truncatingRemainder(dividingBy: 20)).truncatingRemainder(dividingBy: 2)) / (2.0/24.0))
-        let subsquare2 = Int(((latitude.truncatingRemainder(dividingBy: 10)).truncatingRemainder(dividingBy: 1)) / (1.0/24.0))
-        
-        let fieldChar1 = String(UnicodeScalar(65 + field1)!)
-        let fieldChar2 = String(UnicodeScalar(65 + field2)!)
-        let subsquareChar1 = String(UnicodeScalar(97 + subsquare1)!)
-        let subsquareChar2 = String(UnicodeScalar(97 + subsquare2)!)
-        
-        return "\(fieldChar1)\(fieldChar2)\(square1)\(square2)\(subsquareChar1)\(subsquareChar2)"
+
+    /// 每对 Maidenhead 字符对应的经纬度跨度（经度, 纬度）。
+    /// 共 6 对 = 12 字符，覆盖 4/6/8/10/12 字符精度。
+    private static let pairSpans: [(lon: Double, lat: Double)] = [
+        (20.0,                10.0),                  // 1-2: A-R
+        (2.0,                 1.0),                   // 3-4: 0-9
+        (2.0/24.0,            1.0/24.0),              // 5-6: a-x
+        (2.0/24.0/10.0,       1.0/24.0/10.0),         // 7-8: 0-9
+        (2.0/24.0/10.0/24.0,  1.0/24.0/10.0/24.0),    // 9-10: a-x
+        (2.0/24.0/10.0/24.0/10.0, 1.0/24.0/10.0/24.0/10.0)  // 11-12: 0-9
+    ]
+
+    /// 从坐标计算指定精度的网格坐标。
+    ///
+    /// - Parameters:
+    ///   - coordinate: 经纬度
+    ///   - precision: 字符数，必须为 4、6、8、10、12 之一；其它值会被钳制
+    /// - Returns: 规范化的网格字符串（1-2 大写、3-4 数字、5-6 小写、依此类推）
+    ///
+    /// 注：精度偏好仅影响应用 *生成* 的网格坐标；已存储或用户输入的值不会被修改。
+    static func calculateGridSquare(from coordinate: CLLocationCoordinate2D,
+                                    precision: Int) -> String {
+        let clamped = max(4, min(12, precision - (precision % 2)))
+        let pairCount = clamped / 2
+
+        var lon = coordinate.longitude + 180.0
+        var lat = coordinate.latitude + 90.0
+        var out = ""
+        out.reserveCapacity(clamped)
+
+        for pair in 0..<pairCount {
+            let span = pairSpans[pair]
+            // 钳制至各对的合法上限，避免接近 180°/90° 边界时浮点累积误差越界
+            let upper: Int = (pair == 0) ? 17 : (pair % 2 == 0 ? 23 : 9)
+            var i = Int(lon / span.lon)
+            var j = Int(lat / span.lat)
+            if i < 0 { i = 0 } else if i > upper { i = upper }
+            if j < 0 { j = 0 } else if j > upper { j = upper }
+            switch pair {
+            case 0:
+                out.append(Character(UnicodeScalar(65 + i)!))
+                out.append(Character(UnicodeScalar(65 + j)!))
+            case 2, 4:
+                out.append(Character(UnicodeScalar(97 + i)!))
+                out.append(Character(UnicodeScalar(97 + j)!))
+            default: // 1, 3, 5
+                out.append(Character("\(i)"))
+                out.append(Character("\(j)"))
+            }
+            lon -= Double(i) * span.lon
+            lat -= Double(j) * span.lat
+        }
+
+        return out
     }
-    
-    // 验证网格坐标格式
+
+    /// 兼容性入口：调用方未指定精度时，使用用户偏好。
+    static func calculateGridSquare(from coordinate: CLLocationCoordinate2D) -> String {
+        return calculateGridSquare(from: coordinate,
+                                   precision: GridPrecisionManager.shared.displayPrecision)
+    }
+
+    // 验证网格坐标格式（接受 4/6/8/10/12 字符，大小写不敏感）
     static func isValidGridSquare(_ gridSquare: String) -> Bool {
-        let pattern = "^[A-R]{2}[0-9]{2}([a-x]{2})?$"
+        let pattern = "^[A-R]{2}[0-9]{2}([A-X]{2}([0-9]{2}([A-X]{2}([0-9]{2})?)?)?)?$"
         let regex = try! NSRegularExpression(pattern: pattern, options: .caseInsensitive)
         let range = NSRange(location: 0, length: gridSquare.count)
         return regex.firstMatch(in: gridSquare, options: [], range: range) != nil
     }
-    
+
     // 验证CQ Zone
     static func isValidCQZone(_ zone: String) -> Bool {
         guard let zoneNumber = Int(zone) else { return false }
         return zoneNumber >= 1 && zoneNumber <= 40
     }
-    
+
     // 验证ITU Zone
     static func isValidITUZone(_ zone: String) -> Bool {
         guard let zoneNumber = Int(zone) else { return false }
         return zoneNumber >= 1 && zoneNumber <= 90
     }
-    
-    // 从网格坐标计算大致坐标
-    static func coordinateFromGridSquare(_ gridSquare: String) -> CLLocationCoordinate2D? {
-        guard isValidGridSquare(gridSquare) && gridSquare.count >= 4 else { return nil }
-        
-        let upperGrid = gridSquare.uppercased()
-        
-        // 安全地处理field字符 (A-R)
-        guard let fieldChar1 = upperGrid.first,
-              let fieldChar2 = upperGrid.dropFirst().first,
-              let fieldAscii1 = fieldChar1.asciiValue,
-              let fieldAscii2 = fieldChar2.asciiValue,
-              fieldAscii1 >= 65 && fieldAscii1 <= 82,  // A-R
-              fieldAscii2 >= 65 && fieldAscii2 <= 82   // A-R
-        else {
-            return nil // 如果field字符无效，返回nil
-        }
-        
-        let field1 = Int(fieldAscii1 - 65)
-        let field2 = Int(fieldAscii2 - 65)
-        
-        // 安全地处理square数字 (0-9)
-        guard let squareChar1 = upperGrid.dropFirst(2).first,
-              let squareChar2 = upperGrid.dropFirst(3).first,
-              let square1 = Int(String(squareChar1)),
-              let square2 = Int(String(squareChar2))
-        else {
-            return nil // 如果square字符无效，返回nil
-        }
-        
-        var longitude = Double(field1 * 20) + Double(square1 * 2) - 180
-        var latitude = Double(field2 * 10) + Double(square2 * 1) - 90
-        
-        // 如果有子网格，添加精度
-        if gridSquare.count >= 6 {
-            let char5 = gridSquare.dropFirst(4).first!
-            let char6 = gridSquare.dropFirst(5).first!
-            
-            // 安全地检查字符是否在有效范围内 (a-x)
-            guard let ascii5 = char5.asciiValue, 
-                  let ascii6 = char6.asciiValue,
-                  ascii5 >= 97 && ascii5 <= 120,  // a-x
-                  ascii6 >= 97 && ascii6 <= 120   // a-x
-            else {
-                return nil // 如果subsquare字符无效，返回nil
-            }
-            
-            let subsquare1 = Int(ascii5 - 97)
-            let subsquare2 = Int(ascii6 - 97)
-            longitude += Double(subsquare1) * (2.0/24.0)
-            latitude += Double(subsquare2) * (1.0/24.0)
 
-            // 移动到子网格中心
-            longitude += (2.0/24.0) / 2.0
-            latitude += (1.0/24.0) / 2.0
-        } else {
-            // 移动到网格中心（4字符精度）
-            longitude += 1.0
-            latitude += 0.5
+    /// 从网格坐标解码出大致坐标（返回最末单元的中心）。
+    /// 支持 4/6/8/10/12 字符；其它长度返回 nil。
+    static func coordinateFromGridSquare(_ gridSquare: String) -> CLLocationCoordinate2D? {
+        guard isValidGridSquare(gridSquare) else { return nil }
+        let length = gridSquare.count
+        guard [4, 6, 8, 10, 12].contains(length) else { return nil }
+
+        // 规范化大小写：第 1-2、3-4 字符当作大写处理，其余对齐预期
+        let chars = Array(gridSquare)
+        let pairCount = length / 2
+
+        var longitude = -180.0
+        var latitude = -90.0
+
+        for pair in 0..<pairCount {
+            let c1 = chars[pair * 2]
+            let c2 = chars[pair * 2 + 1]
+            let span = pairSpans[pair]
+
+            switch pair {
+            case 0:
+                guard let i = letterIndex(c1, base: 65, max: 17),
+                      let j = letterIndex(c2, base: 65, max: 17) else { return nil }
+                longitude += Double(i) * span.lon
+                latitude += Double(j) * span.lat
+            case 2, 4:
+                guard let i = letterIndex(c1, base: 97, max: 23),
+                      let j = letterIndex(c2, base: 97, max: 23) else { return nil }
+                longitude += Double(i) * span.lon
+                latitude += Double(j) * span.lat
+            default: // 1, 3, 5: 数字
+                guard let i = c1.wholeNumberValue,
+                      let j = c2.wholeNumberValue,
+                      i >= 0 && i <= 9, j >= 0 && j <= 9 else { return nil }
+                longitude += Double(i) * span.lon
+                latitude += Double(j) * span.lat
+            }
         }
-        
+
+        // 移动到最末单元中心
+        let finestSpan = pairSpans[pairCount - 1]
+        longitude += finestSpan.lon / 2.0
+        latitude += finestSpan.lat / 2.0
+
         return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+    }
+
+    /// 将字母字符转换为 0-based 索引，自动处理大小写；超出范围返回 nil。
+    /// - Parameters:
+    ///   - char: 字符
+    ///   - base: 'A' (65) 或 'a' (97)
+    ///   - max: 索引上限（含），如 A-R 为 17，a-x 为 23
+    private static func letterIndex(_ char: Character, base: UInt8, max: UInt8) -> Int? {
+        guard let ascii = char.asciiValue else { return nil }
+        // 统一大小写：base==65 时把小写转大写；base==97 时把大写转小写
+        var normalized = ascii
+        if base == 65, ascii >= 97 && ascii <= 122 { normalized = ascii - 32 }
+        if base == 97, ascii >= 65 && ascii <= 90 { normalized = ascii + 32 }
+        guard normalized >= base && normalized <= base + max else { return nil }
+        return Int(normalized - base)
     }
 }
 

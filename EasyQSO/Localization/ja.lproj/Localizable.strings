@@ -83,7 +83,21 @@
 "callsign_empty" = "コールサインを入力してください";
 "callsign_invalid" = "コールサインの形式が正しくありません。英字と数字を含む必要があります";
 "frequency_invalid" = "周波数の形式が正しくありません。有効な数値で適切な範囲内である必要があります";
-"grid_square_invalid" = "グリッドスクエアの形式が正しくありません。AB12cd形式である必要があります";
+"grid_square_invalid" = "グリッドスクエアの形式が正しくありません。4/6/8/10/12 文字（例: AB12、AB12cd、AB12cd34、AB12cd34ef、AB12cd34ef56）である必要があります。";
+
+// MARK: - グリッドスクエア精度
+"grid_precision_section" = "グリッドスクエア精度";
+"grid_precision_footer" = "アプリが座標から生成するグリッドにのみ影響します（地図選択、現在位置）。既存または手入力の値は変更されません。";
+"grid_precision_label" = "精度";
+"grid_precision_chars" = "文字";
+"grid_precision_preview_label" = "プレビュー";
+"grid_precision_preview_current" = "現在位置から計算";
+"grid_precision_preview_sample" = "サンプル座標（サンフランシスコ）から計算。位置情報を有効にすると現在位置をプレビューできます。";
+"grid_precision_resolution_4" = "約 150 km";
+"grid_precision_resolution_6" = "約 5 km";
+"grid_precision_resolution_8" = "約 500 m";
+"grid_precision_resolution_10" = "約 20 m";
+"grid_precision_resolution_12" = "約 1 m";
 "cq_zone_invalid" = "CQゾーンは1〜40の数値である必要があります";
 "itu_zone_invalid" = "ITUゾーンは1〜90の数値である必要があります";
 

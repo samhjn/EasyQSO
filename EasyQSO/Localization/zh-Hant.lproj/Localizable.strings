@@ -83,7 +83,21 @@
 "callsign_empty" = "呼號不能為空";
 "callsign_invalid" = "呼號格式不正確，應包含字母和/或數字";
 "frequency_invalid" = "頻率格式不正確，應為有效數字且在合理範圍內";
-"grid_square_invalid" = "網格座標格式不正確，應為 AB12cd 格式";
+"grid_square_invalid" = "網格座標格式不正確。應為 4/6/8/10/12 位字元（如 AB12、AB12cd、AB12cd34、AB12cd34ef、AB12cd34ef56）。";
+
+// MARK: - 網格座標精度
+"grid_precision_section" = "網格座標精度";
+"grid_precision_footer" = "僅影響應用從座標生成的網格（地圖選點、目前位置）。已儲存或手動輸入的值不會被修改。";
+"grid_precision_label" = "精度";
+"grid_precision_chars" = "位";
+"grid_precision_preview_label" = "預覽";
+"grid_precision_preview_current" = "依目前位置計算";
+"grid_precision_preview_sample" = "依範例座標（舊金山）計算。啟用定位權限即可顯示您自己位置的預覽。";
+"grid_precision_resolution_4" = "約 150 公里";
+"grid_precision_resolution_6" = "約 5 公里";
+"grid_precision_resolution_8" = "約 500 公尺";
+"grid_precision_resolution_10" = "約 20 公尺";
+"grid_precision_resolution_12" = "約 1 公尺";
 "cq_zone_invalid" = "CQ Zone 應為 1-40 之間的數字";
 "itu_zone_invalid" = "ITU Zone 應為 1-90 之間的數字";
 

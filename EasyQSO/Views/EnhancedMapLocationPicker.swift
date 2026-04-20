@@ -33,7 +33,8 @@ struct EnhancedMapLocationPicker: View {
     @Environment(\.presentationMode) var presentationMode
     
     @StateObject private var qthManager = QTHManager()
-    
+    @ObservedObject private var gridPrecision = GridPrecisionManager.shared
+
     @State private var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 39.9042, longitude: 116.4074),
         span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
@@ -99,7 +100,7 @@ struct EnhancedMapLocationPicker: View {
                             // 使用临时变量避免直接修改绑定
                             DispatchQueue.main.async {
                                 locationName = tempLocationName
-                                gridSquare = formatGridSquare(QTHManager.calculateGridSquare(from: location))
+                                gridSquare = GridSquareFormatter.format(QTHManager.calculateGridSquare(from: location, precision: gridPrecision.displayPrecision))
                             }
                         }
                         presentationMode.wrappedValue.dismiss()
@@ -206,7 +207,7 @@ struct EnhancedMapLocationPicker: View {
             
             HStack {
                 Text("map_grid_label".localized)
-                Text(formatGridSquare(QTHManager.calculateGridSquare(from: location)))
+                Text(GridSquareFormatter.format(QTHManager.calculateGridSquare(from: location, precision: gridPrecision.displayPrecision)))
                     .foregroundColor(.secondary)
             }
             .font(.caption)
@@ -477,19 +478,6 @@ struct EnhancedMapLocationPicker: View {
         }
     }
     
-    // 格式化网格坐标：前4位大写，后2位小写
-    private func formatGridSquare(_ input: String) -> String {
-        let cleaned = input.replacingOccurrences(of: " ", with: "")
-        if cleaned.count <= 4 {
-            return cleaned.uppercased()
-        } else if cleaned.count >= 6 {
-            let prefix = String(cleaned.prefix(4)).uppercased()
-            let suffix = String(cleaned.dropFirst(4).prefix(2)).lowercased()
-            return prefix + suffix
-        } else {
-            return cleaned.uppercased()
-        }
-    }
 }
 
 // 增强的交互式地图视图

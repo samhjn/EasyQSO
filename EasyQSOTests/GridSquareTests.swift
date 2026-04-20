@@ -28,9 +28,93 @@ final class GridSquareTests: XCTestCase {
                 XCTFail("coordinateFromGridSquare returned nil for \(grid)")
                 continue
             }
-            let result = QTHManager.calculateGridSquare(from: coord)
+            let result = QTHManager.calculateGridSquare(from: coord, precision: 6)
             XCTAssertEqual(result.lowercased(), grid.lowercased(),
                            "Round-trip failed for \(grid): got \(result)")
+        }
+    }
+
+    // MARK: - Extended Precision Round-Trip (8/10/12 chars)
+
+    /// Round-trip for 8-character grids
+    func testRoundTrip_8char_batch() {
+        let grids = [
+            "PM00cg00", "FN31pr99", "JN58td45", "OM89xb12", "IO91wm03",
+            "AA00aa00", "RR99xx99"
+        ]
+        for grid in grids {
+            guard let coord = QTHManager.coordinateFromGridSquare(grid) else {
+                XCTFail("coordinateFromGridSquare returned nil for \(grid)")
+                continue
+            }
+            let result = QTHManager.calculateGridSquare(from: coord, precision: 8)
+            XCTAssertEqual(result.lowercased(), grid.lowercased(),
+                           "8-char round-trip failed for \(grid): got \(result)")
+        }
+    }
+
+    /// Round-trip for 10-character grids
+    func testRoundTrip_10char_batch() {
+        let grids = [
+            "PM00cg00aa", "FN31pr99xx", "JN58td45mn", "OM89xb12cd",
+            "AA00aa00aa", "RR99xx99xx"
+        ]
+        for grid in grids {
+            guard let coord = QTHManager.coordinateFromGridSquare(grid) else {
+                XCTFail("coordinateFromGridSquare returned nil for \(grid)")
+                continue
+            }
+            let result = QTHManager.calculateGridSquare(from: coord, precision: 10)
+            XCTAssertEqual(result.lowercased(), grid.lowercased(),
+                           "10-char round-trip failed for \(grid): got \(result)")
+        }
+    }
+
+    /// Round-trip for 12-character grids
+    func testRoundTrip_12char_batch() {
+        let grids = [
+            "PM00cg00aa00", "FN31pr99xx99", "JN58td45mn34", "OM89xb12cd56",
+            "AA00aa00aa00", "RR99xx99xx99"
+        ]
+        for grid in grids {
+            guard let coord = QTHManager.coordinateFromGridSquare(grid) else {
+                XCTFail("coordinateFromGridSquare returned nil for \(grid)")
+                continue
+            }
+            let result = QTHManager.calculateGridSquare(from: coord, precision: 12)
+            XCTAssertEqual(result.lowercased(), grid.lowercased(),
+                           "12-char round-trip failed for \(grid): got \(result)")
+        }
+    }
+
+    /// 8-char decoded coordinate must fall within the 30″×15″ extended-square cell.
+    func testCoordinateFromGridSquare_8char_withinCell() {
+        let grid = "PM00cg23"
+        guard let coord = QTHManager.coordinateFromGridSquare(grid) else {
+            return XCTFail("coordinateFromGridSquare returned nil for \(grid)")
+        }
+        // PM00cg subsquare lower-left: lon 120 + 2*(2/24) = 120.16667, lat 30 + 6*(1/24) = 30.25
+        // extended square (2,3): + 2*(2/240), 3*(1/240) = +0.01667, +0.0125
+        // cell span: 2/240 lon = 0.00833, 1/240 lat = 0.00417
+        let expectedLonLow = 120.16667 + 2.0 * (2.0/240.0)
+        let expectedLatLow = 30.25 + 3.0 * (1.0/240.0)
+        XCTAssertGreaterThanOrEqual(coord.longitude, expectedLonLow - 1e-6)
+        XCTAssertLessThanOrEqual(coord.longitude, expectedLonLow + (2.0/240.0) + 1e-6)
+        XCTAssertGreaterThanOrEqual(coord.latitude, expectedLatLow - 1e-6)
+        XCTAssertLessThanOrEqual(coord.latitude, expectedLatLow + (1.0/240.0) + 1e-6)
+    }
+
+    /// Default no-precision call uses the user's preference.
+    func testCalculateGridSquare_defaultUsesPreference() {
+        let original = GridPrecisionManager.shared.displayPrecision
+        defer { GridPrecisionManager.shared.displayPrecision = original }
+
+        let coord = CLLocationCoordinate2D(latitude: 39.9042, longitude: 116.4074)
+        for p in [4, 6, 8, 10, 12] {
+            GridPrecisionManager.shared.displayPrecision = p
+            let grid = QTHManager.calculateGridSquare(from: coord)
+            XCTAssertEqual(grid.count, p,
+                           "No-arg call should respect preference \(p), got \(grid)")
         }
     }
 
@@ -148,6 +232,26 @@ final class GridSquareTests: XCTestCase {
         XCTAssertFalse(QTHManager.isValidGridSquare("PM00cy"))  // y > x
     }
 
+    func testIsValidGridSquare_extended() {
+        // Accept all even lengths 4...12
+        XCTAssertTrue(QTHManager.isValidGridSquare("AB12cd34"))
+        XCTAssertTrue(QTHManager.isValidGridSquare("AB12cd34ef"))
+        XCTAssertTrue(QTHManager.isValidGridSquare("AB12cd34ef56"))
+        XCTAssertTrue(QTHManager.isValidGridSquare("PM00cg00aa00"))
+        // Case insensitive across all positions
+        XCTAssertTrue(QTHManager.isValidGridSquare("ab12CD34EF56"))
+
+        // Reject odd lengths and >12
+        XCTAssertFalse(QTHManager.isValidGridSquare("AB12c"))
+        XCTAssertFalse(QTHManager.isValidGridSquare("AB12cd3"))
+        XCTAssertFalse(QTHManager.isValidGridSquare("AB12cd34e"))
+        XCTAssertFalse(QTHManager.isValidGridSquare("AB12cd34ef5"))
+        XCTAssertFalse(QTHManager.isValidGridSquare("AB12cd34ef56gh"))
+
+        // Reject out-of-range chars in extended subsquare
+        XCTAssertFalse(QTHManager.isValidGridSquare("AB12cd34yy"))  // y > x
+    }
+
     func testCoordinateFromGridSquare_invalidReturnsNil() {
         XCTAssertNil(QTHManager.coordinateFromGridSquare(""))
         XCTAssertNil(QTHManager.coordinateFromGridSquare("AB"))
@@ -173,5 +277,61 @@ final class GridSquareTests: XCTestCase {
         XCTAssertFalse(QTHManager.isValidITUZone("0"))
         XCTAssertFalse(QTHManager.isValidITUZone("91"))
         XCTAssertFalse(QTHManager.isValidITUZone("xyz"))
+    }
+
+    // MARK: - GridSquareFormatter
+
+    func testFormatter_normalizesCaseAndStripsWhitespace() {
+        XCTAssertEqual(GridSquareFormatter.format("ab12CD34EF56"), "AB12cd34ef56")
+        XCTAssertEqual(GridSquareFormatter.format("  ab 12 CD 34 ef 56 "), "AB12cd34ef56")
+        XCTAssertEqual(GridSquareFormatter.format("pm00cg"), "PM00cg")
+    }
+
+    func testFormatter_truncatesAtTwelve() {
+        // Extra characters beyond 12 should be discarded
+        XCTAssertEqual(GridSquareFormatter.format("AB12cd34ef56gh78"), "AB12cd34ef56")
+    }
+
+    func testFormatter_dropsInvalidChars() {
+        // Z is out of range A-R at position 1; whole prefix dropped until valid
+        XCTAssertEqual(GridSquareFormatter.format("ZZ99"), "")
+        // Only the first char invalid: drop it, rest sanitized as if shifted
+        XCTAssertEqual(GridSquareFormatter.format("Z" + "AB12cd"), "AB12cd")
+        // Digit at position 1 is invalid; dropped
+        XCTAssertEqual(GridSquareFormatter.format("1AB12"), "AB12")
+    }
+
+    func testFormatter_emptyAndPartial() {
+        XCTAssertEqual(GridSquareFormatter.format(""), "")
+        XCTAssertEqual(GridSquareFormatter.format("A"), "A")
+        XCTAssertEqual(GridSquareFormatter.format("AB"), "AB")
+        XCTAssertEqual(GridSquareFormatter.format("AB1"), "AB1")
+    }
+
+    // MARK: - GridPrecisionManager
+
+    func testGridPrecisionManager_persistence() {
+        let original = GridPrecisionManager.shared.displayPrecision
+        defer { GridPrecisionManager.shared.displayPrecision = original }
+
+        for p in [4, 6, 8, 10, 12] {
+            GridPrecisionManager.shared.displayPrecision = p
+            XCTAssertEqual(UserDefaults.standard.integer(forKey: "gridDisplayPrecision"), p)
+        }
+    }
+
+    func testGridPrecisionManager_invalidValueClampsToDefault() {
+        let original = GridPrecisionManager.shared.displayPrecision
+        defer { GridPrecisionManager.shared.displayPrecision = original }
+
+        GridPrecisionManager.shared.displayPrecision = 7  // odd / unsupported
+        XCTAssertEqual(GridPrecisionManager.shared.displayPrecision, 6)
+
+        GridPrecisionManager.shared.displayPrecision = 99
+        XCTAssertEqual(GridPrecisionManager.shared.displayPrecision, 6)
+    }
+
+    func testGridPrecisionManager_supportedList() {
+        XCTAssertEqual(GridPrecisionManager.supportedPrecisions, [4, 6, 8, 10, 12])
     }
 }

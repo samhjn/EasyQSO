@@ -530,7 +530,7 @@ struct QSORecordView: View {
         TextField(LocalizedStrings.gridSquare.localized, text: $gridSquare)
             .focused($focusedField, equals: "GRIDSQUARE")
             .onChange(of: gridSquare) { newValue in
-                gridSquare = formatGridSquare(newValue)
+                gridSquare = GridSquareFormatter.format(newValue)
             }
             .floatingLabel(LocalizedStrings.gridSquare.localized, text: gridSquare)
         
@@ -582,7 +582,7 @@ struct QSORecordView: View {
         TextField(LocalizedStrings.gridSquare.localized, text: $ownGridSquare)
             .focused($focusedField, equals: "MY_GRIDSQUARE")
             .onChange(of: ownGridSquare) { newValue in
-                ownGridSquare = formatGridSquare(newValue)
+                ownGridSquare = GridSquareFormatter.format(newValue)
                 autoFillEngine.trackFieldChange("MY_GRIDSQUARE", newValue: ownGridSquare)
             }
             .autoFillLabel(LocalizedStrings.gridSquare.localized, text: ownGridSquare, isAutoFilled: autoFillEngine.isAutoFilled("MY_GRIDSQUARE"))
@@ -1094,19 +1094,6 @@ struct QSORecordView: View {
         satellite = state.satellite
         remarks = state.remarks
         extendedFields = state.extendedFields
-    }
-    
-    private func formatGridSquare(_ input: String) -> String {
-        let cleaned = input.replacingOccurrences(of: " ", with: "")
-        if cleaned.count <= 4 {
-            return cleaned.uppercased()
-        } else if cleaned.count >= 6 {
-            let prefix = String(cleaned.prefix(4)).uppercased()
-            let suffix = String(cleaned.dropFirst(4).prefix(2)).lowercased()
-            return prefix + suffix
-        } else {
-            return cleaned.uppercased()
-        }
     }
     
     private func formatADIFLocation(latitude: Double) -> String {

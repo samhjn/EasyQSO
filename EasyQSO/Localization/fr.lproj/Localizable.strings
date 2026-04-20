@@ -83,7 +83,21 @@
 "callsign_empty" = "L'indicatif ne peut pas être vide";
 "callsign_invalid" = "Format d'indicatif invalide, doit contenir des lettres et/ou des chiffres";
 "frequency_invalid" = "Format de fréquence invalide, doit être un nombre valide dans une plage raisonnable";
-"grid_square_invalid" = "Format de locator invalide, doit être au format AB12cd";
+"grid_square_invalid" = "Format de locator invalide. Doit comporter 4, 6, 8, 10 ou 12 caractères (par ex. AB12, AB12cd, AB12cd34, AB12cd34ef, AB12cd34ef56).";
+
+// MARK: - Précision du locator
+"grid_precision_section" = "Précision du locator";
+"grid_precision_footer" = "Affecte uniquement les locators générés par l'application (sélecteur de carte, position actuelle). Les valeurs existantes ou saisies manuellement ne sont pas modifiées.";
+"grid_precision_label" = "Précision";
+"grid_precision_chars" = "caractères";
+"grid_precision_preview_label" = "Aperçu";
+"grid_precision_preview_current" = "Calculé depuis votre position actuelle.";
+"grid_precision_preview_sample" = "Calculé depuis une coordonnée d'exemple (San Francisco). Activez la localisation pour prévisualiser votre propre position.";
+"grid_precision_resolution_4" = "~150 km";
+"grid_precision_resolution_6" = "~5 km";
+"grid_precision_resolution_8" = "~500 m";
+"grid_precision_resolution_10" = "~20 m";
+"grid_precision_resolution_12" = "~1 m";
 "cq_zone_invalid" = "La zone CQ doit être un nombre entre 1 et 40";
 "itu_zone_invalid" = "La zone ITU doit être un nombre entre 1 et 90";
 

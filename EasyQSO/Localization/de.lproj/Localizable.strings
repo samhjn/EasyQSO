@@ -83,7 +83,21 @@
 "callsign_empty" = "Rufzeichen darf nicht leer sein";
 "callsign_invalid" = "Ungültiges Rufzeichenformat, sollte Buchstaben und/oder Zahlen enthalten";
 "frequency_invalid" = "Ungültiges Frequenzformat, muss eine gültige Zahl in einem sinnvollen Bereich sein";
-"grid_square_invalid" = "Ungültiges Locator-Format, sollte AB12cd sein";
+"grid_square_invalid" = "Ungültiges Locator-Format. Muss 4, 6, 8, 10 oder 12 Zeichen lang sein (z. B. AB12, AB12cd, AB12cd34, AB12cd34ef, AB12cd34ef56).";
+
+// MARK: - Locator-Genauigkeit
+"grid_precision_section" = "Locator-Genauigkeit";
+"grid_precision_footer" = "Wirkt sich nur auf von der App generierte Locator aus (Kartenauswahl, aktueller Standort). Vorhandene oder manuell eingegebene Werte bleiben unverändert.";
+"grid_precision_label" = "Genauigkeit";
+"grid_precision_chars" = "Zeichen";
+"grid_precision_preview_label" = "Vorschau";
+"grid_precision_preview_current" = "Berechnet aus dem aktuellen Standort.";
+"grid_precision_preview_sample" = "Berechnet aus einer Beispielkoordinate (San Francisco). Aktiviere die Ortungsdienste, um deinen eigenen Standort anzuzeigen.";
+"grid_precision_resolution_4" = "ca. 150 km";
+"grid_precision_resolution_6" = "ca. 5 km";
+"grid_precision_resolution_8" = "ca. 500 m";
+"grid_precision_resolution_10" = "ca. 20 m";
+"grid_precision_resolution_12" = "ca. 1 m";
 "cq_zone_invalid" = "CQ-Zone muss eine Zahl zwischen 1 und 40 sein";
 "itu_zone_invalid" = "ITU-Zone muss eine Zahl zwischen 1 und 90 sein";
 

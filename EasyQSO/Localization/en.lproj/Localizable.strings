@@ -83,7 +83,21 @@
 "callsign_empty" = "Callsign cannot be empty";
 "callsign_invalid" = "Invalid callsign format, should contain letters and/or numbers";
 "frequency_invalid" = "Invalid frequency format, should be a valid number within reasonable range";
-"grid_square_invalid" = "Invalid grid square format, should be AB12cd format";
+"grid_square_invalid" = "Invalid grid square format. Must be 4, 6, 8, 10, or 12 characters (e.g. AB12, AB12cd, AB12cd34, AB12cd34ef, AB12cd34ef56).";
+
+// MARK: - Grid Square Precision
+"grid_precision_section" = "Grid Square Precision";
+"grid_precision_footer" = "Affects grid squares the app generates from coordinates (map picker, current location). Existing or manually-typed values are not modified.";
+"grid_precision_label" = "Precision";
+"grid_precision_chars" = "chars";
+"grid_precision_preview_label" = "Preview";
+"grid_precision_preview_current" = "Computed from your current location.";
+"grid_precision_preview_sample" = "Computed from a sample coordinate (San Francisco). Enable Location Services to preview your own location.";
+"grid_precision_resolution_4" = "~150 km";
+"grid_precision_resolution_6" = "~5 km";
+"grid_precision_resolution_8" = "~500 m";
+"grid_precision_resolution_10" = "~20 m";
+"grid_precision_resolution_12" = "~1 m";
 "cq_zone_invalid" = "CQ Zone should be a number between 1-40";
 "itu_zone_invalid" = "ITU Zone should be a number between 1-90";
 
