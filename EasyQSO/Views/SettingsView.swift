@@ -21,7 +21,6 @@ import UniformTypeIdentifiers
 import CoreData
 import MobileCoreServices
 import UIKit
-import CoreLocation
 
 struct SettingsView: View {
     @Binding var scrollToGPL: Bool
@@ -56,14 +55,6 @@ struct SettingsView: View {
     @ObservedObject private var autoFillManager = AutoFillManager.shared
     @ObservedObject private var dxccManager = DXCCManager.shared
     @ObservedObject private var fieldVisibility = FieldVisibilityManager.shared
-    @ObservedObject private var gridPrecision = GridPrecisionManager.shared
-
-    // 网格坐标精度预览：用户已授权时使用当前位置，否则用 fallback 示例坐标
-    @StateObject private var precisionPreviewQTH = QTHManager()
-    @State private var precisionPreviewCoord: CLLocationCoordinate2D? = nil
-    private let precisionPreviewFallback = CLLocationCoordinate2D(
-        latitude: 37.7749, longitude: -122.4194
-    )
     
     
     // 导入报告相关
@@ -191,43 +182,6 @@ struct SettingsView: View {
                     }
                 }
                 
-                // ===== 网格坐标精度 =====
-                Section(header: Text("grid_precision_section".localized),
-                        footer: Text("grid_precision_footer".localized)
-                            .font(.caption)) {
-                    Picker("grid_precision_label".localized,
-                           selection: $gridPrecision.displayPrecision) {
-                        ForEach(GridPrecisionManager.supportedPrecisions, id: \.self) { p in
-                            Text(verbatim: "\(p) "
-                                 + "grid_precision_chars".localized
-                                 + " — "
-                                 + GridPrecisionManager.resolutionLabelKey(for: p).localized)
-                                .tag(p)
-                        }
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("grid_precision_preview_label".localized)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-
-                        let coord = precisionPreviewCoord ?? precisionPreviewFallback
-                        Text(QTHManager.calculateGridSquare(
-                            from: coord,
-                            precision: gridPrecision.displayPrecision
-                        ))
-                            .font(.system(.body, design: .monospaced))
-                            .textSelection(.enabled)
-
-                        Text(precisionPreviewCoord == nil
-                             ? "grid_precision_preview_sample".localized
-                             : "grid_precision_preview_current".localized)
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.vertical, 2)
-                }
-
                 // ===== ADIF字段设置 =====
                 Section(header: Text("adif_field_config".localized)) {
                     Button(action: {
@@ -629,12 +583,6 @@ struct SettingsView: View {
                 documentPickerDelegate.importHandler = { data in
                     if let url = documentPickerDelegate.importedFileURL {
                         importDataByExtension(data, ext: url.pathExtension.lowercased())
-                    }
-                }
-                // 网格精度预览：仅在已授权时静默获取一次当前位置（不主动弹权限）
-                if precisionPreviewQTH.hasLocationPermission && precisionPreviewCoord == nil {
-                    precisionPreviewQTH.getCurrentLocation { coord in
-                        if let coord = coord { precisionPreviewCoord = coord }
                     }
                 }
                 if scrollToGPL {

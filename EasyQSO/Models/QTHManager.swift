@@ -18,6 +18,7 @@
 
 import Foundation
 import CoreLocation
+import MapKit
 
 class QTHManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var currentLocation: CLLocationCoordinate2D?
@@ -177,10 +178,9 @@ class QTHManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         return out
     }
 
-    /// 兼容性入口：调用方未指定精度时，使用用户偏好。
+    /// 兼容性入口：调用方未指定精度时，默认使用 6 字符（与历史行为一致）。
     static func calculateGridSquare(from coordinate: CLLocationCoordinate2D) -> String {
-        return calculateGridSquare(from: coordinate,
-                                   precision: GridPrecisionManager.shared.displayPrecision)
+        return calculateGridSquare(from: coordinate, precision: 6)
     }
 
     // 验证网格坐标格式（接受 4/6/8/10/12 字符，大小写不敏感）
@@ -263,6 +263,62 @@ class QTHManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         if base == 97, ascii >= 65 && ascii <= 90 { normalized = ascii + 32 }
         guard normalized >= base && normalized <= base + max else { return nil }
         return Int(normalized - base)
+    }
+
+    // MARK: - 缩放与精度的双向映射
+
+    /// 各精度对应的网格单元纬度跨度（°）。用于选择恰当精度和计算单元边框。
+    /// 用纬度跨度是因为纬度跨度正好是经度跨度的一半，但作为 MapKit 视窗的主轴更直观。
+    static func cellLatitudeSpan(for precision: Int) -> Double {
+        switch precision {
+        case 4:  return 1.0                // chars 3-4: 1°
+        case 6:  return 1.0 / 24.0         // chars 5-6: 2.5′
+        case 8:  return 1.0 / 240.0        // chars 7-8: 15″
+        case 10: return 1.0 / 5760.0       // chars 9-10: 0.625″
+        case 12: return 1.0 / 57600.0      // chars 11-12: 0.0625″
+        default: return 1.0 / 24.0
+        }
+    }
+
+    /// 根据当前地图可视区域的纬度跨度，选择最贴合的网格精度。
+    ///
+    /// 策略：当视窗纬度跨度大于"当前精度 cell 一半"时使用当前精度，否则下探到下一级。
+    /// 换言之：视窗能放下 ≥ 2 个当前精度单元时切换到该精度。与 `mapSpan(forPrecision:)`
+    /// （~4 个 cell）双向收敛。
+    static func gridPrecision(forSpan span: MKCoordinateSpan) -> Int {
+        let lat = span.latitudeDelta
+        if lat > cellLatitudeSpan(for: 4)  / 2.0 { return 4 }   // > 0.5°
+        if lat > cellLatitudeSpan(for: 6)  / 2.0 { return 6 }   // > ~0.02°
+        if lat > cellLatitudeSpan(for: 8)  / 2.0 { return 8 }   // > ~0.002°
+        if lat > cellLatitudeSpan(for: 10) / 2.0 { return 10 }  // > ~0.00009°
+        return 12
+    }
+
+    /// 根据给定精度计算一个视觉舒适的地图跨度：视窗内约能展示 4x4 个该精度网格。
+    /// 用于"用户已有 grid → 反向定位并缩放"的场景。
+    static func mapSpan(forPrecision precision: Int) -> MKCoordinateSpan {
+        let cellLat = cellLatitudeSpan(for: precision)
+        let cellLon = cellLat * 2.0   // 经度跨度是纬度的 2 倍
+        // 视窗 ~4 个 cell
+        return MKCoordinateSpan(latitudeDelta: cellLat * 4.0,
+                                longitudeDelta: cellLon * 4.0)
+    }
+
+    /// 包含给定坐标的网格单元边界（经纬度左下 / 右上）。
+    /// 用于在地图上绘制当前网格单元的矩形覆盖层。
+    static func gridCellCorners(for coordinate: CLLocationCoordinate2D,
+                                precision: Int) -> (sw: CLLocationCoordinate2D,
+                                                    ne: CLLocationCoordinate2D)? {
+        let p = max(4, min(12, precision - (precision % 2)))
+        let grid = calculateGridSquare(from: coordinate, precision: p)
+        guard let center = coordinateFromGridSquare(grid) else { return nil }
+        let halfLat = cellLatitudeSpan(for: p) / 2.0
+        let halfLon = halfLat * 2.0
+        let sw = CLLocationCoordinate2D(latitude: center.latitude - halfLat,
+                                        longitude: center.longitude - halfLon)
+        let ne = CLLocationCoordinate2D(latitude: center.latitude + halfLat,
+                                        longitude: center.longitude + halfLon)
+        return (sw, ne)
     }
 }
 

@@ -1,5 +1,6 @@
 import XCTest
 import CoreLocation
+import MapKit
 @testable import EasyQSO
 
 final class GridSquareTests: XCTestCase {
@@ -104,18 +105,11 @@ final class GridSquareTests: XCTestCase {
         XCTAssertLessThanOrEqual(coord.latitude, expectedLatLow + (1.0/240.0) + 1e-6)
     }
 
-    /// Default no-precision call uses the user's preference.
-    func testCalculateGridSquare_defaultUsesPreference() {
-        let original = GridPrecisionManager.shared.displayPrecision
-        defer { GridPrecisionManager.shared.displayPrecision = original }
-
+    /// No-arg convenience returns 6-char grid (historical default).
+    func testCalculateGridSquare_noArgDefaultsToSix() {
         let coord = CLLocationCoordinate2D(latitude: 39.9042, longitude: 116.4074)
-        for p in [4, 6, 8, 10, 12] {
-            GridPrecisionManager.shared.displayPrecision = p
-            let grid = QTHManager.calculateGridSquare(from: coord)
-            XCTAssertEqual(grid.count, p,
-                           "No-arg call should respect preference \(p), got \(grid)")
-        }
+        let grid = QTHManager.calculateGridSquare(from: coord)
+        XCTAssertEqual(grid.count, 6)
     }
 
     /// 4-char grid round-trip: first 4 characters must match
@@ -308,30 +302,57 @@ final class GridSquareTests: XCTestCase {
         XCTAssertEqual(GridSquareFormatter.format("AB1"), "AB1")
     }
 
-    // MARK: - GridPrecisionManager
+    // MARK: - Zoom <-> Precision helpers
 
-    func testGridPrecisionManager_persistence() {
-        let original = GridPrecisionManager.shared.displayPrecision
-        defer { GridPrecisionManager.shared.displayPrecision = original }
+    func testGridPrecisionForSpan_boundaries() {
+        // World / very wide view → 4 chars
+        XCTAssertEqual(QTHManager.gridPrecision(forSpan: MKCoordinateSpan(latitudeDelta: 10.0, longitudeDelta: 20.0)), 4)
+        // City span ~0.3° → 6 chars
+        XCTAssertEqual(QTHManager.gridPrecision(forSpan: MKCoordinateSpan(latitudeDelta: 0.3, longitudeDelta: 0.6)), 6)
+        // Neighborhood ~0.01° → 8 chars
+        XCTAssertEqual(QTHManager.gridPrecision(forSpan: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.02)), 8)
+        // Block-level ~0.0005° → 10 chars
+        XCTAssertEqual(QTHManager.gridPrecision(forSpan: MKCoordinateSpan(latitudeDelta: 0.0005, longitudeDelta: 0.001)), 10)
+        // Very tight ~0.00005° → 12 chars
+        XCTAssertEqual(QTHManager.gridPrecision(forSpan: MKCoordinateSpan(latitudeDelta: 0.00005, longitudeDelta: 0.0001)), 12)
+    }
 
+    func testMapSpanForPrecision_showsAboutFourCells() {
+        // Span should be ~4 cells wide so the cell is clearly visible with context
         for p in [4, 6, 8, 10, 12] {
-            GridPrecisionManager.shared.displayPrecision = p
-            XCTAssertEqual(UserDefaults.standard.integer(forKey: "gridDisplayPrecision"), p)
+            let span = QTHManager.mapSpan(forPrecision: p)
+            let cell = QTHManager.cellLatitudeSpan(for: p)
+            XCTAssertEqual(span.latitudeDelta, cell * 4.0, accuracy: 1e-9,
+                           "span latitude for \(p) chars should be 4 cells")
+            XCTAssertEqual(span.longitudeDelta, cell * 8.0, accuracy: 1e-9,
+                           "span longitude for \(p) chars should be 8 cells (2x lat)")
         }
     }
 
-    func testGridPrecisionManager_invalidValueClampsToDefault() {
-        let original = GridPrecisionManager.shared.displayPrecision
-        defer { GridPrecisionManager.shared.displayPrecision = original }
-
-        GridPrecisionManager.shared.displayPrecision = 7  // odd / unsupported
-        XCTAssertEqual(GridPrecisionManager.shared.displayPrecision, 6)
-
-        GridPrecisionManager.shared.displayPrecision = 99
-        XCTAssertEqual(GridPrecisionManager.shared.displayPrecision, 6)
+    func testGridPrecisionForSpan_roundTripsWithMapSpan() {
+        // spanForPrecision → precisionForSpan should yield the same precision
+        for p in [4, 6, 8, 10, 12] {
+            let span = QTHManager.mapSpan(forPrecision: p)
+            XCTAssertEqual(QTHManager.gridPrecision(forSpan: span), p,
+                           "span->precision round trip failed for \(p)")
+        }
     }
 
-    func testGridPrecisionManager_supportedList() {
-        XCTAssertEqual(GridPrecisionManager.supportedPrecisions, [4, 6, 8, 10, 12])
+    func testGridCellCorners_containsInputCoordinate() {
+        let coord = CLLocationCoordinate2D(latitude: 39.9042, longitude: 116.4074)
+        for p in [4, 6, 8, 10, 12] {
+            guard let corners = QTHManager.gridCellCorners(for: coord, precision: p) else {
+                XCTFail("gridCellCorners returned nil for precision \(p)")
+                continue
+            }
+            XCTAssertLessThanOrEqual(corners.sw.latitude, coord.latitude)
+            XCTAssertGreaterThanOrEqual(corners.ne.latitude, coord.latitude)
+            XCTAssertLessThanOrEqual(corners.sw.longitude, coord.longitude)
+            XCTAssertGreaterThanOrEqual(corners.ne.longitude, coord.longitude)
+            // Cell must have correct dimensions
+            let cellLat = QTHManager.cellLatitudeSpan(for: p)
+            XCTAssertEqual(corners.ne.latitude - corners.sw.latitude, cellLat, accuracy: 1e-9)
+            XCTAssertEqual(corners.ne.longitude - corners.sw.longitude, cellLat * 2.0, accuracy: 1e-9)
+        }
     }
 }

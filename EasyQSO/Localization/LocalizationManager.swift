@@ -83,15 +83,6 @@ struct LocalizedStrings {
     static let qth = "qth"
     static let ownQth = "own_qth"
     static let gridSquare = "grid_square"
-
-    // MARK: - 网格坐标精度
-    static let gridPrecisionSection         = "grid_precision_section"
-    static let gridPrecisionFooter          = "grid_precision_footer"
-    static let gridPrecisionLabel           = "grid_precision_label"
-    static let gridPrecisionChars           = "grid_precision_chars"
-    static let gridPrecisionPreviewLabel    = "grid_precision_preview_label"
-    static let gridPrecisionPreviewCurrent  = "grid_precision_preview_current"
-    static let gridPrecisionPreviewSample   = "grid_precision_preview_sample"
     static let cqZone = "cq_zone"
     static let ituZone = "itu_zone"
     static let satellite = "satellite"
