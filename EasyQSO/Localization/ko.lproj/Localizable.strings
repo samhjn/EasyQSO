@@ -86,14 +86,8 @@
 "grid_square_invalid" = "그리드 로케이터 형식이 올바르지 않습니다. 4/6/8/10/12자(예: AB12, AB12cd, AB12cd34, AB12cd34ef, AB12cd34ef56)여야 합니다.";
 
 // MARK: - 그리드 로케이터 정밀도 (지도 선택)
-"map_grid_precision_label" = "정밀도";
-"map_grid_precision_hint" = "지도를 확대/축소하여 정밀도를 변경";
-"map_grid_precision_chars" = "자";
-"map_grid_resolution_4" = "약 150 km";
-"map_grid_resolution_6" = "약 5 km";
-"map_grid_resolution_8" = "약 500 m";
-"map_grid_resolution_10" = "약 20 m";
-"map_grid_resolution_12" = "약 1 m";
+"map_grid_precision_label" = "정밀도:";
+"map_grid_precision_auto" = "줌에 맞춤";
 "cq_zone_invalid" = "CQ Zone은 1~40 사이의 숫자여야 합니다";
 "itu_zone_invalid" = "ITU Zone은 1~90 사이의 숫자여야 합니다";
 

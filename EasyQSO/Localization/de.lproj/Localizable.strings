@@ -86,14 +86,8 @@
 "grid_square_invalid" = "Ungültiges Locator-Format. Muss 4, 6, 8, 10 oder 12 Zeichen lang sein (z. B. AB12, AB12cd, AB12cd34, AB12cd34ef, AB12cd34ef56).";
 
 // MARK: - Locator-Genauigkeit (Kartenauswahl)
-"map_grid_precision_label" = "Genauigkeit";
-"map_grid_precision_hint" = "Karte zoomen, um die Genauigkeit zu ändern";
-"map_grid_precision_chars" = "Zeichen";
-"map_grid_resolution_4" = "ca. 150 km";
-"map_grid_resolution_6" = "ca. 5 km";
-"map_grid_resolution_8" = "ca. 500 m";
-"map_grid_resolution_10" = "ca. 20 m";
-"map_grid_resolution_12" = "ca. 1 m";
+"map_grid_precision_label" = "Genauigkeit:";
+"map_grid_precision_auto" = "Zoom folgen";
 "cq_zone_invalid" = "CQ-Zone muss eine Zahl zwischen 1 und 40 sein";
 "itu_zone_invalid" = "ITU-Zone muss eine Zahl zwischen 1 und 90 sein";
 

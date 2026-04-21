@@ -86,14 +86,8 @@
 "grid_square_invalid" = "Invalid grid square format. Must be 4, 6, 8, 10, or 12 characters (e.g. AB12, AB12cd, AB12cd34, AB12cd34ef, AB12cd34ef56).";
 
 // MARK: - Grid Square Precision (map picker)
-"map_grid_precision_label" = "Precision";
-"map_grid_precision_hint" = "Zoom the map to change grid precision";
-"map_grid_precision_chars" = "chars";
-"map_grid_resolution_4" = "~150 km";
-"map_grid_resolution_6" = "~5 km";
-"map_grid_resolution_8" = "~500 m";
-"map_grid_resolution_10" = "~20 m";
-"map_grid_resolution_12" = "~1 m";
+"map_grid_precision_label" = "Precision:";
+"map_grid_precision_auto" = "Follow zoom";
 "cq_zone_invalid" = "CQ Zone should be a number between 1-40";
 "itu_zone_invalid" = "ITU Zone should be a number between 1-90";
 

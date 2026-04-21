@@ -86,14 +86,8 @@
 "grid_square_invalid" = "Formato locatore non valido. Deve avere 4, 6, 8, 10 o 12 caratteri (es. AB12, AB12cd, AB12cd34, AB12cd34ef, AB12cd34ef56).";
 
 // MARK: - Precisione del locatore (selezione mappa)
-"map_grid_precision_label" = "Precisione";
-"map_grid_precision_hint" = "Zoom sulla mappa per cambiare la precisione";
-"map_grid_precision_chars" = "caratteri";
-"map_grid_resolution_4" = "~150 km";
-"map_grid_resolution_6" = "~5 km";
-"map_grid_resolution_8" = "~500 m";
-"map_grid_resolution_10" = "~20 m";
-"map_grid_resolution_12" = "~1 m";
+"map_grid_precision_label" = "Precisione:";
+"map_grid_precision_auto" = "Segui zoom";
 "cq_zone_invalid" = "La zona CQ deve essere un numero tra 1 e 40";
 "itu_zone_invalid" = "La zona ITU deve essere un numero tra 1 e 90";
 

@@ -40,6 +40,8 @@ struct EnhancedMapLocationPicker: View {
     )
     /// 根据地图缩放自适应的网格精度（由 EnhancedInteractiveMapView 更新）
     @State private var mapPrecision: Int = 6
+    /// 用户是否手动超控了精度；为 true 时缩放不会改变精度
+    @State private var isPrecisionOverridden: Bool = false
     @State private var annotations: [MapLocationAnnotation] = []
     @State private var tempLocationName = ""
     @State private var searchText = ""
@@ -75,7 +77,8 @@ struct EnhancedMapLocationPicker: View {
                     searchResults: $searchResults,
                     tempLocationName: $tempLocationName,
                     showingSearchResults: $showingSearchResults,
-                    mapPrecision: $mapPrecision
+                    mapPrecision: $mapPrecision,
+                    isPrecisionOverridden: $isPrecisionOverridden
                 )
                 .frame(maxHeight: .infinity)
                 
@@ -214,18 +217,24 @@ struct EnhancedMapLocationPicker: View {
                 Text(QTHManager.calculateGridSquare(from: location, precision: mapPrecision))
                     .font(.system(.caption, design: .monospaced))
                     .foregroundColor(.secondary)
-                Spacer()
-                Text("\(mapPrecision) "
-                     + "map_grid_precision_chars".localized
-                     + " · "
-                     + "map_grid_resolution_\(mapPrecision)".localized)
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
             }
 
-            Text("map_grid_precision_hint".localized)
-                .font(.caption2)
-                .foregroundColor(.secondary)
+            HStack(spacing: 8) {
+                Text("map_grid_precision_label".localized)
+                    .font(.caption)
+                Picker("", selection: precisionPickerBinding) {
+                    ForEach([4, 6, 8, 10, 12], id: \.self) { p in
+                        Text("\(p)").tag(p)
+                    }
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                if isPrecisionOverridden {
+                    Button(action: resetPrecisionToAuto) {
+                        Image(systemName: "arrow.uturn.backward.circle")
+                    }
+                    .accessibilityLabel("map_grid_precision_auto".localized)
+                }
+            }
 
             TextField(LocalizedStrings.locationName.localized, text: $tempLocationName)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -234,6 +243,29 @@ struct EnhancedMapLocationPicker: View {
         .background(Color(.systemGray6))
         .cornerRadius(8)
         .padding()
+    }
+
+    /// 精度 Picker 的绑定：用户任何手动选择都会锁定精度（停止跟随缩放）。
+    /// 同时把地图缩放到对应级别并居中到当前所选位置，便于立即看到网格单元。
+    private var precisionPickerBinding: Binding<Int> {
+        Binding(
+            get: { mapPrecision },
+            set: { newValue in
+                mapPrecision = newValue
+                isPrecisionOverridden = true
+                let center = selectedLocation ?? region.center
+                region = MKCoordinateRegion(
+                    center: center,
+                    span: QTHManager.mapSpan(forPrecision: newValue)
+                )
+            }
+        )
+    }
+
+    /// 恢复为"跟随缩放"模式，并立即按当前缩放重算精度。
+    private func resetPrecisionToAuto() {
+        isPrecisionOverridden = false
+        mapPrecision = QTHManager.gridPrecision(forSpan: region.span)
     }
     
     private var emptyStatePanel: some View {
@@ -510,12 +542,17 @@ struct EnhancedInteractiveMapView: UIViewRepresentable {
     @Binding var showingSearchResults: Bool
     /// 根据当前缩放级别自适应选择的网格精度（由 regionDidChange 回写）
     @Binding var mapPrecision: Int
+    /// 用户是否手动超控了精度；为 true 时缩放不再改变 mapPrecision
+    @Binding var isPrecisionOverridden: Bool
 
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
         mapView.delegate = context.coordinator
         mapView.showsUserLocation = true
         mapView.userTrackingMode = .none
+        // 系统自带比例尺即能传达距离量级，无需在 UI 里再标注一遍精度的物理尺寸
+        mapView.showsScale = true
+        mapView.showsCompass = true
 
         // 允许缩放和平移
         mapView.isZoomEnabled = true
@@ -693,7 +730,8 @@ struct EnhancedInteractiveMapView: UIViewRepresentable {
         
         func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
             self.parent.region = mapView.region
-            // 根据当前缩放级别自适应选择网格精度
+            // 用户未超控时，跟随缩放自适应选择网格精度
+            guard !self.parent.isPrecisionOverridden else { return }
             let newPrecision = QTHManager.gridPrecision(forSpan: mapView.region.span)
             if newPrecision != self.parent.mapPrecision {
                 self.parent.mapPrecision = newPrecision
