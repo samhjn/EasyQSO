@@ -83,7 +83,11 @@
 "callsign_empty" = "콜사인을 입력해 주세요";
 "callsign_invalid" = "콜사인 형식이 올바르지 않습니다. 문자와/또는 숫자를 포함해야 합니다";
 "frequency_invalid" = "주파수 형식이 올바르지 않습니다. 유효한 숫자여야 합니다";
-"grid_square_invalid" = "그리드 로케이터 형식이 올바르지 않습니다. AB12cd 형식이어야 합니다";
+"grid_square_invalid" = "그리드 로케이터 형식이 올바르지 않습니다. 4/6/8/10/12자(예: AB12, AB12cd, AB12cd34, AB12cd34ef, AB12cd34ef56)여야 합니다.";
+
+// MARK: - 그리드 로케이터 정밀도 (지도 선택)
+"map_grid_precision_label" = "정밀도:";
+"map_grid_precision_auto" = "줌에 맞춤";
 "cq_zone_invalid" = "CQ Zone은 1~40 사이의 숫자여야 합니다";
 "itu_zone_invalid" = "ITU Zone은 1~90 사이의 숫자여야 합니다";
 

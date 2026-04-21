@@ -83,7 +83,11 @@
 "callsign_empty" = "L'indicatif ne peut pas être vide";
 "callsign_invalid" = "Format d'indicatif invalide, doit contenir des lettres et/ou des chiffres";
 "frequency_invalid" = "Format de fréquence invalide, doit être un nombre valide dans une plage raisonnable";
-"grid_square_invalid" = "Format de locator invalide, doit être au format AB12cd";
+"grid_square_invalid" = "Format de locator invalide. Doit comporter 4, 6, 8, 10 ou 12 caractères (par ex. AB12, AB12cd, AB12cd34, AB12cd34ef, AB12cd34ef56).";
+
+// MARK: - Précision du locator (sélecteur de carte)
+"map_grid_precision_label" = "Précision :";
+"map_grid_precision_auto" = "Suivre le zoom";
 "cq_zone_invalid" = "La zone CQ doit être un nombre entre 1 et 40";
 "itu_zone_invalid" = "La zone ITU doit être un nombre entre 1 et 90";
 

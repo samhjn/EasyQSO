@@ -83,7 +83,11 @@
 "callsign_empty" = "Rufzeichen darf nicht leer sein";
 "callsign_invalid" = "Ungültiges Rufzeichenformat, sollte Buchstaben und/oder Zahlen enthalten";
 "frequency_invalid" = "Ungültiges Frequenzformat, muss eine gültige Zahl in einem sinnvollen Bereich sein";
-"grid_square_invalid" = "Ungültiges Locator-Format, sollte AB12cd sein";
+"grid_square_invalid" = "Ungültiges Locator-Format. Muss 4, 6, 8, 10 oder 12 Zeichen lang sein (z. B. AB12, AB12cd, AB12cd34, AB12cd34ef, AB12cd34ef56).";
+
+// MARK: - Locator-Genauigkeit (Kartenauswahl)
+"map_grid_precision_label" = "Genauigkeit:";
+"map_grid_precision_auto" = "Zoom folgen";
 "cq_zone_invalid" = "CQ-Zone muss eine Zahl zwischen 1 und 40 sein";
 "itu_zone_invalid" = "ITU-Zone muss eine Zahl zwischen 1 und 90 sein";
 

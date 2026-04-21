@@ -83,7 +83,11 @@
 "callsign_empty" = "Callsign cannot be empty";
 "callsign_invalid" = "Invalid callsign format, should contain letters and/or numbers";
 "frequency_invalid" = "Invalid frequency format, should be a valid number within reasonable range";
-"grid_square_invalid" = "Invalid grid square format, should be AB12cd format";
+"grid_square_invalid" = "Invalid grid square format. Must be 4, 6, 8, 10, or 12 characters (e.g. AB12, AB12cd, AB12cd34, AB12cd34ef, AB12cd34ef56).";
+
+// MARK: - Grid Square Precision (map picker)
+"map_grid_precision_label" = "Precision:";
+"map_grid_precision_auto" = "Follow zoom";
 "cq_zone_invalid" = "CQ Zone should be a number between 1-40";
 "itu_zone_invalid" = "ITU Zone should be a number between 1-90";
 

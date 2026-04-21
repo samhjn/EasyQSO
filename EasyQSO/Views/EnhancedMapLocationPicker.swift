@@ -33,11 +33,15 @@ struct EnhancedMapLocationPicker: View {
     @Environment(\.presentationMode) var presentationMode
     
     @StateObject private var qthManager = QTHManager()
-    
+
     @State private var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 39.9042, longitude: 116.4074),
         span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
     )
+    /// 根据地图缩放自适应的网格精度（由 EnhancedInteractiveMapView 更新）
+    @State private var mapPrecision: Int = 6
+    /// 用户是否手动超控了精度；为 true 时缩放不会改变精度
+    @State private var isPrecisionOverridden: Bool = false
     @State private var annotations: [MapLocationAnnotation] = []
     @State private var tempLocationName = ""
     @State private var searchText = ""
@@ -72,7 +76,9 @@ struct EnhancedMapLocationPicker: View {
                     annotations: $annotations,
                     searchResults: $searchResults,
                     tempLocationName: $tempLocationName,
-                    showingSearchResults: $showingSearchResults
+                    showingSearchResults: $showingSearchResults,
+                    mapPrecision: $mapPrecision,
+                    isPrecisionOverridden: $isPrecisionOverridden
                 )
                 .frame(maxHeight: .infinity)
                 
@@ -99,7 +105,9 @@ struct EnhancedMapLocationPicker: View {
                             // 使用临时变量避免直接修改绑定
                             DispatchQueue.main.async {
                                 locationName = tempLocationName
-                                gridSquare = formatGridSquare(QTHManager.calculateGridSquare(from: location))
+                                gridSquare = GridSquareFormatter.format(
+                                    QTHManager.calculateGridSquare(from: location, precision: mapPrecision)
+                                )
                             }
                         }
                         presentationMode.wrappedValue.dismiss()
@@ -196,21 +204,38 @@ struct EnhancedMapLocationPicker: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("map_location_info".localized)
                 .font(.headline)
-            
+
             HStack {
                 Text("map_coordinates_label".localized)
                 Text("\(String(format: "%.4f", location.latitude)), \(String(format: "%.4f", location.longitude))")
                     .foregroundColor(.secondary)
             }
             .font(.caption)
-            
-            HStack {
+
+            HStack(spacing: 6) {
                 Text("map_grid_label".localized)
-                Text(formatGridSquare(QTHManager.calculateGridSquare(from: location)))
+                Text(QTHManager.calculateGridSquare(from: location, precision: mapPrecision))
+                    .font(.system(.caption, design: .monospaced))
                     .foregroundColor(.secondary)
             }
-            .font(.caption)
-            
+
+            HStack(spacing: 8) {
+                Text("map_grid_precision_label".localized)
+                    .font(.caption)
+                Picker("", selection: precisionPickerBinding) {
+                    ForEach([4, 6, 8, 10, 12], id: \.self) { p in
+                        Text("\(p)").tag(p)
+                    }
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                if isPrecisionOverridden {
+                    Button(action: resetPrecisionToAuto) {
+                        Image(systemName: "arrow.uturn.backward.circle")
+                    }
+                    .accessibilityLabel("map_grid_precision_auto".localized)
+                }
+            }
+
             TextField(LocalizedStrings.locationName.localized, text: $tempLocationName)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
         }
@@ -218,6 +243,29 @@ struct EnhancedMapLocationPicker: View {
         .background(Color(.systemGray6))
         .cornerRadius(8)
         .padding()
+    }
+
+    /// 精度 Picker 的绑定：用户任何手动选择都会锁定精度（停止跟随缩放）。
+    /// 同时把地图缩放到对应级别并居中到当前所选位置，便于立即看到网格单元。
+    private var precisionPickerBinding: Binding<Int> {
+        Binding(
+            get: { mapPrecision },
+            set: { newValue in
+                mapPrecision = newValue
+                isPrecisionOverridden = true
+                let center = selectedLocation ?? region.center
+                region = MKCoordinateRegion(
+                    center: center,
+                    span: QTHManager.mapSpan(forPrecision: newValue)
+                )
+            }
+        )
+    }
+
+    /// 恢复为"跟随缩放"模式，并立即按当前缩放重算精度。
+    private func resetPrecisionToAuto() {
+        isPrecisionOverridden = false
+        mapPrecision = QTHManager.gridPrecision(forSpan: region.span)
     }
     
     private var emptyStatePanel: some View {
@@ -273,12 +321,17 @@ struct EnhancedMapLocationPicker: View {
             let annotation = MapLocationAnnotation(coordinate: location)
             annotations = [annotation]
         } else if !gridSquare.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            // 如果没有选中位置但有网格坐标，从网格坐标计算中心位置
+            // 如果没有选中位置但有网格坐标：
+            // 1) 计算网格中心坐标
+            // 2) 根据网格精度反向设置合适的地图缩放级别（~4 个单元可见）
+            // 3) 同步 mapPrecision 以便初始显示时即为该精度
             let cleanedGrid = gridSquare.trimmingCharacters(in: .whitespacesAndNewlines)
             if let gridCoordinate = QTHManager.coordinateFromGridSquare(cleanedGrid) {
+                let existingPrecision = cleanedGrid.count
                 selectedLocation = gridCoordinate
                 region.center = gridCoordinate
-                region.span = MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
+                region.span = QTHManager.mapSpan(forPrecision: existingPrecision)
+                mapPrecision = existingPrecision
                 let annotation = MapLocationAnnotation(coordinate: gridCoordinate)
                 annotations = [annotation]
                 tempLocationName = locationName
@@ -477,19 +530,6 @@ struct EnhancedMapLocationPicker: View {
         }
     }
     
-    // 格式化网格坐标：前4位大写，后2位小写
-    private func formatGridSquare(_ input: String) -> String {
-        let cleaned = input.replacingOccurrences(of: " ", with: "")
-        if cleaned.count <= 4 {
-            return cleaned.uppercased()
-        } else if cleaned.count >= 6 {
-            let prefix = String(cleaned.prefix(4)).uppercased()
-            let suffix = String(cleaned.dropFirst(4).prefix(2)).lowercased()
-            return prefix + suffix
-        } else {
-            return cleaned.uppercased()
-        }
-    }
 }
 
 // 增强的交互式地图视图
@@ -500,23 +540,30 @@ struct EnhancedInteractiveMapView: UIViewRepresentable {
     @Binding var searchResults: [MKMapItem]
     @Binding var tempLocationName: String
     @Binding var showingSearchResults: Bool
-    
+    /// 根据当前缩放级别自适应选择的网格精度（由 regionDidChange 回写）
+    @Binding var mapPrecision: Int
+    /// 用户是否手动超控了精度；为 true 时缩放不再改变 mapPrecision
+    @Binding var isPrecisionOverridden: Bool
+
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
         mapView.delegate = context.coordinator
         mapView.showsUserLocation = true
         mapView.userTrackingMode = .none
-        
+        // 系统自带比例尺即能传达距离量级，无需在 UI 里再标注一遍精度的物理尺寸
+        mapView.showsScale = true
+        mapView.showsCompass = true
+
         // 允许缩放和平移
         mapView.isZoomEnabled = true
         mapView.isScrollEnabled = true
         mapView.isPitchEnabled = true
         mapView.isRotateEnabled = true
-        
+
         // 添加点击手势
         let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.mapTapped(_:)))
         mapView.addGestureRecognizer(tapGesture)
-        
+
         return mapView
     }
     
@@ -596,14 +643,34 @@ struct EnhancedInteractiveMapView: UIViewRepresentable {
         if searchNeedsUpdate {
             // 移除旧的搜索结果
             mapView.removeAnnotations(existingSearchAnnotations)
-            
+
             // 添加新的搜索结果
             if !newSearchAnnotations.isEmpty {
                 mapView.addAnnotations(newSearchAnnotations)
             }
         }
+
+        // 网格单元覆盖层：跟随所选位置和当前精度更新
+        updateGridCellOverlay(on: mapView)
     }
-    
+
+    /// 在地图上绘制包含所选位置的当前精度网格单元矩形。
+    /// 仅在选中位置时显示；无选中位置时移除。
+    private func updateGridCellOverlay(on mapView: MKMapView) {
+        // 移除历史网格覆盖层（用 title 判定，避免误删其它 MKOverlay）
+        let oldGridOverlays = mapView.overlays.compactMap { $0 as? GridCellOverlay }
+        if !oldGridOverlays.isEmpty {
+            mapView.removeOverlays(oldGridOverlays)
+        }
+
+        guard let location = selectedLocation,
+              let corners = QTHManager.gridCellCorners(for: location, precision: mapPrecision) else {
+            return
+        }
+        let overlay = GridCellOverlay(sw: corners.sw, ne: corners.ne)
+        mapView.addOverlay(overlay, level: .aboveLabels)
+    }
+
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
@@ -663,6 +730,23 @@ struct EnhancedInteractiveMapView: UIViewRepresentable {
         
         func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
             self.parent.region = mapView.region
+            // 用户未超控时，跟随缩放自适应选择网格精度
+            guard !self.parent.isPrecisionOverridden else { return }
+            let newPrecision = QTHManager.gridPrecision(forSpan: mapView.region.span)
+            if newPrecision != self.parent.mapPrecision {
+                self.parent.mapPrecision = newPrecision
+            }
+        }
+
+        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+            if let grid = overlay as? GridCellOverlay {
+                let renderer = MKPolygonRenderer(polygon: grid.polygon)
+                renderer.strokeColor = UIColor.systemBlue
+                renderer.lineWidth = 2
+                renderer.fillColor = UIColor.systemBlue.withAlphaComponent(0.12)
+                return renderer
+            }
+            return MKOverlayRenderer(overlay: overlay)
         }
         
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
@@ -782,4 +866,28 @@ struct EnhancedInteractiveMapView: UIViewRepresentable {
 struct MapLocationAnnotation: Identifiable {
     let id = UUID()
     let coordinate: CLLocationCoordinate2D
+}
+
+/// 代表当前选中位置所在 Maidenhead 网格单元的可视覆盖层。
+/// 继承 NSObject 并满足 MKOverlay，内部持有 MKPolygon 供 renderer 使用。
+final class GridCellOverlay: NSObject, MKOverlay {
+    let polygon: MKPolygon
+    let coordinate: CLLocationCoordinate2D
+    let boundingMapRect: MKMapRect
+
+    init(sw: CLLocationCoordinate2D, ne: CLLocationCoordinate2D) {
+        let corners = [
+            CLLocationCoordinate2D(latitude: sw.latitude, longitude: sw.longitude),
+            CLLocationCoordinate2D(latitude: sw.latitude, longitude: ne.longitude),
+            CLLocationCoordinate2D(latitude: ne.latitude, longitude: ne.longitude),
+            CLLocationCoordinate2D(latitude: ne.latitude, longitude: sw.longitude)
+        ]
+        self.polygon = MKPolygon(coordinates: corners, count: corners.count)
+        self.coordinate = CLLocationCoordinate2D(
+            latitude: (sw.latitude + ne.latitude) / 2.0,
+            longitude: (sw.longitude + ne.longitude) / 2.0
+        )
+        self.boundingMapRect = self.polygon.boundingMapRect
+        super.init()
+    }
 } 

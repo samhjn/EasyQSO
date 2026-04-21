@@ -566,7 +566,7 @@ struct EditQSOView: View {
         TextField(LocalizedStrings.gridSquare.localized, text: $gridSquare)
             .focused($focusedField, equals: "GRIDSQUARE")
             .onChange(of: gridSquare) { newValue in
-                gridSquare = formatGridSquare(newValue)
+                gridSquare = GridSquareFormatter.format(newValue)
             }
             .floatingLabel(LocalizedStrings.gridSquare.localized, text: gridSquare)
         
@@ -619,7 +619,7 @@ struct EditQSOView: View {
         TextField(LocalizedStrings.gridSquare.localized, text: $ownGridSquare)
             .focused($focusedField, equals: "MY_GRIDSQUARE")
             .onChange(of: ownGridSquare) { newValue in
-                ownGridSquare = formatGridSquare(newValue)
+                ownGridSquare = GridSquareFormatter.format(newValue)
             }
             .floatingLabel(LocalizedStrings.gridSquare.localized, text: ownGridSquare)
         
@@ -970,19 +970,6 @@ struct EditQSOView: View {
         let deg = Int(abs)
         let min = (abs - Double(deg)) * 60.0
         return String(format: "%@%03d %05.3f", dir, deg, min)
-    }
-    
-    private func formatGridSquare(_ input: String) -> String {
-        let cleaned = input.uppercased().replacingOccurrences(of: " ", with: "")
-        if cleaned.count <= 4 {
-            return cleaned
-        } else if cleaned.count >= 6 {
-            let prefix = String(cleaned.prefix(4))
-            let suffix = String(cleaned.dropFirst(4).prefix(2)).lowercased()
-            return prefix + suffix
-        } else {
-            return cleaned
-        }
     }
     
     // MARK: - Validation
