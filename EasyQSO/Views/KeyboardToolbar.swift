@@ -36,40 +36,55 @@ struct KeyboardToolbar: ToolbarContent {
 
     var body: some ToolbarContent {
         ToolbarItem(placement: .keyboard) {
-            VStack(spacing: 6) {
-                if shouldShowDigitRow {
-                    HStack(spacing: 4) {
-                        ForEach(0..<10, id: \.self) { digit in
-                            Button("\(digit)") {
-                                insertText("\(digit)")
-                            }
-                            .buttonStyle(.bordered)
-                            .frame(maxWidth: .infinity, minHeight: 36)
+            KeyboardToolbarContent(
+                focusedField: $focusedField,
+                orderedFields: orderedFields,
+                digitRowFieldIDs: digitRowFieldIDs
+            )
+        }
+    }
+}
+
+private struct KeyboardToolbarContent: View {
+    @FocusState.Binding var focusedField: String?
+    let orderedFields: [String]
+    let digitRowFieldIDs: Set<String>
+
+    var body: some View {
+        VStack(spacing: 6) {
+            if shouldShowDigitRow {
+                HStack(spacing: 4) {
+                    ForEach(0..<10, id: \.self) { digit in
+                        Button("\(digit)") {
+                            insertText("\(digit)")
                         }
+                        .buttonStyle(.bordered)
+                        .frame(maxWidth: .infinity, minHeight: 36)
                     }
-                }
-                HStack {
-                    Button(LocalizedStrings.previous.localized) {
-                        focusPreviousField()
-                    }
-                    .disabled(!canFocusPrevious())
-
-                    Spacer()
-
-                    Button(LocalizedStrings.next.localized) {
-                        focusNextField()
-                    }
-                    .disabled(!canFocusNext())
-
-                    Spacer()
-
-                    Button(LocalizedStrings.done.localized) {
-                        dismissKeyboard()
-                    }
-                    .font(.system(size: 17, weight: .bold))
                 }
             }
+            HStack {
+                Button(LocalizedStrings.previous.localized) {
+                    focusPreviousField()
+                }
+                .disabled(!canFocusPrevious())
+
+                Spacer()
+
+                Button(LocalizedStrings.next.localized) {
+                    focusNextField()
+                }
+                .disabled(!canFocusNext())
+
+                Spacer()
+
+                Button(LocalizedStrings.done.localized) {
+                    dismissKeyboard()
+                }
+                .font(.system(size: 17, weight: .bold))
+            }
         }
+        .frame(maxWidth: .infinity)
     }
 
     private var shouldShowDigitRow: Bool {
@@ -81,14 +96,14 @@ struct KeyboardToolbar: ToolbarContent {
         guard let responder = UIResponder.currentFirstResponder as? UIKeyInput else { return }
         responder.insertText(text)
     }
-    
+
     private func dismissKeyboard() {
         focusedField = nil
         UIApplication.shared.sendAction(
             #selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil
         )
     }
-    
+
     private func focusPreviousField() {
         guard let current = focusedField,
               let idx = orderedFields.firstIndex(of: current),
@@ -99,7 +114,7 @@ struct KeyboardToolbar: ToolbarContent {
             focusedField = target
         }
     }
-    
+
     private func focusNextField() {
         guard let current = focusedField,
               let idx = orderedFields.firstIndex(of: current),
@@ -110,13 +125,13 @@ struct KeyboardToolbar: ToolbarContent {
             focusedField = target
         }
     }
-    
+
     private func canFocusPrevious() -> Bool {
         guard let current = focusedField,
               let idx = orderedFields.firstIndex(of: current) else { return false }
         return idx > 0
     }
-    
+
     private func canFocusNext() -> Bool {
         guard let current = focusedField,
               let idx = orderedFields.firstIndex(of: current) else { return false }
