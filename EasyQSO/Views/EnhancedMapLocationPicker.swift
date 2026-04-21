@@ -218,6 +218,7 @@ struct EnhancedMapLocationPicker: View {
                     .font(.system(.caption, design: .monospaced))
                     .foregroundColor(.secondary)
             }
+            .font(.caption)
 
             HStack(spacing: 8) {
                 Text("map_grid_precision_label".localized)
@@ -314,34 +315,40 @@ struct EnhancedMapLocationPicker: View {
     // MARK: - 功能函数
     
     private func setupInitialState() {
-        if let location = selectedLocation {
-            // 如果已有选中位置，使用该位置
-            region.center = location
-            tempLocationName = locationName
-            let annotation = MapLocationAnnotation(coordinate: location)
-            annotations = [annotation]
-        } else if !gridSquare.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            // 如果没有选中位置但有网格坐标：
-            // 1) 计算网格中心坐标
-            // 2) 根据网格精度反向设置合适的地图缩放级别（~4 个单元可见）
-            // 3) 同步 mapPrecision 以便初始显示时即为该精度
-            let cleanedGrid = gridSquare.trimmingCharacters(in: .whitespacesAndNewlines)
-            if let gridCoordinate = QTHManager.coordinateFromGridSquare(cleanedGrid) {
-                let existingPrecision = cleanedGrid.count
-                selectedLocation = gridCoordinate
-                region.center = gridCoordinate
-                region.span = QTHManager.mapSpan(forPrecision: existingPrecision)
-                mapPrecision = existingPrecision
-                let annotation = MapLocationAnnotation(coordinate: gridCoordinate)
-                annotations = [annotation]
-                tempLocationName = locationName
+        // 永远同步外部传入的位置名
+        tempLocationName = locationName
+
+        let trimmedGrid = gridSquare.trimmingCharacters(in: .whitespacesAndNewlines)
+        let gridCoord = trimmedGrid.isEmpty
+            ? nil
+            : QTHManager.coordinateFromGridSquare(trimmedGrid)
+
+        // 情况一：用户输入了合法网格——以网格字符数为权威精度设置缩放级别。
+        // 中心优先保留已有 selectedLocation（常见场景：EditQSO 从已保存记录反推出的精确
+        // 坐标），但仅当其仍落在所输入的网格单元内才保留；否则回退到网格中心，确保
+        // 打开选择器后视窗内能完整看到用户指定的网格。
+        if !trimmedGrid.isEmpty, let gridCoord = gridCoord {
+            let precision = trimmedGrid.count
+            let center: CLLocationCoordinate2D
+            if let loc = selectedLocation,
+               QTHManager.calculateGridSquare(from: loc, precision: precision).lowercased()
+                == trimmedGrid.lowercased() {
+                center = loc
             } else {
-                // 网格坐标无效，使用默认位置
-                tempLocationName = locationName
+                center = gridCoord
             }
-        } else {
-            // 确保有默认的临时位置名称
-            tempLocationName = locationName
+            selectedLocation = center
+            region.center = center
+            region.span = QTHManager.mapSpan(forPrecision: precision)
+            mapPrecision = precision
+            annotations = [MapLocationAnnotation(coordinate: center)]
+            return
+        }
+
+        // 情况二：无合法网格但有已选位置——沿用该位置，保留默认缩放。
+        if let location = selectedLocation {
+            region.center = location
+            annotations = [MapLocationAnnotation(coordinate: location)]
         }
     }
     
