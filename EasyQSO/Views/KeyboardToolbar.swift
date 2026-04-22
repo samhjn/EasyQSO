@@ -19,41 +19,57 @@
 import SwiftUI
 import UIKit
 
-struct KeyboardToolbar: ToolbarContent {
+extension View {
+    /// 在 Form/ZStack 底部挂一个自绘的键盘工具栏：顶行为 Previous/Next/Done 导航，
+    /// 当焦点落在 `digitRowFieldIDs` 中的字段时追加一行贴着键盘的 0-9 数字按钮。
+    /// 使用 `.safeAreaInset(edge: .bottom)` 而非 `.toolbar(.keyboard)`，避开
+    /// iOS 26 对键盘工具栏的自动 liquid-glass 胶囊化处理。
+    func callsignKeyboardBar(
+        focusedField: FocusState<String?>.Binding,
+        orderedFields: [String],
+        digitRowFieldIDs: Set<String> = ["CALL", "GRIDSQUARE", "MY_GRIDSQUARE"]
+    ) -> some View {
+        modifier(
+            CallsignKeyboardBarModifier(
+                focusedField: focusedField,
+                orderedFields: orderedFields,
+                digitRowFieldIDs: digitRowFieldIDs
+            )
+        )
+    }
+}
+
+private struct CallsignKeyboardBarModifier: ViewModifier {
     @FocusState.Binding var focusedField: String?
     let orderedFields: [String]
     let digitRowFieldIDs: Set<String>
 
-    init(
-        focusedField: FocusState<String?>.Binding,
-        orderedFields: [String],
-        digitRowFieldIDs: Set<String> = ["CALL", "GRIDSQUARE", "MY_GRIDSQUARE"]
-    ) {
-        self._focusedField = focusedField
-        self.orderedFields = orderedFields
-        self.digitRowFieldIDs = digitRowFieldIDs
-    }
-
-    var body: some ToolbarContent {
-        ToolbarItem(placement: .keyboard) {
-            KeyboardToolbarContent(
-                currentFocus: focusedField,
-                focusedField: $focusedField,
-                orderedFields: orderedFields,
-                digitRowFieldIDs: digitRowFieldIDs
-            )
-        }
+    func body(content: Content) -> some View {
+        let currentFocus = focusedField
+        return content
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                if currentFocus != nil {
+                    KeyboardAccessoryBar(
+                        currentFocus: currentFocus,
+                        focusedField: $focusedField,
+                        orderedFields: orderedFields,
+                        digitRowFieldIDs: digitRowFieldIDs
+                    )
+                    .transition(.opacity)
+                }
+            }
+            .animation(.easeInOut(duration: 0.2), value: focusedField)
     }
 }
 
-private struct KeyboardToolbarContent: View {
+private struct KeyboardAccessoryBar: View {
     let currentFocus: String?
     @FocusState.Binding var focusedField: String?
     let orderedFields: [String]
     let digitRowFieldIDs: Set<String>
 
     var body: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 8) {
             HStack {
                 Button(LocalizedStrings.previous.localized) {
                     focusPreviousField()
@@ -79,22 +95,23 @@ private struct KeyboardToolbarContent: View {
                     ForEach(0..<10, id: \.self) { digit in
                         Button(action: { insertText("\(digit)") }) {
                             Text("\(digit)")
-                                .font(.system(size: 18, weight: .medium))
+                                .font(.system(size: 20, weight: .medium))
                                 .foregroundColor(.primary)
-                                .frame(maxWidth: .infinity, minHeight: 40)
+                                .frame(maxWidth: .infinity, minHeight: 42)
                                 .background(
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .fill(Color(.systemGray5))
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(Color(.tertiarySystemBackground))
                                 )
                         }
                         .buttonStyle(.plain)
                     }
                 }
-                .padding(.top, 24)
             }
         }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 4)
+        .background(.bar)
     }
 
     private var shouldShowDigitRow: Bool {

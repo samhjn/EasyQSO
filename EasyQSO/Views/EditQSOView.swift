@@ -479,8 +479,8 @@ struct EditQSOView: View {
                     }
                 }
             }
-            KeyboardToolbar(focusedField: $focusedField, orderedFields: keyboardOrderedFieldIDs)
         }
+        .callsignKeyboardBar(focusedField: $focusedField, orderedFields: keyboardOrderedFieldIDs)
         .alert(isPresented: $showingAlert) {
             Alert(
                 title: Text(alertTitle),

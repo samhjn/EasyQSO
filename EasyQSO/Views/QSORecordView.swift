@@ -437,9 +437,7 @@ struct QSORecordView: View {
             .animation(.easeInOut(duration: 0.2), value: focusedField)
         }
         .navigationTitle(LocalizedStrings.recordQSO.localized)
-        .toolbar {
-            KeyboardToolbar(focusedField: $focusedField, orderedFields: keyboardOrderedFieldIDs)
-        }
+        .callsignKeyboardBar(focusedField: $focusedField, orderedFields: keyboardOrderedFieldIDs)
         .background(
             EmptyView()
                 .alert(isPresented: $showingAlert) {
