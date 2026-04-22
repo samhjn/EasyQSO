@@ -53,7 +53,7 @@ private struct KeyboardToolbarContent: View {
     let digitRowFieldIDs: Set<String>
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 0) {
             HStack {
                 Button(LocalizedStrings.previous.localized) {
                     focusPreviousField()
@@ -90,6 +90,7 @@ private struct KeyboardToolbarContent: View {
                         .buttonStyle(.plain)
                     }
                 }
+                .padding(.top, 24)
             }
         }
         .frame(maxWidth: .infinity)
