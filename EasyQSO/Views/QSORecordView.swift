@@ -402,35 +402,39 @@ struct QSORecordView: View {
             
             VStack {
                 Spacer()
-                
-                Button(action: {
-                    focusedField = nil
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                        if validateInputs() {
-                            saveQSO()
+
+                if focusedField == nil {
+                    Button(action: {
+                        focusedField = nil
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            if validateInputs() {
+                                saveQSO()
+                            }
                         }
+                    }) {
+                        Text(LocalizedStrings.saveQSO.localized)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 50)
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(12)
                     }
-                }) {
-                    Text(LocalizedStrings.saveQSO.localized)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 50)
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(12)
-                }
-                .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
-                .padding(.horizontal, 16)
-                .padding(.bottom, 8)
-                .background(
-                    LinearGradient(
-                        colors: [Color.clear, Color(UIColor.systemBackground).opacity(0.9)],
-                        startPoint: .top,
-                        endPoint: .bottom
+                    .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
+                    .background(
+                        LinearGradient(
+                            colors: [Color.clear, Color(UIColor.systemBackground).opacity(0.9)],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .frame(height: 100)
                     )
-                    .frame(height: 100)
-                )
+                    .transition(.opacity)
+                }
             }
-            .allowsHitTesting(true)
+            .allowsHitTesting(focusedField == nil)
+            .animation(.easeInOut(duration: 0.2), value: focusedField)
         }
         .navigationTitle(LocalizedStrings.recordQSO.localized)
         .toolbar {
