@@ -116,7 +116,9 @@ private struct KeyboardAccessoryBar: View {
                 .padding(.bottom, 4)
             }
         }
+        .padding(.horizontal, 10)
         .frame(maxWidth: .infinity)
+        .background(Color(UIColor.systemBackground).opacity(0.95))
     }
 
     private var shouldShowDigitRow: Bool {
