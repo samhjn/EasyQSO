@@ -69,27 +69,33 @@ private struct KeyboardAccessoryBar: View {
     let digitRowFieldIDs: Set<String>
 
     var body: some View {
-        VStack(spacing: 8) {
-            HStack {
+        VStack(spacing: 6) {
+            HStack(spacing: 24) {
                 Button(LocalizedStrings.previous.localized) {
                     focusPreviousField()
                 }
                 .disabled(!canFocusPrevious())
-
-                Spacer()
 
                 Button(LocalizedStrings.next.localized) {
                     focusNextField()
                 }
                 .disabled(!canFocusNext())
 
-                Spacer()
-
                 Button(LocalizedStrings.done.localized) {
                     dismissKeyboard()
                 }
                 .font(.system(size: 17, weight: .bold))
             }
+            .padding(.horizontal, 24)
+            .padding(.vertical, 10)
+            .background(.regularMaterial, in: Capsule())
+            .overlay(
+                Capsule()
+                    .strokeBorder(Color.white.opacity(0.25), lineWidth: 0.5)
+            )
+            .shadow(color: .black.opacity(0.12), radius: 8, x: 0, y: 2)
+            .padding(.top, 4)
+
             if shouldShowDigitRow {
                 HStack(spacing: 6) {
                     ForEach(0..<10, id: \.self) { digit in
@@ -97,21 +103,20 @@ private struct KeyboardAccessoryBar: View {
                             Text("\(digit)")
                                 .font(.system(size: 20, weight: .medium))
                                 .foregroundColor(.primary)
-                                .frame(maxWidth: .infinity, minHeight: 42)
+                                .frame(maxWidth: .infinity, minHeight: 40)
                                 .background(
-                                    RoundedRectangle(cornerRadius: 8)
+                                    RoundedRectangle(cornerRadius: 6)
                                         .fill(Color(.tertiarySystemBackground))
                                 )
                         }
                         .buttonStyle(.plain)
                     }
                 }
+                .padding(.horizontal, 4)
+                .padding(.bottom, 4)
             }
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
         .frame(maxWidth: .infinity)
-        .background(.bar)
     }
 
     private var shouldShowDigitRow: Bool {
