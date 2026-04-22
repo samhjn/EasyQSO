@@ -27,7 +27,7 @@ struct KeyboardToolbar: ToolbarContent {
     init(
         focusedField: FocusState<String?>.Binding,
         orderedFields: [String],
-        digitRowFieldIDs: Set<String> = ["CALL"]
+        digitRowFieldIDs: Set<String> = ["CALL", "GRIDSQUARE", "MY_GRIDSQUARE"]
     ) {
         self._focusedField = focusedField
         self.orderedFields = orderedFields
@@ -52,17 +52,6 @@ private struct KeyboardToolbarContent: View {
 
     var body: some View {
         VStack(spacing: 6) {
-            if shouldShowDigitRow {
-                HStack(spacing: 4) {
-                    ForEach(0..<10, id: \.self) { digit in
-                        Button("\(digit)") {
-                            insertText("\(digit)")
-                        }
-                        .buttonStyle(.bordered)
-                        .frame(maxWidth: .infinity, minHeight: 36)
-                    }
-                }
-            }
             HStack {
                 Button(LocalizedStrings.previous.localized) {
                     focusPreviousField()
@@ -82,6 +71,17 @@ private struct KeyboardToolbarContent: View {
                     dismissKeyboard()
                 }
                 .font(.system(size: 17, weight: .bold))
+            }
+            if shouldShowDigitRow {
+                HStack(spacing: 4) {
+                    ForEach(0..<10, id: \.self) { digit in
+                        Button("\(digit)") {
+                            insertText("\(digit)")
+                        }
+                        .buttonStyle(.bordered)
+                        .frame(maxWidth: .infinity, minHeight: 36)
+                    }
+                }
             }
         }
         .frame(maxWidth: .infinity)

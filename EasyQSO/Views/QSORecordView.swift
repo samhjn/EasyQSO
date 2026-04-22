@@ -238,6 +238,7 @@ struct QSORecordView: View {
                 // ═══════════ Basic Info ═══════════
                 Section(header: Text(LocalizedStrings.basicInfo.localized)) {
                     TextField(LocalizedStrings.callsign.localized, text: $callsign)
+                        .keyboardType(.asciiCapable)
                         .autocapitalization(.allCharacters)
                         .focused($focusedField, equals: "CALL")
                         .onChange(of: callsign) { newValue in
@@ -528,6 +529,8 @@ struct QSORecordView: View {
         }
         
         TextField(LocalizedStrings.gridSquare.localized, text: $gridSquare)
+            .keyboardType(.asciiCapable)
+            .autocapitalization(.allCharacters)
             .focused($focusedField, equals: "GRIDSQUARE")
             .onChange(of: gridSquare) { newValue in
                 gridSquare = GridSquareFormatter.format(newValue)
@@ -580,6 +583,8 @@ struct QSORecordView: View {
         }
 
         TextField(LocalizedStrings.gridSquare.localized, text: $ownGridSquare)
+            .keyboardType(.asciiCapable)
+            .autocapitalization(.allCharacters)
             .focused($focusedField, equals: "MY_GRIDSQUARE")
             .onChange(of: ownGridSquare) { newValue in
                 ownGridSquare = GridSquareFormatter.format(newValue)
