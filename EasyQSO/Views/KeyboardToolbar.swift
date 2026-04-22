@@ -37,6 +37,7 @@ struct KeyboardToolbar: ToolbarContent {
     var body: some ToolbarContent {
         ToolbarItem(placement: .keyboard) {
             KeyboardToolbarContent(
+                currentFocus: focusedField,
                 focusedField: $focusedField,
                 orderedFields: orderedFields,
                 digitRowFieldIDs: digitRowFieldIDs
@@ -46,12 +47,13 @@ struct KeyboardToolbar: ToolbarContent {
 }
 
 private struct KeyboardToolbarContent: View {
+    let currentFocus: String?
     @FocusState.Binding var focusedField: String?
     let orderedFields: [String]
     let digitRowFieldIDs: Set<String>
 
     var body: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 8) {
             HStack {
                 Button(LocalizedStrings.previous.localized) {
                     focusPreviousField()
@@ -73,22 +75,29 @@ private struct KeyboardToolbarContent: View {
                 .font(.system(size: 17, weight: .bold))
             }
             if shouldShowDigitRow {
-                HStack(spacing: 4) {
+                HStack(spacing: 6) {
                     ForEach(0..<10, id: \.self) { digit in
-                        Button("\(digit)") {
-                            insertText("\(digit)")
+                        Button(action: { insertText("\(digit)") }) {
+                            Text("\(digit)")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(.primary)
+                                .frame(maxWidth: .infinity, minHeight: 40)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .fill(Color(.systemGray5))
+                                )
                         }
-                        .buttonStyle(.bordered)
-                        .frame(maxWidth: .infinity, minHeight: 36)
+                        .buttonStyle(.plain)
                     }
                 }
             }
         }
         .frame(maxWidth: .infinity)
+        .padding(.vertical, 4)
     }
 
     private var shouldShowDigitRow: Bool {
-        guard let current = focusedField else { return false }
+        guard let current = currentFocus else { return false }
         return digitRowFieldIDs.contains(current)
     }
 
