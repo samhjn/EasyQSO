@@ -680,6 +680,7 @@ struct EditQSOView: View {
                 }
                 if hasTxPwr {
                     TextField("adif_field_tx_pwr".localized, text: $txPower)
+                        .keyboardType(.decimalPad)
                         .focused($focusedField, equals: "TX_PWR")
                         .floatingLabel("adif_field_tx_pwr".localized, text: txPower)
                 }
