@@ -104,6 +104,7 @@ struct ADIFDynamicFieldRows: View {
     var isFieldAutoFilled: ((String) -> Bool)? = nil
 
     private static let dxccFieldIds: Set<String> = ["DXCC", "MY_DXCC"]
+    private static let decimalPadFieldIds: Set<String> = ["RX_PWR"]
 
     var body: some View {
         let visible = visibilityManager.visibleFields(for: category).filter {
@@ -117,6 +118,7 @@ struct ADIFDynamicFieldRows: View {
                 ContestFieldRow(selectedContest: bindingFor(field.id), label: field.displayName)
             } else {
                 TextField(field.displayName, text: bindingFor(field.id))
+                    .keyboardType(Self.decimalPadFieldIds.contains(field.id) ? .decimalPad : .default)
                     .focused($focusedField, equals: field.id)
                     .floatingLabel(field.displayName, text: extendedFields[field.id] ?? "")
             }
@@ -168,6 +170,7 @@ struct ADIFCollapsedFieldsSection: View {
     @FocusState.Binding var focusedField: String?
 
     private let dxccFieldIds: Set<String> = ["DXCC", "MY_DXCC"]
+    private let decimalPadFieldIds: Set<String> = ["RX_PWR"]
 
     var body: some View {
         let allCollapsed = visibilityManager.allCollapsedFields()
@@ -192,6 +195,7 @@ struct ADIFCollapsedFieldsSection: View {
                                     ContestFieldRow(selectedContest: bindingFor(field.id), label: field.displayName)
                                 } else {
                                     TextField(field.displayName, text: bindingFor(field.id))
+                                        .keyboardType(decimalPadFieldIds.contains(field.id) ? .decimalPad : .default)
                                         .focused($focusedField, equals: field.id)
                                         .floatingLabel(field.displayName, text: extendedFields[field.id] ?? "")
                                 }

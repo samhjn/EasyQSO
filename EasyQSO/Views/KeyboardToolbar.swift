@@ -27,13 +27,19 @@ extension View {
     func callsignKeyboardBar(
         focusedField: FocusState<String?>.Binding,
         orderedFields: [String],
-        digitRowFieldIDs: Set<String> = ["CALL", "GRIDSQUARE", "MY_GRIDSQUARE"]
+        digitRowFieldIDs: Set<String> = [
+            "CALL", "STATION_CALLSIGN", "OPERATOR", "CONTACTED_OP", "EQ_CALL",
+            "GRIDSQUARE", "MY_GRIDSQUARE", "VUCC_GRIDS", "MY_VUCC_GRIDS",
+            "RST_SENT", "RST_RCVD"
+        ],
+        skipFieldIDs: Set<String> = ["SAT_NAME", "DXCC", "MY_DXCC", "CONTEST_ID"]
     ) -> some View {
         modifier(
             CallsignKeyboardBarModifier(
                 focusedField: focusedField,
                 orderedFields: orderedFields,
-                digitRowFieldIDs: digitRowFieldIDs
+                digitRowFieldIDs: digitRowFieldIDs,
+                skipFieldIDs: skipFieldIDs
             )
         )
     }
@@ -43,6 +49,7 @@ private struct CallsignKeyboardBarModifier: ViewModifier {
     @FocusState.Binding var focusedField: String?
     let orderedFields: [String]
     let digitRowFieldIDs: Set<String>
+    let skipFieldIDs: Set<String>
 
     func body(content: Content) -> some View {
         let currentFocus = focusedField
@@ -53,7 +60,8 @@ private struct CallsignKeyboardBarModifier: ViewModifier {
                         currentFocus: currentFocus,
                         focusedField: $focusedField,
                         orderedFields: orderedFields,
-                        digitRowFieldIDs: digitRowFieldIDs
+                        digitRowFieldIDs: digitRowFieldIDs,
+                        skipFieldIDs: skipFieldIDs
                     )
                     .transition(.opacity)
                 }
@@ -67,6 +75,7 @@ private struct KeyboardAccessoryBar: View {
     @FocusState.Binding var focusedField: String?
     let orderedFields: [String]
     let digitRowFieldIDs: Set<String>
+    let skipFieldIDs: Set<String>
 
     var body: some View {
         VStack(spacing: 6) {
@@ -139,29 +148,39 @@ private struct KeyboardAccessoryBar: View {
     }
 
     private func focusPreviousField() {
-        guard let current = focusedField,
-              let idx = orderedFields.firstIndex(of: current),
-              idx > 0 else { return }
-        focusedField = orderedFields[idx - 1]
+        guard let target = neighborFieldID(direction: -1) else { return }
+        focusedField = target
     }
 
     private func focusNextField() {
-        guard let current = focusedField,
-              let idx = orderedFields.firstIndex(of: current),
-              idx < orderedFields.count - 1 else { return }
-        focusedField = orderedFields[idx + 1]
+        guard let target = neighborFieldID(direction: 1) else { return }
+        focusedField = target
     }
 
     private func canFocusPrevious() -> Bool {
-        guard let current = focusedField,
-              let idx = orderedFields.firstIndex(of: current) else { return false }
-        return idx > 0
+        neighborFieldID(direction: -1) != nil
     }
 
     private func canFocusNext() -> Bool {
+        neighborFieldID(direction: 1) != nil
+    }
+
+    /// Walk `orderedFields` from the current focus toward `direction` and return
+    /// the first field that isn't in `skipFieldIDs`. Pickers / date rows / non-
+    /// text rows registered in the ordered list are transparently jumped over
+    /// so Previous/Next only lands on places where the keyboard is useful.
+    private func neighborFieldID(direction: Int) -> String? {
         guard let current = focusedField,
-              let idx = orderedFields.firstIndex(of: current) else { return false }
-        return idx < orderedFields.count - 1
+              let currentIdx = orderedFields.firstIndex(of: current) else { return nil }
+        var idx = currentIdx + direction
+        while idx >= 0 && idx < orderedFields.count {
+            let candidate = orderedFields[idx]
+            if !skipFieldIDs.contains(candidate) {
+                return candidate
+            }
+            idx += direction
+        }
+        return nil
     }
 }
 

@@ -644,6 +644,7 @@ struct QSORecordView: View {
                 }
                 if hasTxPwr {
                     TextField("adif_field_tx_pwr".localized, text: $txPower)
+                        .keyboardType(.decimalPad)
                         .focused($focusedField, equals: "TX_PWR")
                         .onChange(of: txPower) { _ in autoFillEngine.trackFieldChange("TX_PWR", newValue: txPower) }
                         .autoFillLabel("adif_field_tx_pwr".localized, text: txPower, isAutoFilled: autoFillEngine.isAutoFilled("TX_PWR"))
