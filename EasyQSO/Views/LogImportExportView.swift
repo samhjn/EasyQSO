@@ -613,6 +613,12 @@ extension UTType {
     static var csvType: UTType {
         UTType(importedAs: "public.comma-separated-values-text")
     }
+    // iOS 内置将 .adx 识别为 CRI ADX 音频，会与我们的 com.hamradio.adx 冲突，
+    // 导致文件选择器将 ADIF XML 文件归类为音频而无法被勾选。
+    // 在导入时显式接受该类型，让用户仍能选中真实的 .adx 文件。
+    static var criAdxAudioType: UTType? {
+        UTType("public.cri-adx-audio")
+    }
 }
 
 // 导出文档
