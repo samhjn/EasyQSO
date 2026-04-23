@@ -511,7 +511,7 @@ struct SettingsView: View {
             }
             .fileImporter(
                 isPresented: $showingImportPicker,
-                allowedContentTypes: [.adifType, .adxType, .csvType],
+                allowedContentTypes: [.adifType, .adxType, .csvType, .xml],
                 allowsMultipleSelection: false
             ) { result in
                 switch result {
