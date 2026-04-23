@@ -142,22 +142,14 @@ private struct KeyboardAccessoryBar: View {
         guard let current = focusedField,
               let idx = orderedFields.firstIndex(of: current),
               idx > 0 else { return }
-        let target = orderedFields[idx - 1]
-        focusedField = nil
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-            focusedField = target
-        }
+        focusedField = orderedFields[idx - 1]
     }
 
     private func focusNextField() {
         guard let current = focusedField,
               let idx = orderedFields.firstIndex(of: current),
               idx < orderedFields.count - 1 else { return }
-        let target = orderedFields[idx + 1]
-        focusedField = nil
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-            focusedField = target
-        }
+        focusedField = orderedFields[idx + 1]
     }
 
     private func canFocusPrevious() -> Bool {
