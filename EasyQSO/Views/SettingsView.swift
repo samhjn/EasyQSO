@@ -362,7 +362,7 @@ struct SettingsView: View {
                             if #available(iOS 15.0, *) {
                                 showingImportPicker = true
                             } else {
-                                presentLegacyDocumentPicker(fileType: "adi")
+                                presentLegacyDocumentPicker()
                             }
                         }
 
@@ -370,7 +370,7 @@ struct SettingsView: View {
                             if #available(iOS 15.0, *) {
                                 showingImportPicker = true
                             } else {
-                                presentLegacyDocumentPicker(fileType: "adx")
+                                presentLegacyDocumentPicker()
                             }
                         }
 
@@ -378,7 +378,7 @@ struct SettingsView: View {
                             if #available(iOS 15.0, *) {
                                 showingImportPicker = true
                             } else {
-                                presentLegacyDocumentPicker(fileType: "csv")
+                                presentLegacyDocumentPicker()
                             }
                         }
                     }
@@ -511,7 +511,7 @@ struct SettingsView: View {
             }
             .fileImporter(
                 isPresented: $showingImportPicker,
-                allowedContentTypes: importPickerContentTypes,
+                allowedContentTypes: [.data],
                 allowsMultipleSelection: false
             ) { result in
                 switch result {
@@ -693,36 +693,12 @@ struct SettingsView: View {
         topController.present(activityVC, animated: true)
     }
     
-    private var importPickerContentTypes: [UTType] {
-        // .xml 兜底：来自 iCloud/邮件等未关联到 com.hamradio.adx 的 ADX 文件会被
-        // iOS 归类为通用 XML。
-        // public.cri-adx-audio 兜底：iOS 内置把 .adx 优先识别为 CRI ADX 音频，
-        // 我们的 com.hamradio.adx 声明会被它压过，需要显式接受这个音频类型，
-        // 否则文件选择器会把 ADIF XML 文件灰掉无法选中。
-        var types: [UTType] = [.adifType, .adxType, .csvType, .xml]
-        if let criAdx = UTType.criAdxAudioType {
-            types.append(criAdx)
-        }
-        return types
-    }
-
-    private func presentLegacyDocumentPicker(fileType: String) {
+    private func presentLegacyDocumentPicker() {
         DispatchQueue.main.async {
-            let contentTypes: [UTType]
-            switch fileType {
-            case "adi":
-                contentTypes = [UTType("com.hamradio.adif") ?? .text, .text]
-            case "adx":
-                var adxTypes: [UTType] = [UTType("com.hamradio.adx") ?? .xml, .xml]
-                if let criAdx = UTType.criAdxAudioType {
-                    adxTypes.append(criAdx)
-                }
-                contentTypes = adxTypes
-            default:
-                contentTypes = [.commaSeparatedText, .text]
-            }
-
-            let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: contentTypes)
+            // .adx 与 Apple 内置的 CRI ADX 音频 UTI 抢扩展名，按 com.hamradio.adx
+            // 或 public.xml 过滤都会把 ADIF XML 文件灰掉。改为放开类型限制，
+            // 选完后由 importDataByExtension 按扩展名分派到对应解析器。
+            let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [.data])
             documentPicker.delegate = documentPickerDelegate
             documentPicker.allowsMultipleSelection = false
 
