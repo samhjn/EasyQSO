@@ -341,6 +341,11 @@ struct EnhancedMapLocationPicker: View {
             region.center = center
             region.span = QTHManager.mapSpan(forPrecision: precision)
             mapPrecision = precision
+            // MKMapView 会按视图纵横比扩展 setRegion 传入的 span（手机竖屏会把纬度跨度
+            // 扩到 ~2 倍），扩展后落入 regionDidChangeAnimated 重算的 gridPrecision 往往
+            // 比用户输入的网格字符数低一级（如 6 字符被回退到 4 字符），导致绘制的网格
+            // 单元远大于用户意图。锁定精度让其忠于用户输入；用户可点 reset 箭头恢复跟随。
+            isPrecisionOverridden = true
             annotations = [MapLocationAnnotation(coordinate: center)]
             return
         }
