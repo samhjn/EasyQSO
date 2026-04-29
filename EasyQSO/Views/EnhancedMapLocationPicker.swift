@@ -268,6 +268,17 @@ struct EnhancedMapLocationPicker: View {
         isPrecisionOverridden = false
         mapPrecision = QTHManager.gridPrecision(forSpan: region.span)
     }
+
+    /// 把地图视窗切换到指定中心/缩放，同步把 mapPrecision 调整到与新缩放对应的精度，
+    /// 避免出现"地图已放大到街道级但 cell 仍按上一次的精度绘制"的视觉错位。
+    /// `regionDidChangeAnimated` 在地图渲染完成后会再次同步，但这里立即更新可以让覆盖
+    /// 层在动画起始时就匹配新缩放，不会先闪一帧巨大或过小的 cell。
+    private func updateRegion(center: CLLocationCoordinate2D, span: MKCoordinateSpan) {
+        region = MKCoordinateRegion(center: center, span: span)
+        if !isPrecisionOverridden {
+            mapPrecision = QTHManager.gridPrecision(forSpan: span)
+        }
+    }
     
     private var emptyStatePanel: some View {
         VStack {
@@ -397,9 +408,9 @@ struct EnhancedMapLocationPicker: View {
         }
         
         // 更新地图区域
-        region.center = coordinate
-        region.span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-        
+        updateRegion(center: coordinate,
+                     span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+
         // 添加标注
         annotations.removeAll()
         let annotation = MapLocationAnnotation(coordinate: coordinate)
@@ -429,31 +440,31 @@ struct EnhancedMapLocationPicker: View {
                     if self.editMode == .ownQTH {
                         // 己方QTH：预填坐标和位置信息
                         self.selectedLocation = coordinate
-                        self.region.center = coordinate
-                        self.region.span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-                        
+                        self.updateRegion(center: coordinate,
+                                          span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+
                         // 清除现有标注
                         self.annotations.removeAll()
-                        
+
                         // 添加新标注
                         let annotation = MapLocationAnnotation(coordinate: coordinate)
                         self.annotations.append(annotation)
-                        
+
                         // 反向地理编码获取位置名称
                         self.reverseGeocodeLocation(coordinate) { locationName in
                             DispatchQueue.main.async {
                                 self.tempLocationName = locationName
                             }
                         }
-                        
+
                         // 提供触觉反馈，让用户知道定位成功
                         let impactFeedback = UIImpactFeedbackGenerator(style: .light)
                         impactFeedback.impactOccurred()
                                          } else {
                          // 对方QTH：只切换地图位置，不预填
-                         self.region.center = coordinate
-                         self.region.span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-                         
+                         self.updateRegion(center: coordinate,
+                                           span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+
                          // 提供触觉反馈，让用户知道地图已切换到当前位置
                          let impactFeedback = UIImpactFeedbackGenerator(style: .light)
                          impactFeedback.impactOccurred()
@@ -488,16 +499,16 @@ struct EnhancedMapLocationPicker: View {
                     if self.editMode == .ownQTH {
                         // 己方QTH：预填坐标和位置信息
                         self.selectedLocation = coordinate
-                        self.region.center = coordinate
-                        self.region.span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-                        
+                        self.updateRegion(center: coordinate,
+                                          span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+
                         // 清除现有标注
                         self.annotations.removeAll()
-                        
+
                         // 添加新标注
                         let annotation = MapLocationAnnotation(coordinate: coordinate)
                         self.annotations.append(annotation)
-                        
+
                         // 反向地理编码获取位置名称
                         self.reverseGeocodeLocation(coordinate) { locationName in
                             DispatchQueue.main.async {
@@ -506,8 +517,8 @@ struct EnhancedMapLocationPicker: View {
                         }
                     } else {
                         // 对方QTH：只切换地图位置
-                        self.region.center = coordinate
-                        self.region.span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+                        self.updateRegion(center: coordinate,
+                                          span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
                     }
                 }
                 // 自动获取失败时不显示任何提示
