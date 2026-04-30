@@ -583,8 +583,13 @@ struct EnhancedInteractiveMapView: UIViewRepresentable {
         mapView.isPitchEnabled = true
         mapView.isRotateEnabled = true
 
-        // 添加点击手势
+        // 添加点击手势；需要与双击手势协调，否则单击识别会吞掉双击缩放的第一次 tap
+        let doubleTap = UITapGestureRecognizer()
+        doubleTap.numberOfTapsRequired = 2
+        mapView.addGestureRecognizer(doubleTap)
+
         let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.mapTapped(_:)))
+        tapGesture.require(toFail: doubleTap)
         mapView.addGestureRecognizer(tapGesture)
 
         return mapView
