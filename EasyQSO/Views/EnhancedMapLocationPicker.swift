@@ -704,12 +704,29 @@ struct EnhancedInteractiveMapView: UIViewRepresentable {
         init(_ parent: EnhancedInteractiveMapView) {
             self.parent = parent
         }
-        
+
+        /// 把 mapPrecision 拉齐到地图当前真正显示的 span 对应的精度。
+        /// 用户已手动锁定精度时不动。
+        fileprivate func syncPrecisionToCurrentSpan(_ mapView: MKMapView) {
+            guard !self.parent.isPrecisionOverridden else { return }
+            let p = QTHManager.gridPrecision(forSpan: mapView.region.span)
+            if p != self.parent.mapPrecision {
+                self.parent.mapPrecision = p
+            }
+        }
+
         @objc func mapTapped(_ gesture: UITapGestureRecognizer) {
             let mapView = gesture.view as! MKMapView
             let touchPoint = gesture.location(in: mapView)
             let coordinate = mapView.convert(touchPoint, toCoordinateFrom: mapView)
-            
+
+            // 写入 selectedLocation 前先按地图当前实际缩放刷新一次精度。
+            // 否则在初始动画期间 regionDidChangeAnimated 可能尚未把精度从更宽跨度
+            // (例如 MKMapView 默认世界视图回调过的 4 字符)收敛到当前显示对应的精度，
+            // 用户一点屏幕，cell 与精度选择器就锁定在那个过期值上，与肉眼可见的
+            // 比例尺不符。tap 这个用户操作正是同步当前缩放精度的最佳时机。
+            self.syncPrecisionToCurrentSpan(mapView)
+
             // 更新选中位置
             self.parent.selectedLocation = coordinate
             
@@ -854,7 +871,11 @@ struct EnhancedInteractiveMapView: UIViewRepresentable {
             if let annotation = view.annotation,
                let title = annotation.title as? String,
                !title.isEmpty && title != "SELECTED" {
-                
+
+                // 同 mapTapped：在 selectedLocation 落点前先把精度对齐到当前缩放，
+                // 避免 callout 选中时沿用初始/过期 mapPrecision 绘制。
+                self.syncPrecisionToCurrentSpan(mapView)
+
                 // 选择这个搜索结果
                 self.parent.selectedLocation = annotation.coordinate
                 
