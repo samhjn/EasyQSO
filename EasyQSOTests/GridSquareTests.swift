@@ -355,4 +355,17 @@ final class GridSquareTests: XCTestCase {
             XCTAssertEqual(corners.ne.longitude - corners.sw.longitude, cellLat * 2.0, accuracy: 1e-9)
         }
     }
+
+    /// Regression: EnhancedMapLocationPicker hardcodes a 0.01°/0.01° span when
+    /// auto-locating, manually locating, or selecting a search result, and the
+    /// picker now derives mapPrecision via gridPrecision(forSpan:) at the same
+    /// moment so the cell overlay doesn't draw at a stale precision. That sync
+    /// assumes 0.01° lat resolves to 8 chars. The 6/8 boundary lives at
+    /// 1/48 ≈ 0.02083°, so 0.01° is comfortably inside the 8-char band — but
+    /// this test pins the exact span the picker uses to guard against future
+    /// drift if someone tweaks the constant or the boundary table.
+    func testGridPrecisionForSpan_locateMeSpanResolvesToEightChars() {
+        let locateMeSpan = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+        XCTAssertEqual(QTHManager.gridPrecision(forSpan: locateMeSpan), 8)
+    }
 }

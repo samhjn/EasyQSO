@@ -268,6 +268,17 @@ struct EnhancedMapLocationPicker: View {
         isPrecisionOverridden = false
         mapPrecision = QTHManager.gridPrecision(forSpan: region.span)
     }
+
+    /// 把地图视窗切换到指定中心/缩放，同步把 mapPrecision 调整到与新缩放对应的精度，
+    /// 避免出现"地图已放大到街道级但 cell 仍按上一次的精度绘制"的视觉错位。
+    /// `regionDidChangeAnimated` 在地图渲染完成后会再次同步，但这里立即更新可以让覆盖
+    /// 层在动画起始时就匹配新缩放，不会先闪一帧巨大或过小的 cell。
+    private func updateRegion(center: CLLocationCoordinate2D, span: MKCoordinateSpan) {
+        region = MKCoordinateRegion(center: center, span: span)
+        if !isPrecisionOverridden {
+            mapPrecision = QTHManager.gridPrecision(forSpan: span)
+        }
+    }
     
     private var emptyStatePanel: some View {
         VStack {
@@ -341,6 +352,11 @@ struct EnhancedMapLocationPicker: View {
             region.center = center
             region.span = QTHManager.mapSpan(forPrecision: precision)
             mapPrecision = precision
+            // MKMapView 会按视图纵横比扩展 setRegion 传入的 span（手机竖屏会把纬度跨度
+            // 扩到 ~2 倍），扩展后落入 regionDidChangeAnimated 重算的 gridPrecision 往往
+            // 比用户输入的网格字符数低一级（如 6 字符被回退到 4 字符），导致绘制的网格
+            // 单元远大于用户意图。锁定精度让其忠于用户输入；用户可点 reset 箭头恢复跟随。
+            isPrecisionOverridden = true
             annotations = [MapLocationAnnotation(coordinate: center)]
             return
         }
@@ -392,9 +408,9 @@ struct EnhancedMapLocationPicker: View {
         }
         
         // 更新地图区域
-        region.center = coordinate
-        region.span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-        
+        updateRegion(center: coordinate,
+                     span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+
         // 添加标注
         annotations.removeAll()
         let annotation = MapLocationAnnotation(coordinate: coordinate)
@@ -424,31 +440,31 @@ struct EnhancedMapLocationPicker: View {
                     if self.editMode == .ownQTH {
                         // 己方QTH：预填坐标和位置信息
                         self.selectedLocation = coordinate
-                        self.region.center = coordinate
-                        self.region.span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-                        
+                        self.updateRegion(center: coordinate,
+                                          span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+
                         // 清除现有标注
                         self.annotations.removeAll()
-                        
+
                         // 添加新标注
                         let annotation = MapLocationAnnotation(coordinate: coordinate)
                         self.annotations.append(annotation)
-                        
+
                         // 反向地理编码获取位置名称
                         self.reverseGeocodeLocation(coordinate) { locationName in
                             DispatchQueue.main.async {
                                 self.tempLocationName = locationName
                             }
                         }
-                        
+
                         // 提供触觉反馈，让用户知道定位成功
                         let impactFeedback = UIImpactFeedbackGenerator(style: .light)
                         impactFeedback.impactOccurred()
                                          } else {
                          // 对方QTH：只切换地图位置，不预填
-                         self.region.center = coordinate
-                         self.region.span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-                         
+                         self.updateRegion(center: coordinate,
+                                           span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+
                          // 提供触觉反馈，让用户知道地图已切换到当前位置
                          let impactFeedback = UIImpactFeedbackGenerator(style: .light)
                          impactFeedback.impactOccurred()
@@ -483,16 +499,16 @@ struct EnhancedMapLocationPicker: View {
                     if self.editMode == .ownQTH {
                         // 己方QTH：预填坐标和位置信息
                         self.selectedLocation = coordinate
-                        self.region.center = coordinate
-                        self.region.span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-                        
+                        self.updateRegion(center: coordinate,
+                                          span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+
                         // 清除现有标注
                         self.annotations.removeAll()
-                        
+
                         // 添加新标注
                         let annotation = MapLocationAnnotation(coordinate: coordinate)
                         self.annotations.append(annotation)
-                        
+
                         // 反向地理编码获取位置名称
                         self.reverseGeocodeLocation(coordinate) { locationName in
                             DispatchQueue.main.async {
@@ -501,8 +517,8 @@ struct EnhancedMapLocationPicker: View {
                         }
                     } else {
                         // 对方QTH：只切换地图位置
-                        self.region.center = coordinate
-                        self.region.span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+                        self.updateRegion(center: coordinate,
+                                          span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
                     }
                 }
                 // 自动获取失败时不显示任何提示
@@ -688,12 +704,29 @@ struct EnhancedInteractiveMapView: UIViewRepresentable {
         init(_ parent: EnhancedInteractiveMapView) {
             self.parent = parent
         }
-        
+
+        /// 把 mapPrecision 拉齐到地图当前真正显示的 span 对应的精度。
+        /// 用户已手动锁定精度时不动。
+        fileprivate func syncPrecisionToCurrentSpan(_ mapView: MKMapView) {
+            guard !self.parent.isPrecisionOverridden else { return }
+            let p = QTHManager.gridPrecision(forSpan: mapView.region.span)
+            if p != self.parent.mapPrecision {
+                self.parent.mapPrecision = p
+            }
+        }
+
         @objc func mapTapped(_ gesture: UITapGestureRecognizer) {
             let mapView = gesture.view as! MKMapView
             let touchPoint = gesture.location(in: mapView)
             let coordinate = mapView.convert(touchPoint, toCoordinateFrom: mapView)
-            
+
+            // 写入 selectedLocation 前先按地图当前实际缩放刷新一次精度。
+            // 否则在初始动画期间 regionDidChangeAnimated 可能尚未把精度从更宽跨度
+            // (例如 MKMapView 默认世界视图回调过的 4 字符)收敛到当前显示对应的精度，
+            // 用户一点屏幕，cell 与精度选择器就锁定在那个过期值上，与肉眼可见的
+            // 比例尺不符。tap 这个用户操作正是同步当前缩放精度的最佳时机。
+            self.syncPrecisionToCurrentSpan(mapView)
+
             // 更新选中位置
             self.parent.selectedLocation = coordinate
             
@@ -838,7 +871,11 @@ struct EnhancedInteractiveMapView: UIViewRepresentable {
             if let annotation = view.annotation,
                let title = annotation.title as? String,
                !title.isEmpty && title != "SELECTED" {
-                
+
+                // 同 mapTapped：在 selectedLocation 落点前先把精度对齐到当前缩放，
+                // 避免 callout 选中时沿用初始/过期 mapPrecision 绘制。
+                self.syncPrecisionToCurrentSpan(mapView)
+
                 // 选择这个搜索结果
                 self.parent.selectedLocation = annotation.coordinate
                 
