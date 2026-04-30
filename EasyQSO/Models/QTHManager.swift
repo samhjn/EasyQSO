@@ -282,26 +282,34 @@ class QTHManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 
     /// 根据当前地图可视区域的纬度跨度，选择最贴合的网格精度。
     ///
-    /// 策略：当视窗纬度跨度大于"当前精度 cell 一半"时使用当前精度，否则下探到下一级。
-    /// 换言之：视窗能放下 ≥ 2 个当前精度单元时切换到该精度。与 `mapSpan(forPrecision:)`
-    /// （~4 个 cell）双向收敛。
+    /// 策略：当视窗纬度跨度大于一个 cell 时使用当前精度，否则下探到下一级。
+    /// 换言之：视窗能放下 ≥ 1 个当前精度单元时切换到该精度。
+    ///
+    /// 阈值设为整个 cell 高度（而非 cell/2），是为了兼容 MKMapView 在竖屏设备上对
+    /// 请求 span 的自动扩展——竖屏手机上 MKMapView 会把纬度跨度放大 2–3 倍以填满
+    /// 更高的视图。使用 cell/2 时，`mapSpan(forPrecision:)` 生成的跨度被 MKMapView
+    /// 扩展后容易落入上一级更粗的精度桶，导致用户手动选择精度后 reset 回自动时精度
+    /// 跳变（Bug #2），以及默认视窗在首次/再次打开时回退到 4 位精度（Bug #1）。
     static func gridPrecision(forSpan span: MKCoordinateSpan) -> Int {
         let lat = span.latitudeDelta
-        if lat > cellLatitudeSpan(for: 4)  / 2.0 { return 4 }   // > 0.5°
-        if lat > cellLatitudeSpan(for: 6)  / 2.0 { return 6 }   // > ~0.02°
-        if lat > cellLatitudeSpan(for: 8)  / 2.0 { return 8 }   // > ~0.002°
-        if lat > cellLatitudeSpan(for: 10) / 2.0 { return 10 }  // > ~0.00009°
+        if lat > cellLatitudeSpan(for: 4)  { return 4 }   // > 1°
+        if lat > cellLatitudeSpan(for: 6)  { return 6 }   // > ~0.042°
+        if lat > cellLatitudeSpan(for: 8)  { return 8 }   // > ~0.0042°
+        if lat > cellLatitudeSpan(for: 10) { return 10 }  // > ~0.00017°
         return 12
     }
 
-    /// 根据给定精度计算一个视觉舒适的地图跨度：视窗内约能展示 4x4 个该精度网格。
-    /// 用于"用户已有 grid → 反向定位并缩放"的场景。
+    /// 根据给定精度计算一个视觉舒适的地图跨度。
+    ///
+    /// 返回等比经纬度跨度（正方形请求区域），约展示 3 个 cell 的纬度高度。
+    /// 使用等比跨度而非 Maidenhead 原生的 2:1 比例，是因为 MKMapView 在竖屏设备上
+    /// 会把请求区域按视图长宽比扩展。原先的 2:1 比例 + 竖屏 ~2:1 长宽比 = 纬度被
+    /// 放大约 4 倍，容易越过 `gridPrecision(forSpan:)` 的精度边界。等比跨度最多只被
+    /// 放大 ~2 倍（竖屏高度/宽度），留出足够的安全余量。
     static func mapSpan(forPrecision precision: Int) -> MKCoordinateSpan {
         let cellLat = cellLatitudeSpan(for: precision)
-        let cellLon = cellLat * 2.0   // 经度跨度是纬度的 2 倍
-        // 视窗 ~4 个 cell
-        return MKCoordinateSpan(latitudeDelta: cellLat * 4.0,
-                                longitudeDelta: cellLon * 4.0)
+        let delta = cellLat * 3.0
+        return MKCoordinateSpan(latitudeDelta: delta, longitudeDelta: delta)
     }
 
     /// 包含给定坐标的网格单元边界（经纬度左下 / 右上）。

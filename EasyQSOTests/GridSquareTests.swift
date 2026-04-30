@@ -317,15 +317,14 @@ final class GridSquareTests: XCTestCase {
         XCTAssertEqual(QTHManager.gridPrecision(forSpan: MKCoordinateSpan(latitudeDelta: 0.00005, longitudeDelta: 0.0001)), 12)
     }
 
-    func testMapSpanForPrecision_showsAboutFourCells() {
-        // Span should be ~4 cells wide so the cell is clearly visible with context
+    func testMapSpanForPrecision_showsThreeCellsSquare() {
         for p in [4, 6, 8, 10, 12] {
             let span = QTHManager.mapSpan(forPrecision: p)
             let cell = QTHManager.cellLatitudeSpan(for: p)
-            XCTAssertEqual(span.latitudeDelta, cell * 4.0, accuracy: 1e-9,
-                           "span latitude for \(p) chars should be 4 cells")
-            XCTAssertEqual(span.longitudeDelta, cell * 8.0, accuracy: 1e-9,
-                           "span longitude for \(p) chars should be 8 cells (2x lat)")
+            XCTAssertEqual(span.latitudeDelta, cell * 3.0, accuracy: 1e-9,
+                           "span latitude for \(p) chars should be 3 cells")
+            XCTAssertEqual(span.longitudeDelta, cell * 3.0, accuracy: 1e-9,
+                           "span longitude for \(p) chars should equal lat (square)")
         }
     }
 
@@ -367,5 +366,34 @@ final class GridSquareTests: XCTestCase {
     func testGridPrecisionForSpan_locateMeSpanResolvesToEightChars() {
         let locateMeSpan = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
         XCTAssertEqual(QTHManager.gridPrecision(forSpan: locateMeSpan), 8)
+    }
+
+    /// Regression: mapSpan(forPrecision:) generates a span that MKMapView will
+    /// expand to fill its view. On a portrait phone (height ≈ 2× width) the
+    /// latitude delta roughly doubles. After that expansion,
+    /// gridPrecision(forSpan:) must still return the SAME precision — otherwise
+    /// the user sees the precision jump when resetting from manual override back
+    /// to auto (Bug #2), and the default viewport resolves to a coarser precision
+    /// than intended on every open (Bug #1).
+    func testGridPrecisionRoundTrip_survivesPortraitExpansion() {
+        for p in [4, 6, 8, 10, 12] {
+            let span = QTHManager.mapSpan(forPrecision: p)
+            let expandedSpan = MKCoordinateSpan(
+                latitudeDelta: span.latitudeDelta * 2.0,
+                longitudeDelta: span.longitudeDelta
+            )
+            XCTAssertEqual(QTHManager.gridPrecision(forSpan: expandedSpan), p,
+                           "Precision \(p) must survive 2× portrait lat expansion")
+        }
+    }
+
+    /// Default viewport span used when no grid is entered. After typical
+    /// MKMapView portrait expansion (~2×) it must still resolve to 6-char
+    /// precision, not fall back to 4-char.
+    func testGridPrecisionForSpan_defaultViewportStaysSixChars() {
+        let defaultSpan = MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
+        XCTAssertEqual(QTHManager.gridPrecision(forSpan: defaultSpan), 6)
+        let expanded = MKCoordinateSpan(latitudeDelta: 0.3, longitudeDelta: 0.1)
+        XCTAssertEqual(QTHManager.gridPrecision(forSpan: expanded), 6)
     }
 }
