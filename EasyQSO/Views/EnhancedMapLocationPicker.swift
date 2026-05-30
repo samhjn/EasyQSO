@@ -583,13 +583,16 @@ struct EnhancedInteractiveMapView: UIViewRepresentable {
         mapView.isPitchEnabled = true
         mapView.isRotateEnabled = true
 
-        // 添加点击手势；需要与双击手势协调，否则单击识别会吞掉双击缩放的第一次 tap
-        let doubleTap = UITapGestureRecognizer()
-        doubleTap.numberOfTapsRequired = 2
-        mapView.addGestureRecognizer(doubleTap)
-
+        // 添加单击选点手势，但不拦截 MKMapView 内建的双击/单指拖动缩放。
+        // 之前额外注册了一个空的 doubleTap 用来协调单击，会抢占系统双击缩放
+        // 以及“单指双击后上下滑动缩放”的连续手势，导致 QTH 地图无法用单指
+        // 滑动放大缩小。这里改为让选点手势与地图自身手势协同工作。
         let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.mapTapped(_:)))
-        tapGesture.require(toFail: doubleTap)
+        tapGesture.cancelsTouchesInView = false
+        tapGesture.delaysTouchesBegan = false
+        tapGesture.delaysTouchesEnded = false
+        tapGesture.delegate = context.coordinator
+        context.coordinator.selectionTapGesture = tapGesture
         mapView.addGestureRecognizer(tapGesture)
 
         return mapView
@@ -703,11 +706,45 @@ struct EnhancedInteractiveMapView: UIViewRepresentable {
         Coordinator(self)
     }
     
-    class Coordinator: NSObject, MKMapViewDelegate {
+    class Coordinator: NSObject, MKMapViewDelegate, UIGestureRecognizerDelegate {
         var parent: EnhancedInteractiveMapView
+        weak var selectionTapGesture: UITapGestureRecognizer?
         
         init(_ parent: EnhancedInteractiveMapView) {
             self.parent = parent
+        }
+
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+            // MKMapView 依赖内部手势识别器实现双击放大、单指双击后上下滑动缩放、拖动等交互。
+            // 单击选点只需要在 tap 结束后读取坐标，不应取消或独占地图自身手势。
+            gestureRecognizer === selectionTapGesture || otherGestureRecognizer === selectionTapGesture
+        }
+
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+            guard gestureRecognizer === selectionTapGesture else { return false }
+
+            // 对 MapKit 内置的多次点击手势让路，避免单击选点抢先识别第一下 tap，
+            // 保留系统的双击放大和单指连续缩放体验。
+            if let tapGesture = otherGestureRecognizer as? UITapGestureRecognizer {
+                return tapGesture.numberOfTapsRequired > 1
+            }
+
+            return false
+        }
+
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+            // 标注 callout、详情按钮等控件继续交给系统；其它地图区域仍可单击选点。
+            guard gestureRecognizer === selectionTapGesture else { return true }
+
+            var touchedView = touch.view
+            while let view = touchedView {
+                if view is UIControl || view is MKAnnotationView {
+                    return false
+                }
+                touchedView = view.superview
+            }
+
+            return true
         }
 
         /// 把 mapPrecision 拉齐到地图当前真正显示的 span 对应的精度。
