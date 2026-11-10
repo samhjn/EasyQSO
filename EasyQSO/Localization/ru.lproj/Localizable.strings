@@ -563,3 +563,10 @@
 "adif_import_confirm_title" = "Импорт файла ADIF";
 "adif_import_confirm_message" = "Хотите импортировать записи QSO из \"%@\"?";
 "import_action" = "Импортировать";
+
+// Band preferences
+"common_bands" = "Частые диапазоны";
+"other_bands" = "Другие диапазоны";
+"band_settings_desc" = "Выберите диапазоны для показа в меню передачи и приёма. Остальные доступны в подменю «Другие диапазоны».";
+"band_reset_defaults" = "Восстановить по умолчанию";
+"band_not_set" = "Не задано";

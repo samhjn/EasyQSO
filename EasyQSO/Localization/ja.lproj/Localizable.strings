@@ -563,3 +563,10 @@
 "adif_import_confirm_title" = "ADIFファイルのインポート";
 "adif_import_confirm_message" = "「%@」からQSOレコードをインポートしますか？";
 "import_action" = "インポート";
+
+// Band preferences
+"common_bands" = "よく使うバンド";
+"other_bands" = "その他のバンド";
+"band_settings_desc" = "選択したバンドを送信・受信バンドメニューに直接表示します。それ以外は「その他のバンド」から選択できます。";
+"band_reset_defaults" = "デフォルトに戻す";
+"band_not_set" = "未設定";
