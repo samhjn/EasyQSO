@@ -563,3 +563,10 @@
 "adif_import_confirm_title" = "导入ADIF文件";
 "adif_import_confirm_message" = "是否要从\"%@\"中导入QSO记录？";
 "import_action" = "导入";
+
+// Band preferences
+"common_bands" = "常用频段";
+"other_bands" = "其他频段";
+"band_settings_desc" = "勾选的频段直接显示在发射和接收频段菜单中，其余频段收进“其他频段”二级菜单。";
+"band_reset_defaults" = "恢复默认";
+"band_not_set" = "未设置";

@@ -95,7 +95,6 @@ struct EditQSOView: View {
         currentSnapshot != savedSnapshot
     }
     
-    let bands = ["160m", "80m", "40m", "30m", "20m", "17m", "15m", "12m", "10m", "6m", "2m", "70cm"]
     
     private var modePickerItems: [ModePickerItem] {
         modeManager.pickerItems(currentMode: mode, currentSubmode: submode)
@@ -369,9 +368,7 @@ struct EditQSOView: View {
                         .floatingLabel(LocalizedStrings.frequency.localized, text: frequency)
                 }
                 
-                Picker(LocalizedStrings.band.localized, selection: $band) {
-                    ForEach(bands, id: \.self) { Text($0) }
-                }
+                BandPickerView(title: LocalizedStrings.band.localized, selection: $band)
                 .onChange(of: band) { newBand in
                     if isBandChangedByFrequency {
                         isBandChangedByFrequency = false
@@ -664,10 +661,7 @@ struct EditQSOView: View {
                         .floatingLabel(LocalizedStrings.rxFrequency.localized, text: rxFrequency)
                 }
                 if showRxBandPicker {
-                    Picker("rx_band".localized, selection: $rxBand) {
-                        Text("").tag("")
-                        ForEach(bands, id: \.self) { Text($0) }
-                    }
+                    BandPickerView(title: "rx_band".localized, selection: $rxBand, allowsEmpty: true)
                     .onChange(of: rxBand) { newBand in
                         if isRxBandChangedByFrequency {
                             isRxBandChangedByFrequency = false

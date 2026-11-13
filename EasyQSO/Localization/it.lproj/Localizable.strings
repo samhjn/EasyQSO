@@ -563,3 +563,10 @@
 "adif_import_confirm_title" = "Importa file ADIF";
 "adif_import_confirm_message" = "Vuoi importare i record QSO da \"%@\"?";
 "import_action" = "Importa";
+
+// Band preferences
+"common_bands" = "Bande frequenti";
+"other_bands" = "Altre bande";
+"band_settings_desc" = "Scegli le bande da mostrare direttamente nei menu di trasmissione e ricezione. Le restanti sono disponibili in Altre bande.";
+"band_reset_defaults" = "Ripristina predefiniti";
+"band_not_set" = "Non impostata";

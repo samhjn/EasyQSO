@@ -69,7 +69,6 @@ struct QSORecordView: View {
     @State private var rxBand = ""
     @State private var isRxBandChangedByFrequency = false
     
-    let bands = ["160m", "80m", "40m", "30m", "20m", "17m", "15m", "12m", "10m", "6m", "2m", "70cm"]
     
     private var modePickerItems: [ModePickerItem] {
         modeManager.pickerItems(currentMode: mode, currentSubmode: submode)
@@ -275,11 +274,11 @@ struct QSORecordView: View {
                             .autoFillLabel(LocalizedStrings.frequency.localized, text: frequency, isAutoFilled: autoFillEngine.isAutoFilled("FREQ"))
                     }
                     
-                    Picker(selection: $band) {
-                        ForEach(bands, id: \.self) { Text($0) }
-                    } label: {
-                        AutoFillPickerLabel(title: LocalizedStrings.band.localized, isAutoFilled: autoFillEngine.isAutoFilled("BAND"))
-                    }
+                    BandPickerView(
+                        title: LocalizedStrings.band.localized,
+                        selection: $band,
+                        isAutoFilled: autoFillEngine.isAutoFilled("BAND")
+                    )
                     .onChange(of: band) { newBand in
                         autoFillEngine.trackFieldChange("BAND", newValue: newBand)
                         if isBandChangedByFrequency {
@@ -628,10 +627,7 @@ struct QSORecordView: View {
                         .floatingLabel(LocalizedStrings.rxFrequency.localized, text: rxFrequency)
                 }
                 if showRxBandPicker {
-                    Picker("rx_band".localized, selection: $rxBand) {
-                        Text("").tag("")
-                        ForEach(bands, id: \.self) { Text($0) }
-                    }
+                    BandPickerView(title: "rx_band".localized, selection: $rxBand, allowsEmpty: true)
                     .onChange(of: rxBand) { newBand in
                         if isRxBandChangedByFrequency {
                             isRxBandChangedByFrequency = false

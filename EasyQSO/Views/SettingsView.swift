@@ -49,6 +49,7 @@ struct SettingsView: View {
     @State private var showingFieldSettings = false
     @State private var navigateToDXCCData = false
     @ObservedObject private var visibilityManager = FieldVisibilityManager.shared
+    @ObservedObject private var bandManager = BandManager.shared
     @ObservedObject private var modeManager = ModeManager.shared
     @ObservedObject private var satelliteManager = SatelliteManager.shared
     @ObservedObject private var contestManager = ContestManager.shared
@@ -208,6 +209,17 @@ struct SettingsView: View {
                 
                 // ===== 列表管理 =====
                 Section(header: Text("list_management".localized)) {
+                    NavigationLink(destination: BandSettingsView()) {
+                        HStack {
+                            Image(systemName: "star")
+                            Text("common_bands".localized)
+                            Spacer()
+                            Text("\(bandManager.commonBands.count)/\(BandManager.allBands.count)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+
                     NavigationLink(destination: ModeSettingsView()) {
                         HStack {
                             Image(systemName: "antenna.radiowaves.left.and.right")
